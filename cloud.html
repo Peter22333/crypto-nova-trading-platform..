@@ -1483,34 +1483,230 @@
     </div>
   </div>
 
-  <script>
-    const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxa3VibGV0Z2lmcWR1dHliem56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NjA5OTMsImV4cCI6MjA4ODQzNjk5M30.TkweXseKRQuA7FoT7erYdUJMuGtYWYSZ7b7l9WCPq-8';
-    const sb = {
-      _h() { return { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (sb._tok() || SUPA_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' }; },
-      _tok() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.access_token; } catch { return null; } },
-      _uid() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.user?.id; } catch { return null; } },
-      isLoggedIn() { return !!sb._tok(); },
-      requireAuth() { if (!sb.isLoggedIn()) { window.location.href = 'login.html'; return false; } return true; },
-      async get(table, filters = '') { const r = await fetch(SUPA_URL + '/rest/v1/' + table + (filters ? '?' + filters : ''), { headers: sb._h() }); return r.json(); },
-      async insert(table, body) { const r = await fetch(SUPA_URL + '/rest/v1/' + table, { method: 'POST', headers: sb._h(), body: JSON.stringify(body) }); return r.json(); },
-      async update(table, body, filters) { const r = await fetch(SUPA_URL + '/rest/v1/' + table + '?' + filters, { method: 'PATCH', headers: sb._h(), body: JSON.stringify(body) }); return r.json(); },
-      async getProfile() { const uid = sb._uid(); if (!uid) return null; const r = await sb.get('profiles', 'id=eq.' + uid + '&select=*'); return Array.isArray(r) ? r[0] : null; },
-      async updateBalance(newBal) { const uid = sb._uid(); if (!uid) return; return sb.update('profiles', { balance: newBal }, 'id=eq.' + uid); }
-    };
-    if (!sb.isLoggedIn()) { window.location.href = 'login.html'; }
+<script type="module">
+     // ===============================================================================================
+  // FIREBASE CLIENT & AUTH GUARD (Cloud.html)
+  // This replaces the Supabase client, sb object, and initial auth check.
+  // ===============================================================================================
 
-    async function saveMiningToDB(c) {
-      const uid = sb._uid(); if (!uid) return;
-      await sb.insert('mining_contracts', {
-        id: c.id, user_id: uid, type: c.type, name: c.name,
-        price: c.price, hashrate: c.hashrate, daily_roi: c.dailyRoi, duration: c.duration,
-        earned: 0, status: 'active', start_date: c.startDate, end_date: c.endDate,
-        start_ts: c.startTs, end_ts: c.endTs
-      });
-      await sb.insert('transactions', { user_id: uid, type: 'mining', asset: c.name, amount: '-$' + c.price.toFixed(2), status: 'active', ref: c.id });
-      await sb.updateBalance(STATE.balance);
+  // Firebase SDK Imports
+  // These lines bring in the necessary functions from the Firebase libraries.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    updateDoc,
+    collection,
+    query,
+    where,
+    getDocs, // For one-time fetches (e.g., initial load of contracts)
+    addDoc,
+    runTransaction, // For atomic balance updates when purchasing
+    serverTimestamp // For consistent date/time stamps in Firestore
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+  // Your Firebase Configuration (This must be identical across all your Firebase-enabled pages)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBwdhzot1c6-3HMrAmYjVrpWtgRpFiysdk",
+    authDomain: "crypto-dashboard-12911.firebaseapp.com",
+    projectId: "crypto-dashboard-12911",
+    storageBucket: "crypto-dashboard-12911.firebasestorage.app",
+    messagingSenderId: "426133649845",
+    appId: "1:426133649845:web:6edc16f7031a1c934a41fc",
+    measurementId: "G-3744FSNNKK"
+  };
+
+  // Initialize Firebase App, Auth, and Firestore services
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentUser = null; // Stores the Firebase authenticated user object
+  let userProfile = null; // Stores the user's profile document from Firestore
+
+  // ===============================================================================================
+  // FIREBASE HELPER FUNCTIONS (replaces sb. functions like updateBalance, getProfile, etc.)
+  // These functions encapsulate common Firestore operations for user data.
+  // ===============================================================================================
+
+  // Replaces your `sb.updateBalance` logic
+  async function updateBalanceInFirestore(newBalance) {
+    if (!currentUser) {
+      console.error("No authenticated user to update balance for.");
+      return;
     }
+    const userDocRef = doc(db, "users", currentUser.uid);
+    try {
+      await updateDoc(userDocRef, {
+        currentBalance: newBalance,
+        lastUpdated: serverTimestamp() // Optional: track when balance was last updated
+      });
+      console.log("User balance updated in Firestore successfully.");
+      // Update local profile and STATE to reflect change immediately
+      if (userProfile) userProfile.currentBalance = newBalance;
+      if (STATE) STATE.balance = newBalance;
+    } catch (error) {
+      console.error("Error updating user balance in Firestore:", error);
+      showToast("Failed to update balance in database.", "error");
+    }
+  }
+
+  // Helper to update a mining contract document in Firestore
+  async function updateMiningContractInFirestore(contractId, dataToUpdate) {
+    if (!currentUser) return;
+    try {
+      const mineDocRef = doc(db, "mining_contracts", contractId); // Assumes contractId is the Firestore document ID
+      await updateDoc(mineDocRef, dataToUpdate);
+      // console.log(`Mining contract ${contractId} updated in Firestore.`);
+    } catch (error) {
+      console.error(`Error updating mining contract ${contractId} in Firestore:`, error);
+      showToast("Failed to update mining contract in database.", "error");
+    }
+  }
+
+  // Firebase Logout Function (replaces sb.logout() logic)
+  async function firebaseLogout() {
+    try {
+      await signOut(auth);
+      console.log("User signed out from Firebase.");
+    } catch (error) {
+      console.error("Error signing out from Firebase:", error);
+    } finally {
+      // Clear any local storage items that might be related to previous sessions
+      localStorage.removeItem('at_state');
+      // Clear any old Supabase-specific items just in case
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith('sb-') || k.startsWith('supabase')) localStorage.removeItem(k);
+      });
+      // Redirect to the login page after logout
+      window.location.href = 'login.html';
+    }
+  }
+
+  // Helper to load mining contracts from Firestore (used during initial load)
+  async function loadMiningContractsFromFirestore() {
+      if (!currentUser) return;
+      try {
+          const q = query(collection(db, "mining_contracts"), where("userId", "==", currentUser.uid), orderBy("timestamp", "desc"));
+          const querySnapshot = await getDocs(q);
+          STATE.miningContracts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          // console.log("Loaded mining contracts:", STATE.miningContracts);
+      } catch (error) {
+          console.error("Error loading mining contracts from Firestore:", error);
+          showToast("Failed to load mining contracts.", "error");
+      }
+  }
+
+  // ===============================================================================================
+  // FIREBASE AUTHENTICATION STATE LISTENER (replaces sb.isLoggedIn() and initial data loading)
+  // This listener handles checking if a user is logged in, fetching their profile,
+  // and then initializing the page UI.
+  // ===============================================================================================
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user; // Set the global currentUser object
+      // Fetch user's profile from Firestore
+      const userDocRef = doc(db, "users", currentUser.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        userProfile = userDocSnap.data(); // Store the user's profile data
+        // Populate local STATE object with data from fetched profile
+        STATE.balance = userProfile.currentBalance || 0; // Set initial balance from Firestore
+        
+        // Fetch all of the user's mining contracts from Firestore
+        await loadMiningContractsFromFirestore(); 
+
+        // Initial UI updates that depend on loaded user data
+        updateMiningCalc(); // Update calculator with initial values
+        loadFromDB(); // This now resumes active tickers based on loaded STATE.miningContracts
+
+      } else {
+        console.error("User profile not found in Firestore for UID:", currentUser.uid);
+        showToast("Your user profile is incomplete. Please contact support.", "error");
+        await firebaseLogout(); // Force logout if profile is missing
+      }
+    } else {
+      // No user is logged in, redirect to login page
+      window.location.href = 'login.html';
+    }
+  });
+
+  // ===============================================================================================
+  // SHARED STATE MANAGEMENT (client-side)
+  // Your local STATE object for temporary client-side UI persistence.
+  // ===============================================================================================
+  var STATE = {};
+  try { STATE = JSON.parse(localStorage.getItem('at_state')) || {}; } catch (e) { }
+  if (!STATE.balance) STATE.balance = 0;
+  if (!STATE.transactions) STATE.transactions = []; // Ensure this is initialized
+  if (!STATE.miningContracts) STATE.miningContracts = [];
+  if (!STATE.investments) STATE.investments = []; // Ensure this is initialized
+
+  function saveState() {
+    try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { }
+    // The explicit call to updateBalanceInFirestore is now handled by executeMining
+    // or startMiningTicker (if it updates balance), so no need for it here unless
+    // STATE.balance is updated by other means on this page.
+  }
+
+
+     // ===============================================================================================
+  // Function: saveMiningToDB (Firebase Firestore Version)
+  // Replaces Supabase inserts and balance update for new mining contract.
+  // ===============================================================================================
+  async function saveMiningToDB(c) {
+    if (!currentUser) {
+      console.error('No current user found. Cannot save mining contract.');
+      showToast('Session expired. Please log in again.', 'error');
+      await firebaseLogout();
+      return;
+    }
+    const uid = currentUser.uid;
+
+    try {
+      // 1. Add mining contract to 'mining_contracts' collection
+      await addDoc(collection(db, "mining_contracts"), {
+        userId: uid, // Use Firebase Auth UID
+        type: c.type,
+        name: c.name,
+        price: c.price,
+        hashrate: c.hashrate,
+        dailyRoi: c.dailyRoi,
+        duration: c.duration,
+        earned: 0,
+        status: 'active',
+        startDate: c.startDate,
+        endDate: c.endDate,
+        startTs: c.startTs,
+        endTs: c.endTs,
+        timestamp: serverTimestamp() // Record creation time
+      });
+
+      // 2. Add transaction record for mining contract purchase
+      await addDoc(collection(db, "transactions"), {
+        userId: uid,
+        type: 'mining',
+        asset: c.name,
+        amount: '-$' + c.price.toFixed(2), // Negative amount for purchase
+        status: 'completed', // Purchase is immediately completed
+        ref: c.id, // Reference to the contract ID
+        timestamp: serverTimestamp()
+      });
+
+      // Note: Updating the user's balance in Firestore is handled by executeMining,
+      // which calls updateBalanceInFirestore before calling this saveMiningToDB.
+
+      // console.log("Mining contract and transaction saved to Firestore.");
+
+    } catch (error) {
+      console.error("Error saving mining contract to Firestore:", error);
+      showToast(`Failed to save mining contract: ${error.message}`, "error");
+    }
+  }
 
     /* ── NAV SCROLL ── */
     window.addEventListener('scroll', function () {
@@ -1621,37 +1817,34 @@
 
     function saveState() {
       try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { }
-      sb.updateBalance(STATE.balance).catch(function () { });
+      // sb.updateBalance(STATE.balance).catch(function () { }); // REMOVE THIS LINE
+      // The balance update to Firestore is handled explicitly in executeMining and startMiningTicker
     }
 
-    /* Load fresh balance + contracts from Supabase on page load */
+
+   
+    /* Load fresh balance + contracts from Firestore on page load */
+    // This function is now simplified as the onAuthStateChanged listener already
+    // loads the initial balance and calls loadMiningContractsFromFirestore.
+    // Its primary remaining purpose is to resume the tickers.
     async function loadFromDB() {
       try {
-        var profile = await sb.getProfile();
-        if (!profile) return;
-        STATE.balance = parseFloat(profile.balance) || 0;
-        var uid = sb._uid();
-        var mines = await sb.get('mining_contracts', 'user_id=eq.' + uid + '&order=created_at.desc');
-        if (Array.isArray(mines) && mines.length) {
-          STATE.miningContracts = mines.map(function (m) {
-            return {
-              id: m.id, type: m.type, name: m.name,
-              price: parseFloat(m.price), hashrate: m.hashrate,
-              dailyRoi: parseFloat(m.daily_roi), duration: m.duration,
-              startDate: m.start_date, endDate: m.end_date,
-              startTs: m.start_ts, endTs: m.end_ts,
-              earned: parseFloat(m.earned) || 0, status: m.status
-            };
-          });
-        }
-        try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { }
+        // STATE.balance is already loaded by onAuthStateChanged
+        // STATE.miningContracts is already loaded by loadMiningContractsFromFirestore
+        // (which is called by onAuthStateChanged)
+
+        try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { } // Ensure local storage is updated
+
         /* Resume active contracts */
         STATE.miningContracts.forEach(function (c) {
           if (c.status === 'active' && Date.now() < c.endTs) startMiningTicker(c);
         });
       } catch (e) { console.warn('DB load error:', e); }
     }
-    loadFromDB();
+    // loadFromDB() is now called from the onAuthStateChanged listener
+    // Remove the `loadFromDB()` call from the global scope at the end of this block
+    // as it's now called conditionally.
+
 
     /* ── CONTRACT DEFINITIONS ── */
     var CONTRACTS = {
@@ -1704,11 +1897,21 @@
       document.getElementById('mine-overlay').style.display = 'flex';
     }
 
-    function executeMining(key) {
+        // ===============================================================================================
+    // Function: executeMining (Firebase Firestore Version)
+    // Replaces Supabase logic for purchasing a mining contract.
+    // ===============================================================================================
+    async function executeMining(key) { // Make it async
       var c = CONTRACTS[key];
       var errEl = document.getElementById('mine-err');
       var btn = document.getElementById('mine-btn');
       errEl.style.display = 'none';
+
+      if (!currentUser) {
+        errEl.style.display = 'block';
+        errEl.textContent = 'You must be logged in to purchase a contract.';
+        return;
+      }
 
       if (STATE.balance <= 0) {
         errEl.style.display = 'block';
@@ -1724,40 +1927,59 @@
       btn.disabled = true;
       btn.textContent = 'Starting…';
 
-      setTimeout(function () {
-        STATE.balance -= c.price;
-        var now = new Date(), end = new Date(now.getTime() + c.duration * 86400000);
+      // Introduce a small delay for UI feedback (from your original code)
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      try {
+        // 1. Deduct price from user's balance in Firestore
+        const newBalance = STATE.balance - c.price;
+        if (newBalance < 0) { // Safety check, though already checked above
+          errEl.textContent = 'Balance check failed during processing.';
+          errEl.style.display = 'block';
+          return;
+        }
+
+        // Use a transaction for atomic balance update and contract creation
+        // Note: For simplicity, `saveMiningToDB` was updated separately.
+        // For a single atomic operation, you could move the `addDoc` for mining_contracts
+        // directly into this transaction. For now, we'll call the helper.
+
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const updatedBalance = await runTransaction(db, async (transaction) => {
+          const userDoc = await transaction.get(userDocRef);
+          if (!userDoc.exists()) throw "User document does not exist!";
+          const currentBalance = parseFloat(userDoc.data().currentBalance) || 0;
+          if (currentBalance < c.price) throw "Insufficient balance for purchase.";
+
+          const finalBalance = currentBalance - c.price;
+          transaction.update(userDocRef, {
+            currentBalance: finalBalance,
+            lastUpdated: serverTimestamp()
+          });
+          return finalBalance;
+        });
+
+        STATE.balance = updatedBalance; // Update local state balance
+
+        // 2. Prepare contract data
+        var now = serverTimestamp(); // Use Firestore's serverTimestamp
+        var now_client = new Date(); // Client-side date for display strings
+        var end_client = new Date(now_client.getTime() + c.duration * 86400000);
         var contract = {
-          id: 'MNE' + Date.now(),
+          id: 'MNE' + Date.now(), // Client-generated ID for local use
+          userId: currentUser.uid,
           type: key,
           name: c.name,
           price: c.price,
           hashrate: c.hashrate,
           dailyRoi: c.dailyRoi,
           duration: c.duration,
-          startDate: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          endDate: end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          startTs: now.getTime(),
-          endTs: end.getTime(),
+          startDate: now_client.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          endDate: end_client.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          startTs: now_client.getTime(), // Store client timestamp
+          endTs: end_client.getTime(),   // Store client timestamp
           earned: 0,
-          status: 'active'
-        };
-        STATE.miningContracts.push(contract);
-        saveMiningToDB(contract).catch(() => { });
-        STATE.transactions.unshift({ id: contract.id, type: 'mining', asset: c.name, amount: '-$' + c.price.toFixed(2), date: contract.startDate, hash: contract.id, status: 'active' });
-        saveState();
-        document.getElementById('mine-overlay').style.display = 'none';
-
-        var f = function (n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
-        document.getElementById('mine-s-title').textContent = c.name + ' Active! ⛏️';
-        document.getElementById('mine-s-summary').innerHTML =
-          mRow('Contract', c.name) + mRow('Cost Deducted', f(c.price)) +
-          mRow('Hashrate', c.hashrate) + mRow('Daily Earning', '+' + f(c.price * c.dailyRoi) + ' / day', '#16a34a') +
-          mRow('Duration', c.duration + ' days') + mRow('Contract Ends', contract.endDate);
-        document.getElementById('mine-success-overlay').style.display = 'flex';
-        startMiningTicker(contract);
-      }, 800);
-    }
+          status: 'No response
 
     function mRow(k, v, color) {
       return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #e2e8f0;font-size:13px">' +
@@ -1766,27 +1988,92 @@
         '</div>';
     }
 
+    // ===============================================================================================
+    // Function: startMiningTicker (Firebase Firestore Version)
+    // Replaces Supabase logic for periodic balance and contract updates.
+    // ===============================================================================================
     function startMiningTicker(contract) {
-      var tickAmt = (contract.price * contract.dailyRoi) / 2880;
-      var tid = setInterval(function () {
+      // Ensure currentUser exists before starting a ticker that updates data
+      if (!currentUser) return; 
+
+      var tickAmt = (contract.price * contract.dailyRoi) / 2880; // Assuming 2880 intervals per day
+      var tid = setInterval(async function () { // Make the callback async
+        // Re-load STATE from local storage to ensure consistency if multiple tabs/windows
+        // are modifying it, or if it was recently updated from elsewhere.
         try { STATE = JSON.parse(localStorage.getItem('at_state') || '{}'); } catch (e) { }
+
         if (!STATE.miningContracts) { clearInterval(tid); return; }
         var idx = STATE.miningContracts.findIndex(function (c) { return c.id === contract.id; });
-        if (idx === -1 || STATE.miningContracts[idx].status !== 'active') { clearInterval(tid); return; }
-        if (Date.now() >= STATE.miningContracts[idx].endTs) {
-          STATE.miningContracts[idx].status = 'completed';
-          saveState(); // syncs balance to Supabase
-          sb.update('mining_contracts', { status: 'completed' }, 'id=eq.' + contract.id).catch(function () { });
-          clearInterval(tid); return;
+
+        if (idx === -1 || STATE.miningContracts[idx].status !== 'active') {
+          clearInterval(tid); // Stop ticker if contract is not found or no longer active
+          return;
         }
+
+        const currentContract = STATE.miningContracts[idx];
+
+        if (Date.now() >= currentContract.endTs) {
+          currentContract.status = 'completed';
+          // Persist status change to Firestore
+          await updateMiningContractInFirestore(currentContract.id, {
+            status: 'completed',
+            earned: currentContract.earned, // Ensure final earned value is saved
+            completedAt: serverTimestamp()
+          });
+          saveState(); // Update local storage
+          clearInterval(tid);
+          // Optional: You might want to refresh part of the UI here
+          return;
+        }
+
+        // --- Perform local updates ---
+        currentContract.earned = (currentContract.earned || 0) + tickAmt;
         STATE.balance += tickAmt;
-        STATE.miningContracts[idx].earned = (STATE.miningContracts[idx].earned || 0) + tickAmt;
-        saveState(); // syncs balance to Supabase every 30s tick
-        if (Math.random() < 0.1) {
-          sb.update('mining_contracts', { earned: STATE.miningContracts[idx].earned }, 'id=eq.' + contract.id).catch(function () { });
+
+        // --- Persist changes to Firestore (Atomic operations are highly recommended for financial updates) ---
+        try {
+          // Use a transaction for atomic update of user balance and contract earnings
+          await runTransaction(db, async (transaction) => {
+            const userDocRef = doc(db, "users", currentUser.uid);
+            const contractDocRef = doc(db, "mining_contracts", currentContract.id); // Firestore document ID
+
+            // Get current user balance and contract earnings
+            const userDoc = await transaction.get(userDocRef);
+            if (!userDoc.exists()) throw new Error("User document not found during transaction!");
+            const currentBalance = parseFloat(userDoc.data().currentBalance) || 0;
+            
+            const contractDoc = await transaction.get(contractDocRef);
+            if (!contractDoc.exists()) throw new Error("Mining contract document not found during transaction!");
+            const currentEarned = parseFloat(contractDoc.data().earned) || 0;
+
+            // Update user balance
+            transaction.update(userDocRef, {
+              currentBalance: currentBalance + tickAmt,
+              lastUpdated: serverTimestamp()
+            });
+
+            // Update contract earned amount
+            transaction.update(contractDocRef, {
+              earned: currentEarned + tickAmt,
+              lastUpdated: serverTimestamp()
+            });
+          });
+          // If transaction successful, update local state
+          saveState(); // Syncs STATE (including miningContracts[idx].earned and STATE.balance) to localStorage
+          
+          // You might need to refresh parts of the UI that display the balance or contract earnings
+          // document.getElementById('bal-display').textContent = '$' + STATE.balance.toLocaleString(...);
+          // document.getElementById('ov-balance').textContent = '$' + STATE.balance.toLocaleString(...);
+          // Instead of piecemeal updates, refreshAllUI() (if available on this page) or a specific component update is better.
+
+        } catch (error) {
+          console.error(`Transaction failed for mining contract ${currentContract.id}:`, error);
+          showToast("Error updating earnings in database. Check console.", "error");
+          clearInterval(tid); // Stop ticker on error to prevent further issues
         }
-      }, 30000);
+      }, 30000); // Every 30 seconds
     }
+
 
     /* Resume handled by loadFromDB() above */
   </script>
