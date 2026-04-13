@@ -716,51 +716,258 @@
     </div>
   </div>
 
-  <script>
-    const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxa3VibGV0Z2lmcWR1dHliem56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NjA5OTMsImV4cCI6MjA4ODQzNjk5M30.TkweXseKRQuA7FoT7erYdUJMuGtYWYSZ7b7l9WCPq-8';
+ <script type="module">
+  // Firebase SDK Imports
+  // These imports fetch the necessary Firebase modules from Google's CDN.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { 
+    getAuth, 
+    createUserWithEmailAndPassword, 
+    updateProfile, 
+    onAuthStateChanged,
+    GoogleAuthProvider, 
+    signInWithPopup
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    serverTimestamp // For consistent server-side timestamps
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    function togglePw(id, iconId) { const pw = document.getElementById(id), icon = document.getElementById(iconId); if (pw.type === 'password') { pw.type = 'text'; icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'; } else { pw.type = 'password'; icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'; } }
-    function checkStrength(val) { const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3')], label = document.getElementById('strength-label'); bars.forEach(b => { b.className = 'strength-bar'; }); if (!val) { label.textContent = ''; return; } let score = 0; if (val.length >= 8) score++; if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++; if (/[^A-Za-z0-9]/.test(val)) score++; const cls = ['weak', 'fair', 'good'][score - 1] || 'weak'; const txt = ['Weak password', 'Fair password', 'Strong password'][score - 1] || ''; for (let i = 0; i < score; i++)bars[i].classList.add(cls); label.textContent = txt; label.style.color = score === 1 ? '#ef4444' : score === 2 ? '#f59e0b' : '#22c55e'; }
-    function selectCurrency(el) { document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
-    function toggleCheck(row) { const cb = row.querySelector('input'), box = row.querySelector('.c-box'); cb.checked = !cb.checked; box.classList.toggle('on', cb.checked); }
 
-    async function handleCreate(e) {
-      e.preventDefault();
-      const err = document.getElementById('err-box'), btn = document.getElementById('create-btn');
-      err.style.display = 'none';
-      const fname = document.getElementById('fname').value.trim();
-      const lname = document.getElementById('lname').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const pw = document.getElementById('password').value;
-      const cpw = document.getElementById('confirm').value;
-      const terms = document.getElementById('chk-terms').checked;
-      if (!terms) { err.style.display = 'block'; err.textContent = 'You must agree to the Terms of Service to continue.'; return; }
-      if (pw !== cpw) { err.style.display = 'block'; err.textContent = 'Passwords do not match.'; return; }
-      if (pw.length < 8) { err.style.display = 'block'; err.textContent = 'Password must be at least 8 characters.'; return; }
-      btn.disabled = true; btn.textContent = 'Creating account…';
-      try {
-        const res = await fetch(SUPA_URL + '/auth/v1/signup', {
-          method: 'POST', headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password: pw, data: { full_name: fname + ' ' + lname, first_name: fname, last_name: lname } })
-        });
-        const data = await res.json();
-        if (data.access_token) {
-          localStorage.setItem('sb_session', JSON.stringify(data));
-          window.location.href = 'userdashboard.html';
-        } else if (data.id) {
-          // Email confirmation required
-          err.style.display = 'block'; err.style.background = '#f0fdf4'; err.style.borderColor = '#86efac'; err.style.color = '#166534';
-          err.textContent = '✓ Account created! Check your email to confirm, then log in.';
-          btn.disabled = false; btn.textContent = 'Create Trading Account';
-        } else {
-          err.style.display = 'block';
-          err.textContent = data.error_description || data.msg || data.message || 'Signup failed. Try a different email.';
-          btn.disabled = false; btn.textContent = 'Create Trading Account';
-        }
-      } catch (ex) { err.style.display = 'block'; err.textContent = 'Network error. Please try again.'; btn.disabled = false; btn.textContent = 'Create Trading Account'; }
+  // Your Firebase Configuration (This should be identical across your Firebase-enabled pages)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBwdhzot1c6-3HMrAmYjVrpWtgRpFiysdk",
+    authDomain: "crypto-dashboard-12911.firebaseapp.com",
+    projectId: "crypto-dashboard-12911",
+    storageBucket: "crypto-dashboard-12911.firebasestorage.app",
+    messagingSenderId: "426133649845",
+    appId: "1:426133649845:web:6edc16f7031a1c934a41fc",
+    measurementId: "G-3744FSNNKK"
+  };
+
+  // Initialize Firebase App, Auth, and Firestore services
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app); // Get the Authentication service instance
+  const db = getFirestore(app); // Get the Firestore service instance
+
+
+  // Firebase Authentication State Listener
+  // This checks if a user is already authenticated. If so, they are redirected
+  // to the dashboard, preventing them from seeing the signup page again.
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      window.location.href = 'userdashboard.html';
     }
-  </script>
+  });
+
+
+  // --- Existing UI-related functions (no changes needed for backend logic) ---
+
+  function togglePw(id, iconId) {
+    const pw = document.getElementById(id);
+    const icon = document.getElementById(iconId);
+    if (pw.type === 'password') {
+      pw.type = 'text';
+      icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    } else {
+      pw.type = 'password';
+      icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    }
+  }
+
+  function checkStrength(val) {
+    const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3')],
+      label = document.getElementById('strength-label');
+    bars.forEach(b => {
+      b.className = 'strength-bar';
+    });
+    if (!val) {
+      label.textContent = '';
+      return;
+    }
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const cls = ['weak', 'fair', 'good'][score - 1] || 'weak';
+    const txt = ['Weak password', 'Fair password', 'Strong password'][score - 1] || '';
+    for (let i = 0; i < score; i++) bars[i].classList.add(cls);
+    label.textContent = txt;
+    label.style.color = score === 1 ? '#ef4444' : score === 2 ? '#f59e0b' : '#22c55e';
+  }
+
+  function selectCurrency(el) {
+    document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function toggleCheck(row) {
+    const cb = row.querySelector('input');
+    const box = row.querySelector('.c-box');
+    cb.checked = !cb.checked;
+    box.classList.toggle('on', cb.checked);
+  }
+
+
+  // --- Firebase Signup Function (replaces Supabase auth sign-up) ---
+
+  async function handleCreate(e) {
+    e.preventDefault(); // Prevent default form submission
+
+    const err = document.getElementById('err-box'); // Error message display div
+    const btn = document.getElementById('create-btn'); // Signup button
+
+    err.style.display = 'none'; // Hide any previous error messages
+
+    const fname = document.getElementById('fname').value.trim();
+    const lname = document.getElementById('lname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const pw = document.getElementById('password').value;
+    const cpw = document.getElementById('confirm').value;
+    const terms = document.getElementById('chk-terms').checked; // Assuming checkbox for terms
+
+    // Frontend validation checks (unchanged from your original logic)
+    if (!terms) {
+      err.style.display = 'block';
+      err.textContent = 'You must agree to the Terms of Service to continue.';
+      return;
+    }
+    if (pw !== cpw) {
+      err.style.display = 'block';
+      err.textContent = 'Passwords do not match.';
+      return;
+    }
+    if (pw.length < 6) { // Firebase default minimum password length is 6
+      err.style.display = 'block';
+      err.textContent = 'Password must be at least 6 characters.';
+      return;
+    }
+
+    btn.disabled = true; // Disable button to prevent multiple submissions
+    btn.textContent = 'Creating account…'; // Update button text for feedback
+
+    try {
+      // 1. Create user with email and password in Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pw);
+      const user = userCredential.user;
+
+      // 2. Update user profile with first and last name as display name
+      const fullName = `${fname} ${lname}`.trim();
+      if (fullName) {
+        await updateProfile(user, {
+          displayName: fullName
+        });
+      }
+
+      // 3. Store initial user data in Cloud Firestore (as discussed in data structure)
+      // This creates a document in the 'users' collection with the user's UID as the document ID.
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        displayName: user.displayName || fullName, // Use updated displayName or fallback to generated fullName
+        currentBalance: 0, // Initialize user's balance
+        totalInvested: 0, // Initialize total invested
+        isAdmin: false, // Default user is not an admin
+        createdAt: serverTimestamp(), // Use server timestamp for consistency
+        lastLogin: serverTimestamp() // Set initial login time
+      });
+
+      // Firebase does not automatically require email confirmation by default.
+      // If you want email verification, you would add:
+      // await sendEmailVerification(user);
+      // Then adjust the success message and redirection accordingly.
+      
+      // If successful, redirect to the user dashboard
+      window.location.href = 'userdashboard.html';
+
+    } catch (error) {
+      console.error("Firebase Auth Error:", error.code, error.message);
+      err.style.display = 'block'; // Show the error box
+      
+      // Provide user-friendly error messages based on Firebase error codes
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          err.textContent = 'This email address is already in use by another account.';
+          break;
+        case 'auth/invalid-email':
+          err.textContent = 'Please enter a valid email address.';
+          break;
+        case 'auth/weak-password':
+          err.textContent = 'Password is too weak. It must be at least 6 characters long.';
+          break;
+        case 'auth/operation-not-allowed':
+          err.textContent = 'Email/Password sign-up is not enabled. Please check Firebase console.';
+          break;
+        default:
+          err.textContent = `Account creation failed: ${error.message || 'Please try again.'}`;
+      }
+      btn.disabled = false; // Re-enable button
+      btn.textContent = 'Create Trading Account'; // Reset button text
+    }
+  }
+
+
+  // --- Optional: Social Sign-up Functions (for Google/Apple buttons) ---
+  // You need to enable the corresponding providers in your Firebase Console
+  // (Authentication -> Sign-in method tab) for these to function.
+
+  async function signInWithGoogle() {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // After Google sign-up/sign-in, check if user data exists in Firestore,
+      // and create it if not (for new users signing up via social)
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef); // Need to import getDoc from firestore.js
+
+      if (!userDocSnap.exists()) {
+        await setDoc(userDocRef, {
+          email: user.email,
+          displayName: user.displayName,
+          currentBalance: 0,
+          totalInvested: 0,
+          isAdmin: false,
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp()
+        });
+      } else {
+        // Update last login if user already exists
+        await updateDoc(userDocRef, { // Need to import updateDoc from firestore.js
+          lastLogin: serverTimestamp()
+        });
+      }
+
+      window.location.href = 'userdashboard.html';
+
+    } catch (error) {
+      console.error("Google Sign-up Error:", error.code, error.message);
+      const err = document.getElementById('err-box');
+      err.style.display = 'block';
+      err.textContent = `Google sign-up failed: ${error.message || 'Please try again.'}`;
+    }
+  }
+
+  async function signInWithApple() {
+    // Implement Apple sign-up/sign-in similarly to Google, using AppleAuthProvider.
+    // This requires specific setup in the Firebase Console and an Apple Developer account.
+    console.warn("Apple Sign-up is not yet implemented in this code.");
+    const err = document.getElementById('err-box');
+    err.style.display = 'block';
+    err.textContent = "Apple Sign-up is not yet configured or implemented.";
+  }
+
+  // --- Attach Event Listeners for Social Buttons ---
+  // You'll need to add specific IDs to your social signup buttons in the HTML
+  // if they don't already have them, then attach listeners here.
+  // Example (assuming you have buttons with IDs 'google-signup-btn' and 'apple-signup-btn'):
+  // document.getElementById('google-signup-btn').addEventListener('click', signInWithGoogle);
+  // document.getElementById('apple-signup-btn').addEventListener('click', signInWithApple);
+
+</script>
+
 </body>
 
 </html>
