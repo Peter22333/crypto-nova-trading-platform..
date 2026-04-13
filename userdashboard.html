@@ -3060,47 +3060,164 @@
     </div>
 
     <script>
-      /* ═══════════════════════════════════════════════
-         SUPABASE CLIENT
+           /* ═══════════════════════════════════════════════
+         FIREBASE CLIENT & AUTH GUARD
       ═══════════════════════════════════════════════ */
-      const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
-      const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxa3VibGV0Z2lmcWR1dHliem56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NjA5OTMsImV4cCI6MjA4ODQzNjk5M30.TkweXseKRQuA7FoT7erYdUJMuGtYWYSZ7b7l9WCPq-8';
-      const sb = {
-        _h() { return { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (sb._tok() || SUPA_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' }; },
-        _tok() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.access_token; } catch { return null; } },
-        _uid() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.user?.id; } catch { return null; } },
-        isLoggedIn() { return !!sb._tok(); },
-        async get(t, f = '') { const r = await fetch(SUPA_URL + '/rest/v1/' + t + (f ? '?' + f : ''), { headers: sb._h() }); return r.json(); },
-        async insert(t, b) { const r = await fetch(SUPA_URL + '/rest/v1/' + t, { method: 'POST', headers: sb._h(), body: JSON.stringify(b) }); return r.json(); },
-        async update(t, b, f) { const r = await fetch(SUPA_URL + '/rest/v1/' + t + '?' + f, { method: 'PATCH', headers: sb._h(), body: JSON.stringify(b) }); return r.json(); },
-        async getProfile() { const uid = sb._uid(); if (!uid) return null; const r = await sb.get('profiles', 'id=eq.' + uid + '&select=*'); return Array.isArray(r) ? r[0] : null; },
-        async updateBalance(nb) { const uid = sb._uid(); if (!uid) return; return sb.update('profiles', { balance: nb }, 'id=eq.' + uid); }
+
+      // Firebase SDK Imports
+      // These imports fetch the necessary Firebase modules from Google's CDN.
+      // IMPORTANT: Make sure your <script> tag has type="module" for these imports to work.
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        updateDoc, // Needed for updateBalanceInFirestore
+        collection,
+        query,
+        where,
+        orderBy,
+        getDocs, // For one-time data fetches
+        onSnapshot, // For real-time updates (optional, but good for dashboards)
+        serverTimestamp
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+      // Your Firebase Configuration (This must be identical across all your Firebase-enabled pages)
+      const firebaseConfig = {
+        apiKey: "AIzaSyBwdhzot1c6-3HMrAmYjVrpWtgRpFiysdk",
+        authDomain: "crypto-dashboard-12911.firebaseapp.com",
+        projectId: "crypto-dashboard-12911",
+        storageBucket: "crypto-dashboard-12911.firebasestorage.app",
+        messagingSenderId: "426133649845",
+        appId: "1:426133649845:web:6edc16f7031a1c934a41fc",
+        measurementId: "G-3744FSNNKK"
       };
 
-      /* ═══════════════════════════════════════════════
-         AUTO-LOGOUT: clear session on tab/window close
-      ═══════════════════════════════════════════════ */
-      window.addEventListener('beforeunload', function () {
-        // Mark that we're leaving — on next load, check if session is stale
-        sessionStorage.setItem('cn_tab_alive', '1');
-      });
-      // If sessionStorage doesn't have the flag, the tab was closed and reopened = fresh start
-      // We use sessionStorage (cleared on close) vs localStorage (persists)
-      // On load: if no sessionStorage flag but localStorage has session → user closed & reopened = logout
-      (function checkSessionOnLoad() {
-        const tabAlive = sessionStorage.getItem('cn_tab_alive');
-        const hasSession = !!sb._tok();
-        if (!tabAlive && hasSession) {
-          // Tab was freshly opened (not just navigated) — for security, we keep session
-          // but set the alive flag going forward
-          sessionStorage.setItem('cn_tab_alive', '1');
-        }
-      })();
+      // Initialize Firebase App, Auth, and Firestore services
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
 
-      /* ═══════════════════════════════════════════════
-         AUTH GUARD
-      ═══════════════════════════════════════════════ */
-      if (!sb.isLoggedIn()) { window.location.href = 'login.html'; }
+      // Global variables to hold the current user and their profile data from Firestore
+      // These will be populated by the onAuthStateChanged listener below.
+      let currentUser = null; 
+      let userProfile = null; 
+
+      // --- Firebase equivalent of sb.updateBalance ---
+      // This function will update the 'currentBalance' field in the user's Firestore profile.
+      async function updateBalanceInFirestore(newBalance) {
+        if (!currentUser) {
+          console.error("No authenticated user to update balance for.");
+          return;
+        }
+        const userDocRef = doc(db, "users", currentUser.uid);
+        try {
+          await updateDoc(userDocRef, {
+            currentBalance: newBalance,
+            // Optionally add a timestamp for when the balance was last updated
+            lastUpdated: serverTimestamp() 
+          });
+          console.log("User balance updated in Firestore successfully.");
+          // Also update the local userProfile and STATE to reflect the change immediately
+          if (userProfile) userProfile.currentBalance = newBalance;
+          if (STATE) STATE.balance = newBalance;
+          // You might also want to re-render parts of the UI that display the balance
+        } catch (error) {
+          console.error("Error updating user balance in Firestore:", error);
+          // Consider showing a user-friendly toast message for the error
+        }
+      }
+
+      // --- Firebase Logout Function ---
+      // This function replaces your old `logout()` and `sb.logout()` logic.
+      async function firebaseLogout() {
+        try {
+          await signOut(auth); // Firebase method to sign out the current user
+          console.log("User signed out from Firebase.");
+        } catch (error) {
+          console.error("Error signing out from Firebase:", error);
+        } finally {
+          // Clear any local storage items that might be related to previous sessions
+          try { localStorage.removeItem('at_state'); } catch (e) { console.error("Error clearing at_state:", e); }
+          // Clear any old Supabase-specific items that might have persisted (just in case)
+          try {
+            Object.keys(localStorage).forEach(k => {
+              if (k.startsWith('sb-') || k.startsWith('supabase')) localStorage.removeItem(k);
+            });
+          } catch (e) { console.error("Error clearing old Supabase items:", e); }
+          // Redirect to the login page after logout (Firebase handles clearing its own session tokens)
+          window.location.href = 'login.html';
+        }
+      }
+
+      // --- Firebase Authentication State Listener (replaces Supabase auth guard and initial data load) ---
+      // This listener runs every time the user's authentication state changes (login, logout, token refresh).
+      // It's the most reliable way to manage user sessions and fetch initial data.
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          // User is signed in.
+          currentUser = user; 
+          
+          // Fetch the user's detailed profile from your 'users' Firestore collection.
+          // This document holds their balance, display name, and other custom data.
+          const userDocRef = doc(db, "users", currentUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            userProfile = userDocSnap.data(); // Store the user's profile data
+
+            // Update your local `STATE` object with the data fetched from Firestore.
+            STATE.user = {
+              name: userProfile.displayName || 'User',
+              email: userProfile.email,
+              initials: (userProfile.displayName || userProfile.email || 'U').charAt(0).toUpperCase(),
+              tier: userProfile.tier || 'Standard' // Assuming 'tier' is part of your userProfile
+            };
+            STATE.balance = userProfile.currentBalance || 0;
+
+            // --- IMPORTANT: Load User-Specific Data from Firestore ---
+            // This is where you replace `sb.get()` calls for trades, transactions, etc.
+            // You can use `getDocs` for a one-time fetch, or `onSnapshot` for real-time updates.
+            // For a dashboard, `onSnapshot` is often preferred for dynamic updates.
+
+            // Example: Load Trades from Firestore (one-time fetch for initial STATE)
+            const tradesQuery = query(collection(db, "trades"), where("userId", "==", currentUser.uid), orderBy("timestamp", "desc"));
+            const tradesSnapshot = await getDocs(tradesQuery);
+            STATE.trades = tradesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            // Example: Load Transactions from Firestore
+            const transactionsQuery = query(collection(db, "transactions"), where("userId", "==", currentUser.uid), orderBy("timestamp", "desc"));
+            const transactionsSnapshot = await getDocs(transactionsQuery);
+            STATE.transactions = transactionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            // Example: Load Investments from Firestore
+            const investmentsQuery = query(collection(db, "investments"), where("userId", "==", currentUser.uid), orderBy("timestamp", "desc"));
+            const investmentsSnapshot = await getDocs(investmentsQuery);
+            STATE.investments = investmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            // Example: Load Mining Contracts from Firestore
+            const miningContractsQuery = query(collection(db, "mining_contracts"), where("userId", "==", currentUser.uid), orderBy("timestamp", "desc"));
+            const miningContractsSnapshot = await getDocs(miningContractsQuery);
+            STATE.miningContracts = miningContractsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+
+            saveState(); // Save the updated local STATE to localStorage
+            initializeDashboardUI(); // Call a function to update all UI elements that depend on the loaded STATE
+
+          } else {
+            // This scenario means the user is authenticated but their custom profile document
+            // in Firestore (created during signup) is missing.
+            console.error("User profile not found in Firestore for UID:", currentUser.uid);
+            alert("Your user profile is incomplete. Please contact support or try logging in again.");
+            await firebaseLogout(); // Force logout as the profile is incomplete.
+          }
+        } else {
+          // No user is signed in. Redirect them to the login page.
+          window.location.href = 'login.html';
+        }
+      });
 
       /* ═══════════════════════════════════════════════
          STATE
@@ -3109,17 +3226,29 @@
         try { var s = JSON.parse(localStorage.getItem('at_state')); if (s) return s; } catch (e) { }
         return { user: { name: '', email: '', initials: '', tier: 'Standard' }, balance: 0, trades: [], transactions: [], investments: [], miningContracts: [] };
       })();
-      function saveState() { try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { } sb.updateBalance(STATE.balance).catch(() => { }); }
-
+            function saveState() {
+        try {
+          localStorage.setItem('at_state', JSON.stringify(STATE));
+          // Call the Firebase version of updateBalance, but ONLY if currentUser is defined
+          // This call is optional here. It's usually better to explicitly update balance
+          // when a relevant action occurs (e.g., successful deposit approval from admin).
+          // If STATE.balance is updated client-side due to local interactions and you want
+          // it to reflect in Firestore, uncomment and use this.
+          // if (currentUser) { // Ensure user is logged in before trying to update Firestore
+          //   updateBalanceInFirestore(STATE.balance).catch((e) => { console.error("Error saving balance to Firestore:", e); });
+          // }
+        } catch (e) {
+          console.error("Error saving STATE to localStorage:", e);
+        }
+      }
       /* ═══════════════════════════════════════════════
          DEPOSIT ADDRESSES
       ═══════════════════════════════════════════════ */
       const ADDRS = {
         BTC: { addr: 'bc1q705yyxfpnkrr3nzu556nnnl4egv9kkr7xma4wc', nets: ['Bitcoin Network (BTC)', 'Lightning Network'] },
-        ETH: { addr: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F', nets: ['Ethereum (ERC-20)', 'Arbitrum', 'Optimism'] },
-        USDT: { addr: 'bc1q705yyxfpnkrr3nzu556nnnl4egv9kkr7xma4wc', nets: ['TRC-20 (Tron)', 'ERC-20 (Ethereum)', 'BEP-20 (BSC)'] },
-        SOL: { addr: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU', nets: ['Solana Network'] },
-        BNB: { addr: 'bnb1grpf0955h0ykzq3ar5nmum7y6gdfl6lxfn46h2', nets: ['BEP-20 (BSC)', 'BEP-2'] }
+        ETH: { addr: '0xD5F5738E11C088fc1F86B5DBD81afA3e178fDb04', nets: ['Ethereum (ERC-20)', 'Arbitrum', 'Optimism'] },
+        SOL: { addr: 'FhU6RnZjgkxeD1xzRQasv4URuSQtgah1vXGNUMgsMcJX', nets: ['Solana Network'] },
+        BNB: { addr: '0xD5F5738E11C088fc1F86B5DBD81afA3e178fDb04', nets: ['BEP-20 (BSC)', 'BEP-2'] }
       };
 
       /* ═══════════════════════════════════════════════
@@ -3177,37 +3306,6 @@
       var currentFilter = 'all';
 
       /* ═══════════════════════════════════════════════
-         LOAD PROFILE FROM SUPABASE
-      ═══════════════════════════════════════════════ */
-      async function loadProfile() {
-        try {
-          const p = await sb.getProfile();
-          if (!p) return;
-          STATE.balance = parseFloat(p.balance) || 0;
-          STATE.user = {
-            name: p.full_name || 'Trader',
-            email: p.email || sb._tok() ? JSON.parse(localStorage.getItem('sb_session')).user.email : '',
-            initials: p.initials || (p.full_name ? (p.full_name.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase().slice(0, 2)) : 'CN'),
-            tier: p.tier || 'Standard'
-          };
-          const uid = sb._uid();
-          const [txns, invs, mines] = await Promise.all([
-            sb.get('transactions', 'user_id=eq.' + uid + '&order=created_at.desc&limit=100'),
-            sb.get('investments', 'user_id=eq.' + uid + '&order=created_at.desc'),
-            sb.get('mining_contracts', 'user_id=eq.' + uid + '&order=created_at.desc')
-          ]);
-          if (Array.isArray(txns)) STATE.transactions = txns.map(function (t) { return { id: t.ref || t.id, type: t.type, asset: t.asset, amount: t.amount, date: new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), hash: t.ref || t.id, status: t.status }; });
-          if (Array.isArray(invs)) STATE.investments = invs.map(function (i) { return { id: i.id, plan: i.plan, planName: i.plan_name, amount: parseFloat(i.amount), dailyRate: parseFloat(i.daily_rate), duration: i.duration, startDate: i.start_date, endDate: i.end_date, startTs: i.start_ts, endTs: i.end_ts, earned: parseFloat(i.earned) || 0, status: i.status }; });
-          if (Array.isArray(mines)) STATE.miningContracts = mines.map(function (m) { return { id: m.id, type: m.type, name: m.name, price: parseFloat(m.price), hashrate: m.hashrate, dailyRoi: parseFloat(m.daily_roi), duration: m.duration, startDate: m.start_date, endDate: m.end_date, startTs: m.start_ts, endTs: m.end_ts, earned: parseFloat(m.earned) || 0, status: m.status }; });
-          saveState();
-          refreshAllUI();
-          // Resume tickers for active investments/mining
-          STATE.investments.filter(function (i) { return i.status === 'active' && Date.now() < i.endTs; }).forEach(startEarningsTicker);
-          STATE.miningContracts.filter(function (m) { return m.status === 'active' && Date.now() < m.endTs; }).forEach(startMiningTicker);
-        } catch (e) { console.warn('Profile load error:', e); }
-      }
-
-      /* ═══════════════════════════════════════════════
          REFRESH ALL UI
       ═══════════════════════════════════════════════ */
       function refreshAllUI() {
@@ -3249,6 +3347,17 @@
         buildDepositHistory();
         buildOpenPositions();
         updateDepositView();
+      }
+            /* ═══════════════════════════════════════════════
+         INITIALIZE DASHBOARD UI (Firebase Integration)
+         This function is called once after user data is loaded from Firebase.
+      ═══════════════════════════════════════════════ */
+      function initializeDashboardUI() {
+        // You can add any other one-time initialization for the dashboard here
+        // For example, setting up listeners that depend on the current user.
+
+        // Then, call your existing function to refresh all UI elements with the loaded data.
+        refreshAllUI();
       }
 
       /* ═══════════════════════════════════════════════
@@ -3367,44 +3476,108 @@
         document.getElementById('trade-amount').value = (bal * (pct / 100)).toFixed(2);
         updateTradeSummary();
       }
-      function executeTrade() {
+           // Make executeTrade an async function (ensure this is how it's declared)
+      async function executeTrade() {
         var errEl = document.getElementById('trade-error');
         errEl.style.display = 'none';
-        var amt = parseFloat(document.getElementById('trade-amount').value) || 0;
-        var lev = parseInt(document.getElementById('trade-leverage').value) || 1;
+
+        if (!currentUser) { // Ensure user is logged in via Firebase Auth
+          errEl.textContent = 'You must be logged in to place a trade.';
+          errEl.style.display = 'block';
+          return;
+        }
+
+        const amt = parseFloat(document.getElementById('trade-amount').value) || 0;
+        const lev = parseInt(document.getElementById('trade-leverage').value) || 1;
+
+        // --- Client-side validation (remains unchanged) ---
         if (amt <= 0) { errEl.textContent = 'Please enter a valid amount.'; errEl.style.display = 'block'; return; }
         if (amt > STATE.balance) { errEl.textContent = 'Insufficient balance. Available: $' + STATE.balance.toFixed(2); errEl.style.display = 'block'; return; }
         if (amt < 5) { errEl.textContent = 'Minimum trade amount is $5.'; errEl.style.display = 'block'; return; }
+
         var btn = document.getElementById('trade-submit-btn');
-        btn.disabled = true; btn.textContent = 'Placing order...';
-        setTimeout(function () {
-          var coin = liveCoins.find(function (c) { return c.sym === currentTradeSym; });
-          var price = coin ? coin.price : 1;
-          var fee = amt * 0.001;
-          STATE.balance -= (amt + fee);
-          var trade = {
-            id: 'TRD' + Date.now(), sym: currentTradeSym, type: currentTradeType,
-            amount: amt, leverage: lev, entryPrice: price,
-            positionSize: amt * lev, fee: fee,
-            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-            status: 'open', pnl: 0
+        btn.disabled = true;
+        btn.textContent = 'Placing order...';
+
+        // Introduce a small delay for UI feedback (from your original code)
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        try {
+          const coin = liveCoins.find(function (c) { return c.sym === currentTradeSym; });
+          const price = coin ? coin.price : 1;
+          const fee = amt * 0.001;
+          const costOfTrade = amt + fee;
+
+          // --- 1. Update user's balance in Firestore ---
+          // This ensures the database reflects the deduction.
+          const newBalance = STATE.balance - costOfTrade;
+          if (newBalance < 0) { // Double check to prevent negative balance
+            errEl.textContent = 'Balance check failed during processing. Please try again.';
+            errEl.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Place ' + currentTradeType.toUpperCase() + ' Order';
+            return;
+          }
+          
+          await updateBalanceInFirestore(newBalance); // Call your Firebase function to update Firestore balance
+          STATE.balance = newBalance; // Update local state immediately
+
+          // --- 2. Create the trade record ---
+          const tradeRefId = 'TRD' + Date.now(); // Unique ID for trade
+          const tradeData = {
+            id: tradeRefId,
+            userId: currentUser.uid, // Link to current user
+            sym: currentTradeSym,
+            type: currentTradeType,
+            amount: amt,
+            leverage: lev,
+            entryPrice: price,
+            positionSize: amt * lev,
+            fee: fee,
+            status: 'open',
+            pnl: 0,
+            timestamp: serverTimestamp() // Use server timestamp for creation
           };
-          if (!STATE.trades) STATE.trades = [];
-          STATE.trades.unshift(trade);
-          STATE.transactions.unshift({
-            id: trade.id, type: 'trade', asset: currentTradeSym + '/USD',
+          await addDoc(collection(db, "trades"), tradeData); // Add to 'trades' collection
+
+          // --- 3. Create a transaction record for the trade ---
+          const transactionData = {
+            id: 'TXN' + Date.now(), // Unique ID for transaction
+            userId: currentUser.uid, // Link to current user
+            type: 'trade',
+            asset: currentTradeSym + '/USD',
             amount: (currentTradeType === 'buy' ? '+' : '-') + '$' + amt.toFixed(2),
-            date: trade.date, hash: trade.id, status: 'active'
-          });
-          saveState();
-          refreshAllUI();
+            status: 'completed', // Trade transactions are completed immediately
+            ref: tradeRefId, // Link to the trade ID
+            timestamp: serverTimestamp()
+          };
+          await addDoc(collection(db, "transactions"), transactionData); // Add to 'transactions' collection
+
+          // --- Update local STATE (remains similar) ---
+          // Assuming STATE.trades and STATE.transactions are arrays that get refreshed by onSnapshot.
+          // If not using onSnapshot, you might need to manually add the new trade/transaction to STATE.
+          if (!STATE.trades) STATE.trades = [];
+          STATE.trades.unshift(tradeData); // Add to local state
+          if (!STATE.transactions) STATE.transactions = [];
+          STATE.transactions.unshift(transactionData); // Add to local state
+          saveState(); // Save local state to localStorage
+
+          refreshAllUI(); // Refresh all UI elements
+          showToast(currentTradeSym + ' ' + currentTradeType.toUpperCase() + ' order placed!', 'success');
+
+        } catch (error) {
+          console.error("Error executing trade:", error);
+          errEl.textContent = `Error placing trade: ${error.message}. Please try again.`;
+          errEl.style.display = 'block';
+        } finally {
+          // Always re-enable button and reset text regardless of success or failure
           btn.disabled = false;
           btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> <span id="trade-btn-label">' + (currentTradeType === 'buy' ? 'Place Buy Order' : 'Place Sell Order') + '</span>';
-          document.getElementById('trade-amount').value = '';
-          showToast(currentTradeSym + ' ' + currentTradeType.toUpperCase() + ' order placed!', 'success');
-          sb.insert('transactions', { user_id: sb._uid(), type: 'trade', asset: currentTradeSym + '/USD', amount: (currentTradeType === 'buy' ? '+' : '-') + '$' + amt.toFixed(2), status: 'active', ref: trade.id }).catch(() => { });
-        }, 800);
+          document.getElementById('trade-amount').value = ''; // Clear amount field
+        }
       }
+
+
 
       /* ═══════════════════════════════════════════════
          OPEN POSITIONS
@@ -3496,41 +3669,87 @@
         openModal('close-trade-modal');
       }
 
-      function confirmCloseTrade() {
+           async function confirmCloseTrade() { // Make it async
         if (!tradeToClose) return;
         var t = tradeToClose;
         var btn = document.getElementById('confirm-close-btn');
         if (btn) { btn.disabled = true; btn.textContent = 'Closing...'; }
-        var coin = liveCoins.find(function (c) { return c.sym === t.sym; });
-        var curPrice = coin ? coin.price : t.entryPrice;
-        var pnlPct = ((curPrice - t.entryPrice) / t.entryPrice) * (t.type === 'buy' ? 1 : -1) * (t.leverage || 1) * 100;
-        var pnl = +(t.amount * pnlPct / 100).toFixed(2);
-        var returns = +(t.amount + pnl).toFixed(2);
-        // Update trade record
-        t.status = 'closed';
-        t.pnl = pnl;
-        t.closePrice = curPrice;
-        t.closeDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        // Return funds + pnl to balance
-        STATE.balance = +(STATE.balance + returns).toFixed(2);
-        // Add to transaction history
-        STATE.transactions.unshift({
-          id: 'TRD' + Date.now(), type: 'trade', asset: t.sym + '/USD',
-          amount: (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2) + ' P&L',
-          date: t.closeDate, hash: t.id, status: 'completed'
-        });
-        saveState(); // syncs balance to Supabase
-        // Also write to Supabase transactions
-        sb.insert('transactions', {
-          user_id: sb._uid(), type: 'trade', asset: t.sym + '/USD closed',
-          amount: (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2) + ' P&L',
-          status: 'completed', ref: t.id + '_close'
-        }).catch(function () { });
-        closeModal('close-trade-modal');
-        tradeToClose = null;
-        if (btn) { btn.disabled = false; btn.textContent = 'Confirm Close Position'; }
-        refreshAllUI();
-        showToast('Position closed. P&L: ' + (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(2), pnl >= 0 ? 'success' : 'error');
+
+        if (!currentUser) { // Ensure user is logged in
+          showToast('Session expired. Please log in again.', 'error');
+          if (btn) { btn.disabled = false; btn.textContent = 'Confirm Close Position'; }
+          await firebaseLogout();
+          return;
+        }
+
+        const coin = liveCoins.find(function (c) { return c.sym === t.sym; });
+        const curPrice = coin ? coin.price : t.entryPrice;
+        const lev = t.leverage || 1;
+        const pnlPct = ((curPrice - t.entryPrice) / t.entryPrice) * (t.type === 'buy' ? 1 : -1) * lev * 100;
+        const pnl = +(t.amount * pnlPct / 100).toFixed(2);
+        const returns = +(t.amount + pnl).toFixed(2); // Total amount returned to balance
+        
+        try {
+          // --- 1. Update the specific trade document in Firestore to 'closed' ---
+          const tradeDocRef = doc(db, "trades", t.id); // Assuming t.id is the Firestore document ID
+          await updateDoc(tradeDocRef, {
+            status: 'closed',
+            pnl: pnl,
+            closePrice: curPrice,
+            closeDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            closedTimestamp: serverTimestamp() // Add a server timestamp for when it was closed
+          });
+
+          // --- 2. Update user's balance in Firestore ---
+          // Add the returns (initial amount + PnL) to the user's current balance
+          const newBalance = +(STATE.balance + returns).toFixed(2);
+          await updateBalanceInFirestore(newBalance); // Call your Firebase function
+          STATE.balance = newBalance; // Update local state immediately
+
+          // --- 3. Add a transaction record for closing the trade (PnL transaction) ---
+          const transactionRefId = 'TXN' + Date.now() + '_CLOSE';
+          const transactionData = {
+            id: transactionRefId,
+            userId: currentUser.uid,
+            type: 'trade_close', // New type for closing a trade
+            asset: t.sym + '/USD',
+            amount: (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2) + ' P&L',
+            status: 'completed',
+            ref: t.id + '_close', // Reference to the original trade
+            timestamp: serverTimestamp()
+          };
+          await addDoc(collection(db, "transactions"), transactionData);
+
+          // --- Update local STATE for trades and transactions (if not using onSnapshot) ---
+          // Find the trade in STATE.trades and update its status, pnl etc.
+          const tradeIndex = STATE.trades.findIndex(trade => trade.id === t.id);
+          if (tradeIndex !== -1) {
+              STATE.trades[tradeIndex].status = 'closed';
+              STATE.trades[tradeIndex].pnl = pnl;
+              STATE.trades[tradeIndex].closePrice = curPrice;
+              STATE.trades[tradeIndex].closeDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+              // Potentially remove from open trades view
+          }
+          if (!STATE.transactions) STATE.transactions = [];
+          STATE.transactions.unshift(transactionData); // Add new transaction to local state
+
+          saveState(); // Save local state to localStorage
+          
+          closeModal('close-trade-modal');
+          tradeToClose = null;
+
+          showToast('Position closed. P&L: ' + (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(2), pnl >= 0 ? 'success' : 'error');
+
+        } catch (error) {
+          console.error("Error closing trade:", error);
+          showToast(`Error closing trade: ${error.message}`, 'error');
+        } finally {
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Confirm Close Position'; // Reset button text
+          }
+          refreshAllUI(); // Refresh all UI elements to reflect changes
+        }
       }
 
       /* ═══════════════════════════════════════════════
@@ -3739,24 +3958,70 @@
         var val = document.getElementById('dep-addr-field').value;
         navigator.clipboard.writeText(val).then(function () { showToast('Address copied!', 'success'); }).catch(function () { showToast('Copy failed – select manually', 'info'); });
       }
-      function confirmDepositSetup() {
+           async function confirmDepositSetup() { // Make it async
+        if (!currentUser) {
+          showToast('Session expired. Please log in again.', 'error');
+          await firebaseLogout();
+          return;
+        }
+
         var coin = document.getElementById('dep-coin').value;
         var network = document.getElementById('dep-network').value;
-        var ref = 'DEP' + Date.now();
-        sb.insert('deposits', {
-          user_id: sb._uid(), method: 'crypto', asset: coin, amount: 0,
-          fee: 0, credited: false, ref: ref, status: 'pending'
-        }).catch(() => { });
-        STATE.transactions.unshift({
-          id: ref, type: 'deposit', asset: coin + ' (' + network + ')',
-          amount: 'Pending', date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          hash: ref, status: 'pending'
-        });
-        saveState();
-        buildDepositHistory(); buildOvTx(); buildTxTable('all', '');
-        document.getElementById('success-title').textContent = 'Deposit Request Submitted!';
-        document.getElementById('success-msg').textContent = 'Your deposit is being reviewed. Funds will be credited to your account within 1–24 hours after confirmation.';
-        openModal('success-modal');
+        var ref = 'DEP' + Date.now(); // Generate a reference ID
+
+        var btn = document.querySelector('#deposit-setup-form .btn-submit'); // Assuming you have a submit button in the deposit setup form
+        if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
+
+        try {
+          // Add to 'deposits' collection in Firestore
+          await addDoc(collection(db, "deposits"), {
+            userId: currentUser.uid,
+            method: 'crypto', // Assuming this is always crypto for this setup function
+            asset: coin,
+            network: network, // Store the selected network
+            amount: 0, // Amount is 0 because it's pending admin approval
+            fee: 0,
+            credited: false,
+            ref: ref,
+            status: 'pending',
+            timestamp: serverTimestamp()
+          });
+
+          // Add to 'transactions' collection in Firestore
+          await addDoc(collection(db, "transactions"), {
+            userId: currentUser.uid,
+            type: 'deposit',
+            asset: coin + ' (' + network + ')',
+            amount: 'Pending', // Amount will be updated when approved
+            status: 'pending',
+            ref: ref,
+            timestamp: serverTimestamp()
+          });
+
+          // --- Update local STATE (for immediate UI reflection) ---
+          STATE.transactions.unshift({
+            id: ref, type: 'deposit', asset: coin + ' (' + network + ')',
+            amount: 'Pending', date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            hash: ref, status: 'pending'
+          });
+          saveState(); // Save local state to localStorage
+
+          buildDepositHistory(); // Rebuild history UI
+          buildOvTx(); // Rebuild overview transactions UI
+          // buildTxTable('all', ''); // Assuming this function exists and refreshes the full transaction table
+          
+          document.getElementById('success-title').textContent = 'Deposit Request Submitted!';
+          document.getElementById('success-msg').textContent = 'Your deposit is being reviewed. Funds will be credited to your account within 1–24 hours after confirmation.';
+          openModal('success-modal');
+          showToast('Deposit request submitted!', 'success');
+
+        } catch (error) {
+          console.error("Error submitting deposit setup:", error);
+          showToast(`Error submitting deposit: ${error.message}`, 'error');
+          // You might want to display a more prominent error on the page if you have an error-box for this section
+        } finally {
+          if (btn) { btn.disabled = false; btn.textContent = 'Confirm Deposit'; } // Reset button state
+        }
       }
       function buildDepositHistory() {
         var el = document.getElementById('recent-deposits');
@@ -3794,47 +4059,106 @@
         document.getElementById('wd-amount').value = max.toFixed(2);
         updateWdFee();
       }
-      function submitWithdraw() {
+      async function submitWithdraw() { // Make it an async function
         var errEl = document.getElementById('wd-error');
         errEl.style.display = 'none';
+
+        if (!currentUser) { // Ensure user is logged in
+          errEl.textContent = 'You must be logged in to request a withdrawal.';
+          errEl.style.display = 'block';
+          return;
+        }
+
         var addr = document.getElementById('wd-address').value.trim();
         var amt = parseFloat(document.getElementById('wd-amount').value) || 0;
         var coin = document.getElementById('wd-coin').value;
+        var network = document.getElementById('wd-network').value; // Get selected network
         var fee = WD_FEES[coin] || 2.5;
-        var total = amt; // full amount deducted including fee
+        var totalDeduction = amt; // The amount to deduct from balance (if fee is separate, adjust this)
+
+        // --- Client-side validation ---
         if (!addr) { errEl.textContent = 'Please enter a valid destination address.'; errEl.style.display = 'block'; return; }
         if (amt < 20) { errEl.textContent = 'Minimum withdrawal is $20.00.'; errEl.style.display = 'block'; return; }
-        if (total > STATE.balance) { errEl.textContent = 'Insufficient balance. Available: $' + STATE.balance.toFixed(2) + '. Note: fee of $' + fee.toFixed(2) + ' is included.'; errEl.style.display = 'block'; return; }
+        if (totalDeduction > STATE.balance) { errEl.textContent = 'Insufficient balance. Available: $' + STATE.balance.toFixed(2) + '. Note: fee of $' + fee.toFixed(2) + ' is included.'; errEl.style.display = 'block'; return; }
+
         var btn = document.querySelector('#view-withdraw .btn-submit');
         if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
-        // Deduct full amount from balance immediately
-        STATE.balance -= total;
+
+        // Local state deduction (will be synced to Firestore)
+        const newBalance = STATE.balance - totalDeduction;
         var ref = 'WD' + Date.now();
         var dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        STATE.transactions.unshift({
-          id: ref, type: 'withdraw', asset: coin,
-          amount: '-$' + amt.toFixed(2),
-          date: dateStr, hash: ref, status: 'pending'
-        });
-        saveState(); // also syncs balance to Supabase
-        sb.insert('withdrawals', {
-          user_id: sb._uid(), amount: amt, asset: coin, address: addr,
-          network: document.getElementById('wd-network').value, ref: ref, status: 'pending'
-        }).catch(() => { });
-        sb.insert('transactions', {
-          user_id: sb._uid(), type: 'withdraw', asset: coin,
-          amount: '-$' + amt.toFixed(2), status: 'pending', ref: ref
-        }).catch(() => { });
-        setTimeout(function () {
-          if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7 7 7-7"/></svg> Submit Withdrawal Request'; }
-        }, 1000);
-        buildWithdrawHistory(); buildOvTx(); buildTxTable('all', ''); refreshAllUI();
-        document.getElementById('wd-address').value = '';
-        document.getElementById('wd-amount').value = '';
-        updateWdFee();
-        document.getElementById('success-title').textContent = 'Withdrawal Submitted!';
-        document.getElementById('success-msg').textContent = 'Your withdrawal of $' + amt.toFixed(2) + ' ' + coin + ' is now pending review. $' + total.toFixed(2) + ' has been deducted from your balance. Processing takes 1–24 hours.';
-        openModal('success-modal');
+
+        try {
+          // --- 1. Deduct full amount from user's balance in Firestore ---
+          // This should ideally be done in a Cloud Function to prevent race conditions
+          // and ensure atomicity for financial transactions. For client-side, it's a direct update.
+          await updateBalanceInFirestore(newBalance); // Call your Firebase function
+          STATE.balance = newBalance; // Update local state immediately
+
+          // --- 2. Record withdrawal in 'withdrawals' collection in Firestore ---
+          await addDoc(collection(db, "withdrawals"), {
+            userId: currentUser.uid,
+            amount: amt,
+            asset: coin,
+            address: addr,
+            network: network,
+            ref: ref,
+            status: 'pending', // Pending admin approval
+            fee: fee, // Store the fee
+            timestamp: serverTimestamp()
+          });
+
+          // --- 3. Add withdrawal transaction to 'transactions' collection in Firestore ---
+          await addDoc(collection(db, "transactions"), {
+            userId: currentUser.uid,
+            type: 'withdraw',
+            asset: coin,
+            amount: '-$' + amt.toFixed(2), // Deducted amount for display
+            status: 'pending', // Pending admin approval
+            ref: ref,
+            timestamp: serverTimestamp()
+          });
+
+          // --- Update local STATE (for immediate UI reflection) ---
+          STATE.transactions.unshift({
+            id: ref, type: 'withdraw', asset: coin,
+            amount: '-$' + amt.toFixed(2),
+            date: dateStr, hash: ref, status: 'pending'
+          });
+          saveState(); // Update localStorage
+
+          // --- UI Refresh and Feedback ---
+          buildWithdrawHistory();
+          buildOvTx();
+          // buildTxTable('all', ''); // Assuming this function exists and refreshes the full transaction table
+          refreshAllUI(); // Refresh other UI components
+
+          document.getElementById('wd-address').value = ''; // Clear form fields
+          document.getElementById('wd-amount').value = '';
+          updateWdFee(); // Update fee display
+
+          document.getElementById('success-title').textContent = 'Withdrawal Submitted!';
+          document.getElementById('success-msg').textContent = 'Your withdrawal of $' + amt.toFixed(2) + ' ' + coin + ' is now pending review. $' + totalDeduction.toFixed(2) + ' has been deducted from your balance. Processing takes 1–24 hours.';
+          openModal('success-modal');
+          showToast('Withdrawal request submitted!', 'success');
+
+        } catch (error) {
+          console.error("Error submitting withdrawal:", error);
+          showToast(`Error submitting withdrawal: ${error.message}`, 'error');
+          errEl.textContent = `Error submitting withdrawal: ${error.message}. Please try again.`;
+          errEl.style.display = 'block';
+          // Revert local state balance if Firestore update failed (important for accuracy)
+          STATE.balance += totalDeduction;
+          saveState();
+          refreshAllUI();
+        } finally {
+          // Reset button state regardless of success or failure
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7 7 7-7"/></svg> Submit Withdrawal Request';
+          }
+        }
       }
       function buildWithdrawHistory() {
         var el = document.getElementById('withdraw-history');
@@ -3884,71 +4208,147 @@
       }
       function searchTx(v) { txSearch = v; buildTxTable(txFilter, v); }
 
-      /* ═══════════════════════════════════════════════
-         SETTINGS — SAVE PROFILE
+         /* ═══════════════════════════════════════════════
+         SETTINGS — SAVE PROFILE (Firebase Firestore Version)
       ═══════════════════════════════════════════════ */
-      function saveProfile() {
+      async function saveProfile() { // Make it async
+        if (!currentUser) {
+          showToast('Session expired. Please log in again.', 'error');
+          await firebaseLogout();
+          return;
+        }
+
         var fn = document.getElementById('set-fname').value.trim();
         var ln = document.getElementById('set-lname').value.trim();
-        var fullName = (fn + ' ' + ln).trim() || STATE.user.name;
-        var initials = ((fn[0] || '') + (ln[0] || '')).toUpperCase() || 'CN';
-        STATE.user.name = fullName;
+        var fullName = (fn + ' ' + ln).trim(); // Recalculate full name
+        var initials = ((fn[0] || '') + (ln[0] || '')).toUpperCase() || 'CN'; // Recalculate initials
+
+        // Update local STATE immediately
+        STATE.user.name = fullName || STATE.user.name; // Use existing name if new is empty
         STATE.user.initials = initials;
+        
+        // Save local state to localStorage (if you have other local state to save)
         saveState();
-        // Update Supabase profiles
-        sb.update('profiles', { full_name: fullName, initials: initials }, 'id=eq.' + sb._uid()).catch(() => { });
-        refreshAllUI();
-        showToast('Profile updated successfully', 'success');
+
+        try {
+          // Update user's profile in Firestore
+          const userDocRef = doc(db, "users", currentUser.uid);
+          await updateDoc(userDocRef, {
+            displayName: fullName,
+            initials: initials, // Store initials in Firestore if you're using them there
+            lastUpdated: serverTimestamp() // Add a timestamp for when the profile was last updated
+          });
+
+          // Also update Firebase Authentication profile display name
+          await updateProfile(currentUser, { displayName: fullName });
+
+          refreshAllUI(); // Refresh UI to reflect changes
+          showToast('Profile updated successfully', 'success');
+
+        } catch (error) {
+          console.error("Error updating profile in Firestore:", error);
+          showToast(`Error updating profile: ${error.message}`, 'error');
+        }
       }
 
-      /* ═══════════════════════════════════════════════
-         SECURITY
+
+           /* ═══════════════════════════════════════════════
+         SECURITY — CHANGE PASSWORD (Firebase Auth Version)
       ═══════════════════════════════════════════════ */
       async function changePassword() {
-        var errEl = document.getElementById('pw-error');
+        var errEl = document.getElementById('pw-error'); // Assuming you have an error element for password changes
         errEl.style.display = 'none';
+
+        if (!currentUser) {
+          errEl.textContent = 'You must be logged in to change your password.';
+          errEl.style.display = 'block';
+          await firebaseLogout();
+          return;
+        }
+
         var np = document.getElementById('new-pw').value;
         var cp = document.getElementById('conf-pw').value;
-        if (!np || np.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
-        if (np !== cp) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
+
+        // --- Client-side validation ---
+        if (!np || np.length < 6) { // Firebase minimum is 6 chars
+          errEl.textContent = 'Password must be at least 6 characters.';
+          errEl.style.display = 'block';
+          return;
+        }
+        if (np !== cp) {
+          errEl.textContent = 'Passwords do not match.';
+          errEl.style.display = 'block';
+          return;
+        }
+
         try {
-          const tok = sb._tok();
-          const r = await fetch(SUPA_URL + '/auth/v1/user', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + tok }, body: JSON.stringify({ password: np }) });
-          const d = await r.json();
-          if (d.error) { errEl.textContent = d.error.message || 'Failed to update password.'; errEl.style.display = 'block'; }
-          else { closeModal('change-pw-modal'); showToast('Password updated successfully', 'success'); }
-        } catch (e) { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; }
-      }
-      function revokeOtherSessions() {
-        showToast('All other sessions have been revoked', 'success');
-      }
+          // Firebase Authentication: Update password
+          await updatePassword(currentUser, np); // `currentUser` is the user object from onAuthStateChanged
+          closeModal('change-pw-modal'); // Assuming this closes your password change modal
+          showToast('Password updated successfully', 'success');
+          // Clear password fields
+          document.getElementById('new-pw').value = '';
+          document.getElementById('conf-pw').value = '';
+        } catch (error) {
+          console.error("Error changing password:", error.code, error.message);
+          errEl.styleNo response
+
 
       /* ═══════════════════════════════════════════════
-         INVESTMENT / MINING EARNINGS TICKERS
+         INVESTMENT / MINING EARNINGS TICKERS (Firebase-adapted)
       ═══════════════════════════════════════════════ */
       function startEarningsTicker(inv) {
-        var tick = inv.amount * inv.dailyRate / 2880;
-        var tid = setInterval(function () {
+        var tick = inv.amount * inv.dailyRate / 2880; // Assuming 2880 intervals per day (30s * 2880 = 24h)
+        var tid = setInterval(async function () { // Make the callback async
           var i = STATE.investments.find(function (x) { return x.id === inv.id; });
           if (!i || i.status !== 'active') { clearInterval(tid); return; }
-          if (Date.now() >= i.endTs) { i.status = 'completed'; saveState(); clearInterval(tid); return; }
-          i.earned = (i.earned || 0) + tick; STATE.balance += tick;
-          saveState();
+
+          if (Date.now() >= i.endTs) {
+            i.status = 'completed';
+            // Persist status change to Firestore
+            await updateInvestmentInFirestore(i.id, { status: 'completed', earned: i.earned });
+            saveState(); // Update local storage
+            clearInterval(tid);
+            refreshAllUI(); // Refresh UI to show completed status
+            return;
+          }
+
+          i.earned = (i.earned || 0) + tick;
+          STATE.balance += tick; // Update local balance
+          
+          // Persist changes to Firestore
+          await updateInvestmentInFirestore(i.id, { earned: i.earned });
+          await updateBalanceInFirestore(STATE.balance); // Update main user balance in Firestore
+
+          saveState(); // Update local storage
+          
+          // Refresh UI elements
           document.getElementById('bal-display').textContent = '$' + STATE.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
           document.getElementById('ov-balance').textContent = '$' + STATE.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }, 30000);
+          // Ensure other relevant UI (like portfolio earned/balance) also gets updated
+          refreshAllUI(); 
+
+        }, 30000); // Every 30 seconds
       }
+
       function startMiningTicker(contract) {
-        var tick = contract.price * contract.dailyRoi / 2880;
-        var tid = setInterval(function () {
+        var tick = contract.price * contract.dailyRoi / 2880; // Assuming 2880 intervals per day
+        var tid = setInterval(async function () { // Make the callback async
           var m = STATE.miningContracts.find(function (x) { return x.id === contract.id; });
           if (!m || m.status !== 'active') { clearInterval(tid); return; }
-          if (Date.now() >= m.endTs) { m.status = 'completed'; saveState(); clearInterval(tid); return; }
-          m.earned = (m.earned || 0) + tick; STATE.balance += tick;
-          saveState();
-          document.getElementById('bal-display').textContent = '$' + STATE.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }, 30000);
-      }
+
+          if (Date.now() >= m.endTs) {
+            m.status = 'completed';
+            // Persist status change to Firestore
+            await updateMiningContractInFirestore(m.id, { status: 'completed', earned: m.earned });
+            saveState(); // Update local storage
+            clearInterval(tid);
+            refreshAllUI(); // Refresh UI to show completed status
+            return;
+          }
+
+          m.earned = (m.earned || 0) + tickNo response
+
 
       /* ═══════════════════════════════════════════════
          QR CODE (canvas draw)
@@ -4015,34 +4415,80 @@
       window.addEventListener('resize', function () { if (window.innerWidth > 900) closeSidebar(); });
       document.querySelectorAll('.modal-overlay').forEach(function (o) { o.addEventListener('click', function (e) { if (e.target === o) closeModal(o.id); }); });
 
-      /* ═══════════════════════════════════════════════
-         LOGOUT
-      ═══════════════════════════════════════════════ */
-      async function logout() {
+      
+          // Helper to update an investment document in Firestore
+      async function updateInvestmentInFirestore(investmentId, dataToUpdate) {
+        if (!currentUser) return;
         try {
-          var tok = sb._tok();
-          if (tok) await fetch(SUPA_URL + '/auth/v1/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + tok, 'apikey': SUPA_KEY } });
-        } catch (e) { }
-        try { localStorage.removeItem('sb_session'); } catch (e) { }
-        try { localStorage.removeItem('at_state'); } catch (e) { }
-        try { Object.keys(localStorage).forEach(function (k) { if (k.startsWith('sb-') || k.startsWith('supabase')) localStorage.removeItem(k); }); } catch (e) { }
-        sessionStorage.clear();
-        window.location.href = 'login.html';
+          const invDocRef = doc(db, "investments", investmentId); // Assuming investmentId is the Firestore document ID
+          await updateDoc(invDocRef, dataToUpdate);
+          console.log(`Investment ${investmentId} updated in Firestore.`);
+        } catch (error) {
+          console.error(`Error updating investment ${investmentId} in Firestore:`, error);
+        }
       }
 
-      /* ═══════════════════════════════════════════════
-         INIT
+      // Helper to update a mining contract document in Firestore
+      async function updateMiningContractInFirestore(contractId, dataToUpdate) {
+        if (!currentUser) return;
+        try {
+          const mineDocRef = doc(db, "mining_contracts", contractId); // Assuming contractId is the Firestore document ID
+          await updateDoc(mineDocRef, dataToUpdate);
+          console.log(`Mining contract ${contractId} updated in Firestore.`);
+        } catch (error) {
+          console.error(`Error updating mining contract ${contractId} in Firestore:`, error);
+        }
+      }
+
+          /* ═══════════════════════════════════════════════
+         LOGOUT (Firebase Version)
+      ═══════════════════════════════════════════════ */
+      async function firebaseLogout() { // Renamed to firebaseLogout to avoid conflicts
+        try {
+          await signOut(auth); // Firebase method to sign out the current user
+          console.log("User signed out from Firebase.");
+        } catch (error) {
+          console.error("Error signing out from Firebase:", error);
+        } finally {
+          // Clear any local storage items that might be related to previous sessions
+          try { localStorage.removeItem('at_state'); } catch (e) { console.error("Error clearing at_state:", e); }
+          // Clear any old Supabase-specific items that might have persisted (just in case)
+          try {
+            Object.keys(localStorage).forEach(k => {
+              if (k.startsWith('sb-') || k.startsWith('supabase')) localStorage.removeItem(k);
+            });
+          } catch (e) { console.error("Error clearing old Supabase items:", e); }
+          // Firebase itself handles clearing its session tokens, so no direct `sb_session` removal needed.
+          sessionStorage.clear(); // Clear sessionStorage as well
+
+          // Redirect to the login page after logout
+          window.location.href = 'login.html';
+        }
+      }
+
+
+           /* ═══════════════════════════════════════════════
+         INIT (Firebase Adapted)
       ═══════════════════════════════════════════════ */
       (function init() {
-        // Draw QR placeholders immediately
+        // Draw QR placeholders immediately (no change needed)
         drawQR('dep-qr-canvas', 'bc1q705yyxfpnkrr3nzu556nnnl4egv9kkr7xma4wc', 120);
-        // Load state from localStorage first (instant)
-        refreshAllUI();
-        // Then load fresh from Supabase (authoritative)
-        loadProfile();
-        // Draw chart
+        
+        // This refreshAllUI() will initially run with default STATE values or
+        // whatever was last in localStorage. The onAuthStateChanged listener
+        // will then update STATE with fresh Firestore data and call initializeDashboardUI(),
+        // which then calls refreshAllUI() again with authoritative data.
+        refreshAllUI(); 
+
+        // The call to `loadProfile()` is removed. Its responsibilities are now
+        // handled by the `onAuthStateChanged` listener which fetches data from Firestore
+        // and then calls `initializeDashboardUI()` (which in turn calls `refreshAllUI()`).
+        // So, no direct replacement here.
+
+        // Draw chart (no change needed)
         setTimeout(function () { drawTradeChart('BTC'); }, 100);
       })();
+
     </script>
   </body>
 
