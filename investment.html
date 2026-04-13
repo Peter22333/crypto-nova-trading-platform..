@@ -1178,33 +1178,204 @@
     </footer>
 
     <script>
-        const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
-        const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxa3VibGV0Z2lmcWR1dHliem56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NjA5OTMsImV4cCI6MjA4ODQzNjk5M30.TkweXseKRQuA7FoT7erYdUJMuGtYWYSZ7b7l9WCPq-8';
-        const sb = {
-            _h() { return { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (sb._tok() || SUPA_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' }; },
-            _tok() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.access_token; } catch { return null; } },
-            _uid() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.user?.id; } catch { return null; } },
-            isLoggedIn() { return !!sb._tok(); },
-            requireAuth() { if (!sb.isLoggedIn()) { window.location.href = 'login.html'; return false; } return true; },
-            async get(table, filters = '') { const r = await fetch(SUPA_URL + '/rest/v1/' + table + (filters ? '?' + filters : ''), { headers: sb._h() }); return r.json(); },
-            async insert(table, body) { const r = await fetch(SUPA_URL + '/rest/v1/' + table, { method: 'POST', headers: sb._h(), body: JSON.stringify(body) }); return r.json(); },
-            async update(table, body, filters) { const r = await fetch(SUPA_URL + '/rest/v1/' + table + '?' + filters, { method: 'PATCH', headers: sb._h(), body: JSON.stringify(body) }); return r.json(); },
-            async getProfile() { const uid = sb._uid(); if (!uid) return null; const r = await sb.get('profiles', 'id=eq.' + uid + '&select=*'); return Array.isArray(r) ? r[0] : null; },
-            async updateBalance(newBal) { const uid = sb._uid(); if (!uid) return; return sb.update('profiles', { balance: newBal }, 'id=eq.' + uid); }
-        };
-        if (!sb.isLoggedIn()) { window.location.href = 'login.html'; }
+        // ===============================================================================================
+  // FIREBASE CLIENT & AUTH GUARD (Investment.html)
+  // This replaces the Supabase client, sb object, and initial auth check.
+  // ===============================================================================================
 
-        async function saveInvestmentToDB(inv) {
-            const uid = sb._uid(); if (!uid) return;
-            await sb.insert('investments', {
-                id: inv.id, user_id: uid, plan: inv.plan, plan_name: inv.planName,
-                amount: inv.amount, daily_rate: inv.dailyRate, duration: inv.duration,
-                earned: 0, status: 'active', start_date: inv.startDate, end_date: inv.endDate,
-                start_ts: inv.startTs, end_ts: inv.endTs
-            });
-            await sb.insert('transactions', { user_id: uid, type: 'investment', asset: inv.planName + ' Plan', amount: '-$' + inv.amount.toFixed(2), status: 'active', ref: inv.id });
-            await sb.updateBalance(STATE.balance);
-        }
+  // Firebase SDK Imports
+  // These lines bring in the necessary functions from the Firebase libraries.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    updateDoc,
+    collection,
+    query,
+    where,
+    getDocs, // For one-time fetches (e.g., initial load of contracts)
+    addDoc,
+    runTransaction, // For atomic balance updates when purchasing
+    serverTimestamp // For consistent date/time stamps in Firestore
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+  // Your Firebase Configuration (This must be identical across all your Firebase-enabled pages)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBwdhzot1c6-3HMrAmYjVrpWtgRpFiysdk",
+    authDomain: "crypto-dashboard-12911.firebaseapp.com",
+    projectId: "crypto-dashboard-12911",
+    storageBucket: "crypto-dashboard-12911.firebasestorage.app",
+    messagingSenderId: "426133649845",
+    appId: "1:426133649845:web:6edc16f7031a1c934a41fc",
+    measurementId: "G-3744FSNNKK"
+  };
+
+  // Initialize Firebase App, Auth, and Firestore services
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentUser = null; // Stores the Firebase authenticated user object
+  let userProfile = null; // Stores the user's profile document from Firestore
+
+  // ===============================================================================================
+  // FIREBASE HELPER FUNCTIONS (replaces sb. functions like updateBalance, getProfile, etc.)
+  // These functions encapsulate common Firestore operations for user data.
+  // ===============================================================================================
+
+  // Replaces your `sb.updateBalance` logic
+  async function updateBalanceInFirestore(newBalance) {
+    if (!currentUser) {
+      console.error("No authenticated user to update balance for.");
+      return;
+    }
+    const userDocRef = doc(db, "users", currentUser.uid);
+    try {
+      await updateDoc(userDocRef, {
+        currentBalance: newBalance,
+        lastUpdated: serverTimestamp() // Optional: track when balance was last updated
+      });
+      console.log("User balance updated in Firestore successfully.");
+      // Update local profile and STATE to reflect change immediately
+      if (userProfile) userProfile.currentBalance = newBalance;
+      if (STATE) STATE.balance = newBalance;
+    } catch (error) {
+      console.error("Error updating user balance in Firestore:", error);
+      showToast("Failed to update balance in database.", "error");
+    }
+  }
+
+  // Helper to update an investment document in Firestore
+  async function updateInvestmentInFirestore(investmentId, dataToUpdate) {
+    if (!currentUser) return;
+    try {
+      const invDocRef = doc(db, "investments", investmentId); // Assumes investmentId is the Firestore document ID
+      await updateDoc(invDocRef, dataToUpdate);
+      // console.log(`Investment ${investmentId} updated in Firestore.`);
+    } catch (error) {
+      console.error(`Error updating investment ${investmentId} in Firestore:`, error);
+      showToast("Failed to update investment in database.", "error");
+    }
+  }
+
+  // Firebase Logout Function (replaces sb.logout() logic)
+  async function firebaseLogout() {
+    try {
+      await signOut(auth);
+      console.log("User signed out from Firebase.");
+    } catch (error) {
+      console.error("Error signing out from Firebase:", error);
+    } finally {
+      // Clear any local storage items that might be related to previous sessions
+      localStorage.removeItem('at_state');
+      // Clear any old Supabase-specific items just in case
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith('sb-') || k.startsWith('supabase')) localStorage.removeItem(k);
+      });
+      // Redirect to the login page after logout
+      window.location.href = 'login.html';
+    }
+  }
+
+  // Helper to load investments from Firestore (used during initial load)
+  async function loadInvestmentsFromFirestore() {
+      if (!currentUser) return;
+      try {
+          const q = query(collection(db, "investments"), where("userId", "==", currentUser.uid), orderBy("timestamp", "desc"));
+          const querySnapshot = await getDocs(q);
+          STATE.investments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          // console.log("Loaded investments:", STATE.investments);
+      } catch (error) {
+          console.error("Error loading investments from Firestore:", error);
+          showToast("Failed to load investments.", "error");
+      }
+  }
+
+  // ===============================================================================================
+  // FIREBASE AUTHENTICATION STATE LISTENER (replaces sb.isLoggedIn() and initial data loading)
+  // This listener handles checking if a user is logged in, fetching their profile,
+  // and then initializing the page UI.
+  // ===============================================================================================
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user; // Set the global currentUser object
+      // Fetch user's profile from Firestore
+      const userDocRef = doc(db, "users", currentUser.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        userProfile = userDocSnap.data(); // Store the user's profile data
+        // Populate local STATE object with data from fetched profile
+        STATE.balance = userProfile.currentBalance || 0; // Set initial balance from Firestore
+        
+        // Fetch all of the user's investments from Firestore
+        await loadInvestmentsFromFirestore(); 
+
+        // Initial UI updates that depend on loaded user data
+        // This function will need to be defined on this page
+        initializeInvestmentPageUI(); 
+        loadFromDB(); // This will resume active tickers
+
+      } else {
+        console.error("User profile not found in Firestore for UID:", currentUser.uid);
+No response
+
+  // ===============================================================================================
+  // Function: saveInvestmentToDB (Firebase Firestore Version)
+  // Replaces Supabase inserts and balance update for new investment plan.
+  // ===============================================================================================
+  async function saveInvestmentToDB(inv) {
+    if (!currentUser) {
+      console.error('No current user found. Cannot save investment.');
+      showToast('Session expired. Please log in again.', 'error');
+      await firebaseLogout();
+      return;
+    }
+    const uid = currentUser.uid;
+
+    try {
+      // 1. Add investment plan to 'investments' collection
+      await addDoc(collection(db, "investments"), {
+        userId: uid, // Use Firebase Auth UID
+        plan: inv.plan,
+        planName: inv.planName,
+        amount: inv.amount,
+        dailyRate: inv.dailyRate,
+        duration: inv.duration,
+        earned: 0,
+        status: 'active',
+        startDate: inv.startDate,
+        endDate: inv.endDate,
+        startTs: inv.startTs,
+        endTs: inv.endTs,
+        timestamp: serverTimestamp() // Record creation time
+      });
+
+      // 2. Add transaction record for investment plan purchase
+      await addDoc(collection(db, "transactions"), {
+        userId: uid,
+        type: 'investment',
+        asset: inv.planName + ' Plan',
+        amount: '-$' + inv.amount.toFixed(2), // Negative amount for purchase
+        status: 'completed', // Purchase is immediately completed
+        ref: inv.id, // Reference to the investment ID
+        timestamp: serverTimestamp()
+      });
+
+      // Note: Updating the user's balance in Firestore is handled by executeInvestment,
+      // which calls updateBalanceInFirestore before calling this saveInvestmentToDB.
+
+      // console.log("Investment plan and transaction saved to Firestore.");
+
+    } catch (error) {
+      console.error("Error saving investment plan to Firestore:", error);
+      showToast(`Failed to save investment plan: ${error.message}`, "error");
+    }
+  }
+
 
         /* ── NAV ── */
         window.addEventListener('scroll', function () { document.getElementById('navbar').classList.toggle('sc', scrollY > 40); }, { passive: true });
@@ -1265,37 +1436,34 @@
 
         function saveState() {
             try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { }
-            sb.updateBalance(STATE.balance).catch(function () { });
+            // sb.updateBalance(STATE.balance).catch(function () { }); // REMOVE THIS LINE
+            // The balance update to Firestore is handled explicitly in executeInvestment and startEarnings
         }
 
+
         /* Load fresh balance + investments from Supabase on page load */
+               /* Load fresh balance + investments from Firestore on page load */
+        // This function is now simplified as the onAuthStateChanged listener already
+        // loads the initial balance and calls loadInvestmentsFromFirestore.
+        // Its primary remaining purpose is to resume the tickers.
         async function loadFromDB() {
             try {
-                var profile = await sb.getProfile();
-                if (!profile) return;
-                /* Always use Supabase balance — never stale localStorage */
-                STATE.balance = parseFloat(profile.balance) || 0;
-                var uid = sb._uid();
-                var invs = await sb.get('investments', 'user_id=eq.' + uid + '&order=created_at.desc');
-                if (Array.isArray(invs) && invs.length) {
-                    STATE.investments = invs.map(function (i) {
-                        return {
-                            id: i.id, plan: i.plan, planName: i.plan_name,
-                            amount: parseFloat(i.amount), dailyRate: parseFloat(i.daily_rate),
-                            duration: i.duration, startDate: i.start_date, endDate: i.end_date,
-                            startTs: i.start_ts, endTs: i.end_ts,
-                            earned: parseFloat(i.earned) || 0, status: i.status
-                        };
-                    });
-                }
-                try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { }
+                // STATE.balance is already loaded by onAuthStateChanged
+                // STATE.investments is already loaded by loadInvestmentsFromFirestore
+                // (which is called by onAuthStateChanged)
+
+                try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { } // Ensure local storage is updated
+
                 /* Resume earnings for any active plans loaded from DB */
                 STATE.investments.forEach(function (inv) {
+                    // Assuming 'startEarnings' is defined elsewhere on this page
                     if (inv.status === 'active' && Date.now() < inv.endTs) startEarnings(inv);
                 });
             } catch (e) { console.warn('DB load error:', e); }
         }
-        loadFromDB();
+        // loadFromDB() is now called from the onAuthStateChanged listener,
+        // so you should REMOVE the global call `loadFromDB();` at the end of this block
+        // from its current position in your script.
 
         /* ── PLAN DEFINITIONS ── */
         var PLANS = {
@@ -1411,13 +1579,24 @@
             document.getElementById('at-t').textContent = f(amt * plan.dailyRate * plan.duration);
         }
 
-        function doInvest(key) {
+               // ===============================================================================================
+        // Function: doInvest (Firebase Firestore Version)
+        // Replaces Supabase logic for purchasing an investment plan.
+        // ===============================================================================================
+        async function doInvest(key) { // Make it async
             var plan = PLANS[key];
             var amt = parseFloat(document.getElementById('at-amt').value) || 0;
             var err = document.getElementById('at-err');
             var btn = document.getElementById('at-btn');
             err.style.display = 'none';
 
+            if (!currentUser) {
+                err.style.display = 'block';
+                err.textContent = 'You must be logged in to invest.';
+                return;
+            }
+
+            // Client-side validation
             if (STATE.balance <= 0) {
                 err.style.display = 'block';
                 err.textContent = 'No balance available. Please deposit funds first.';
@@ -1434,22 +1613,62 @@
                 return;
             }
 
-            btn.disabled = true; btn.textContent = 'Activating…';
+            btn.disabled = true;
+            btn.textContent = 'Activating…';
 
-            setTimeout(function () {
-                STATE.balance -= amt;
-                var now = new Date(), end = new Date(now.getTime() + plan.duration * 86400000);
+            // Introduce a small delay for UI feedback (from your original code)
+            await new Promise(resolve => setTimeout(resolve, 700));
+
+            try {
+                // 1. Deduct amount from user's balance in Firestore using a transaction
+                const newBalance = STATE.balance - amt;
+                if (newBalance < 0) { // Safety check
+                    throw new Error("Balance check failed during processing.");
+                }
+
+                const userDocRef = doc(db, "users", currentUser.uid);
+                await runTransaction(db, async (transaction) => {
+                    const userDoc = await transaction.get(userDocRef);
+                    if (!userDoc.exists()) throw new Error("User document does not exist!");
+                    const currentBalance = parseFloat(userDoc.data().currentBalance) || 0;
+                    if (currentBalance < amt) throw new Error("Insufficient balance for purchase."); // Double check
+
+                    transaction.update(userDocRef, {
+                        currentBalance: currentBalance - amt,
+                        lastUpdated: serverTimestamp()
+                    });
+                });
+
+                STATE.balance = newBalance; // Update local state balance
+
+                // 2. Prepare investment data
+                var now_client = new Date(); // Client-side date for display strings
+                var end_client = new Date(now_client.getTime() + plan.duration * 86400000);
                 var inv = {
-                    id: 'INV' + Date.now(), plan: key, planName: plan.name, amount: amt,
-                    dailyRate: plan.dailyRate, duration: plan.duration,
-                    startDate: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                    endDate: end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                    startTs: now.getTime(), endTs: end.getTime(), earned: 0, status: 'active'
+                    id: 'INV' + Date.now(), // Client-generated ID for local use
+                    userId: currentUser.uid, // Link to current user
+                    plan: key,
+                    planName: plan.name,
+                    amount: amt,
+                    dailyRate: plan.dailyRate,
+                    duration: plan.duration,
+                    startDate: now_client.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    endDate: end_client.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    startTs: now_client.getTime(), // Store client timestamp
+                    endTs: end_client.getTime(),   // Store client timestamp
+                    earned: 0,
+                    status: 'active',
+                    timestamp: serverTimestamp() // Firestore server timestamp
                 };
-                STATE.investments.push(inv);
-                saveInvestmentToDB(inv).catch(() => { });
-                STATE.transactions.unshift({ id: inv.id, type: 'investment', asset: plan.name + ' Plan', amount: '-$' + amt.toFixed(2), date: inv.startDate, hash: inv.id, status: 'active' });
-                saveState();
+
+                // 3. Save the investment plan and transaction to Firestore
+                // This function already uses addDoc
+                await saveInvestmentToDB(inv); // This function will add to 'investments' and 'transactions'
+
+                // 4. Update local STATE for UI
+                STATE.investments.push(inv); // Add the new investment to local state
+                saveState(); // Save local state to localStorage
+
                 document.getElementById('at-ov').style.display = 'none';
 
                 var f = function (n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
@@ -1461,40 +1680,39 @@
                     atRow('Total at Maturity', f(amt * plan.dailyRate * plan.duration), '#1a6bff') +
                     atRow('Ends On', inv.endDate);
                 document.getElementById('at-sov').style.display = 'flex';
-                startEarnings(inv);
-            }, 700);
+                startEarnings(inv); // Start the earnings ticker for this new investment
+
+                showToast('Plan activated successfully!', 'success');
+
+            } catch (error) {
+                console.error("Error executing investment:", error);
+                err.style.display = 'block';
+                err.textContent = `Error activating plan: ${error.message}. Please try again.`;
+            } finally {
+                // Always re-enable button
+                btn.disabled = false;
+                btn.textContent = 'Activate ' + plan.name + ' Plan';
+            }
         }
 
         function atRow(k, v, col) {
             return '<div class="at-row"><span style="color:#6b7a99">' + k + '</span><span style="font-weight:700;font-family:\'Sora\',sans-serif' + (col ? ';color:' + col : '') + '">' + v + '</span></div>';
         }
 
-        /* ── EARNINGS TICKER — 30s = 1/2880 of daily ── */
+       
+         // ===============================================================================================
+        // Function: startEarnings (Firebase Firestore Version)
+        // Replaces Supabase logic for periodic balance and investment updates.
+        // ===============================================================================================
         function startEarnings(inv) {
-            var tick = (inv.amount * inv.dailyRate) / 2880;
-            var tid = setInterval(function () {
-                try { STATE = JSON.parse(localStorage.getItem('at_state') || '{}'); } catch (e) { }
-                if (!STATE.investments) { clearInterval(tid); return; }
-                var idx = STATE.investments.findIndex(function (i) { return i.id === inv.id; });
-                if (idx === -1 || STATE.investments[idx].status !== 'active') { clearInterval(tid); return; }
-                if (Date.now() >= STATE.investments[idx].endTs) {
-                    STATE.investments[idx].status = 'completed';
-                    saveState(); // syncs to Supabase
-                    // Update earned in DB
-                    sb.update('investments', { status: 'completed' }, 'id=eq.' + inv.id).catch(function () { });
-                    clearInterval(tid); return;
-                }
-                STATE.balance += tick;
-                STATE.investments[idx].earned = (STATE.investments[idx].earned || 0) + tick;
-                saveState(); // saves localStorage + syncs balance to Supabase
-                // Periodically update earned field in DB (every 10 ticks = ~5 min)
-                if (Math.random() < 0.1) {
-                    sb.update('investments', { earned: STATE.investments[idx].earned }, 'id=eq.' + inv.id).catch(function () { });
-                }
-            }, 30000);
-        }
+            // Ensure currentUser exists before starting a ticker that updates data
+            if (!currentUser) return;
 
-        /* Resume handled inside loadFromDB() above */
+            var tickAmt = (inv.amount * inv.dailyRate) / 2880; // Assuming 2880 intervals per day (30s * 2880 = 24h)
+            var tid = setInterval(async function () { // Make the callback async
+                // Re-load STATE from local storage to ensure consistency if multiple tabs/windows
+                try { STATE = JSON.parse(localStorage.getItem('at_state') ||No response
+
     </script>
 </body>
 
