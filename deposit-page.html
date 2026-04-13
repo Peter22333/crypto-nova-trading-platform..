@@ -1607,7 +1607,7 @@
           <div class="user-name" id="user-name-display">User</div>
           <div class="user-tier">Standard Tier</div>
         </div>
-        <button class="user-logout" onclick="logout()" title="Log out">
+        <button class="user-logout" onclick="firebaseLogout()" title="Log out">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
             stroke-linecap="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -2159,29 +2159,153 @@
     <span id="t-msg"></span>
   </div>
 
-  <script>
-    const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxa3VibGV0Z2lmcWR1dHliem56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NjA5OTMsImV4cCI6MjA4ODQzNjk5M30.TkweXseKRQuA7FoT7erYdUJMuGtYWYSZ7b7l9WCPq-8';
-    const sb = {
-      _h() { return { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (sb._tok() || SUPA_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' }; },
-      _tok() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.access_token; } catch { return null; } },
-      _uid() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.user?.id; } catch { return null; } },
-      isLoggedIn() { return !!sb._tok(); },
-      requireAuth() { if (!sb.isLoggedIn()) { window.location.href = 'login.html'; return false; } return true; },
-      async get(table, filters = '') { const r = await fetch(SUPA_URL + '/rest/v1/' + table + (filters ? '?' + filters : ''), { headers: sb._h() }); return r.json(); },
-      async insert(table, body) { const r = await fetch(SUPA_URL + '/rest/v1/' + table, { method: 'POST', headers: sb._h(), body: JSON.stringify(body) }); return r.json(); },
-      async update(table, body, filters) { const r = await fetch(SUPA_URL + '/rest/v1/' + table + '?' + filters, { method: 'PATCH', headers: sb._h(), body: JSON.stringify(body) }); return r.json(); },
-      async getProfile() { const uid = sb._uid(); if (!uid) return null; const r = await sb.get('profiles', 'id=eq.' + uid + '&select=*'); return Array.isArray(r) ? r[0] : null; },
-      async updateBalance(newBal) { const uid = sb._uid(); if (!uid) return; return sb.update('profiles', { balance: newBal }, 'id=eq.' + uid); }
-    };
-    if (!sb.isLoggedIn()) { window.location.href = 'login.html'; }
+ <script type="module">
+       // 1. Firebase SDK Imports
+    // These lines bring in the necessary functions from the Firebase libraries.
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      collection,
+      addDoc,
+      updateDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    /* Save deposit to Supabase after crediting */
-    async function saveDepositToDB(method, asset, amount, fee, credited, ref) {
-      const uid = sb._uid(); if (!uid) return;
-      await sb.insert('deposits', { user_id: uid, method, asset, amount, fee, credited: false, ref, status: 'pending' });
-      await sb.insert('transactions', { user_id: uid, type: 'deposit', asset, amount: '+$' + amount.toFixed(2), status: 'pending', ref });
+
+    // 2. Your Firebase Configuration
+    // This connects your web app to your specific Firebase project.
+    // Ensure this matches the config you got from your Firebase project settings.
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwdhzot1c6-3HMrAmYjVrpWtgRpFiysdk",
+      authDomain: "crypto-dashboard-12911.firebaseapp.com",
+      projectId: "crypto-dashboard-12911",
+      storageBucket: "crypto-dashboard-12911.firebasestorage.app",
+      messagingSenderId: "426133649845",
+      appId: "1:426133649845:web:6edc16f7031a1c934a41fc",
+      measurementId: "G-3744FSNNKK"
+    };
+
+    // 3. Initialize Firebase App and Services
+    // These lines initialize the Firebase app and get instances of the
+    // Authentication and Firestore services that you'll use.
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app); // Firebase Authentication service
+    const db = getFirestore(app); // Firebase Firestore database service
+
+    // Global variables to hold the current user and their profile data from Firestore
+    let currentUser = null; 
+    let userProfile = null;
+
+
+    // 4. Firebase Authentication State Listener (Replaces your `sb.isLoggedIn()` check)
+    // This listener automatically runs whenever the user's sign-in state changes.
+    // It's the most reliable way to manage user sessions in Firebase.
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // User is signed in.
+        currentUser = user; // Store the authenticated user object
+
+        // Now, fetch the user's detailed profile from your 'users' Firestore collection.
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          userProfile = userDocSnap.data(); // Store the user's profile data
+
+          // Update your local `STATE` object using the data fetched from Firestore.
+          // This ensures your UI reflects the current user's data from the database.
+          STATE.user = {
+            name: userProfile.displayName || 'User',
+            email: userProfile.email,
+            initials: (userProfile.displayName || userProfile.email || 'U').charAt(0).toUpperCase()
+          };
+          STATE.balance = userProfile.currentBalance || 0; // Use balance from Firestore
+
+          // Call a function to update your page's UI elements that depend on user data.
+          initializePageUI(); 
+          // Save the updated local STATE to localStorage (for temporary client-side persistence).
+          saveState(); 
+
+          // TODO: If you want to load *past* deposits/transactions from Firestore
+          // (which you absolutely should for a robust app), you would fetch them here.
+          // Example:
+          // const depositsQuery = query(collection(db, "deposits"), where("userId", "==", currentUser.uid), orderBy("timestamp", "desc"));
+          // const depositsSnapshot = await getDocs(depositsQuery);
+          // STATE.deposits = depositsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          // buildDepHistory(); // Then call this function to render them.
+
+        } else {
+          // Scenario: User is authenticated but their profile document is missing in Firestore.
+          console.error("User profile not found in Firestore for UID:", currentUser.uid);
+          alert("Your user profile is incomplete. Please contact support or try logging in again.");
+          await firebaseLogout(); // Force logout as the profile is incomplete.
+        }
+      } else {
+        // User is NOT signed in. Redirect them to the login page.
+        window.location.href = 'login.html';
+      }
+    });
+
+    // You will need to define `initializePageUI()` and `firebaseLogout()` later in your script.
+    // `firebaseLogout` will be covered in the logout section.
+
+
+/* Save deposit to Firestore as PENDING (not credited) */
+async function saveDepositToDB(method, asset, amount, fee, credited, ref) {
+  if (!currentUser) { // Check if Firebase user is authenticated
+    console.error('No current user found. Cannot save deposit.');
+    showToast('Session expired. Please log in again.', 'error');
+    await firebaseLogout(); // This function will be defined later in logout section
+    return;
+  }
+  const uid = currentUser.uid;
+
+  try {
+    // Add to 'deposits' collection
+    await addDoc(collection(db, "deposits"), {
+      userId: uid,
+      method: method || 'crypto',
+      asset: asset,
+      amount: amount,
+      fee: fee,
+      credited: false, // Admin approval will change this
+      ref: ref,
+      status: 'pending',
+      timestamp: serverTimestamp() // Use server-generated timestamp
+    });
+    
+    // Add to 'transactions' collection
+    await addDoc(collection(db, "transactions"), {
+      userId: uid,
+      type: 'deposit',
+      asset: asset,
+      amount: '+$' + amount.toFixed(2), // Storing as string with sign for display
+      status: 'pending',
+      ref: ref,
+      timestamp: serverTimestamp()
+    });
+
+    console.log('✅ Deposit and Transaction saved to Firestore successfully. Ref:', ref);
+    return { success: true }; // Indicate success
+
+  } catch (error) {
+    console.error('Firestore deposit insert failed:', error);
+    // Visible error on the success screen (adapt from your Supabase error display)
+    const errDiv = document.getElementById('deposit-save-error'); // Ensure this ID exists or create it
+    if (!errDiv) {
+        errDiv = document.createElement('div');
+        errDiv.id = 'deposit-save-error';
+        errDiv.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 16px;font-size:13px;color:#dc2626;margin:16px 0;line-height:1.6';
+        var successPanel = document.getElementById('panel-success') || document.querySelector('.panel.active');
+        if (successPanel) successPanel.insertBefore(errDiv, successPanel.firstChild);
     }
+    errDiv.innerHTML = `<strong>⚠️ Note:</strong> Deposit submitted but could not be saved to database: ${error.message}<br>Please contact support with ref: ${ref}`;
+    return { success: false, error: error.message }; // Indicate failure
+  }
+}
 
     /* ═══════════════════════════
        STATE
@@ -2195,15 +2319,45 @@
 
     function saveState() { try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { } }
 
-    // Set user info
-    document.getElementById('user-av').textContent = STATE.user.initials || 'U';
-    document.getElementById('user-name-display').textContent = STATE.user.name || 'User';
-    document.getElementById('topbar-balance').textContent = '$' + STATE.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+// Function to initialize/update UI elements that depend on authenticated user data
+// This function should be called from within the onAuthStateChanged listener
+// once `STATE.user` and `STATE.balance` have been populated from Firestore.
+function initializePageUI() {
+  const userAvElement = document.getElementById('user-av');
+  if (userAvElement && STATE.user?.initials) { // Added null checks for safety
+    userAvElement.textContent = STATE.user.initials;
+  }
+  const userNameDisplayElement = document.getElementById('user-name-display');
+  if (userNameDisplayElement && STATE.user?.name) { // Added null checks
+    userNameDisplayElement.textContent = STATE.user.name;
+  }
+  const topbarBalanceElement = document.getElementById('topbar-balance');
+  if (topbarBalanceElement) {
+    topbarBalanceElement.textContent = '$' + STATE.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
 
-    // Bank ref from email
-    var bankRef = 'AT-' + (STATE.user.email || '').split('@')[0].toUpperCase().slice(0, 8) + '-' + Math.floor(Math.random() * 9000 + 1000);
-    document.getElementById('bank-ref').childNodes[0].textContent = bankRef + ' ';
-    document.getElementById('bank-ref-copy').setAttribute('onclick', "copyText('" + bankRef + "')");
+  // Generate Bank reference using the authenticated user's email
+  // Ensure currentUser is available (from onAuthStateChanged)
+  var bankRef = 'AT-' + (currentUser?.email || '').split('@')[0].toUpperCase().slice(0, 8) + '-' + Math.floor(Math.random() * 9000 + 1000);
+  const bankRefNode = document.getElementById('bank-ref');
+  if (bankRefNode && bankRefNode.childNodes[0]) bankRefNode.childNodes[0].textContent = bankRef + ' ';
+  const bankRefCopy = document.getElementById('bank-ref-copy');
+  if (bankRefCopy) bankRefCopy.setAttribute('onclick', `copyText('${bankRef}')`);
+}
+
+// Your STATE object and saveState() function go here, directly after initializePageUI()
+/* ═══════════════════════════
+   STATE
+═══════════════════════════ */
+var STATE = {};
+try { STATE = JSON.parse(localStorage.getItem('at_state')) || {}; } catch (e) { }
+if (!STATE.user) STATE.user = { name: 'User', email: '', initials: 'U' };
+if (!STATE.balance) STATE.balance = 0;
+if (!STATE.transactions) STATE.transactions = [];
+if (!STATE.deposits) STATE.deposits = [];
+
+function saveState() { try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { } }
+
 
     /* ═══════════════════════════
        CRYPTO PRICES (for equiv)
@@ -2435,65 +2589,48 @@
       item.style.opacity = '1';
     }
 
-    function finishDeposit() {
+       async function finishDeposit() { // Made async because saveDepositToDB is async
       // DO NOT credit balance — admin will approve manually
       var feeRates = { crypto: 0, bank: 0, card: 0.015 };
       var fee = depositAmount * (feeRates[selectedMethod] || 0);
       var credited = depositAmount - fee;
       var depRef = 'DEP' + Math.random().toString(36).substr(2, 8).toUpperCase();
 
-      // Save deposit to Supabase as PENDING (not credited)
-      var uid = sb._uid();
-      var asset = selectedMethod === 'crypto' ? (document.getElementById('crypto-coin') ? document.getElementById('crypto-coin').value : 'BTC') : 'USD';
-      if (uid) {
-        // Insert deposit — show visible error if it fails
-        sb.insert('deposits', {
-          user_id: uid,
-          method: selectedMethod || 'crypto',
-          asset: asset,
-          amount: depositAmount,
-          fee: fee,
-          credited: false,
-          ref: depRef,
-          status: 'pending'
-        }).then(function (r) {
-          if (r && r.error) {
-            // Visible error on the success screen
-            var errDiv = document.getElementById('deposit-save-error');
-            if (!errDiv) {
-              errDiv = document.createElement('div');
-              errDiv.id = 'deposit-save-error';
-              errDiv.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 16px;font-size:13px;color:#dc2626;margin:16px 0;line-height:1.6';
-              var successPanel = document.getElementById('panel-success') || document.querySelector('.panel.active');
-              if (successPanel) successPanel.insertBefore(errDiv, successPanel.firstChild);
-            }
-            errDiv.innerHTML = '<strong>⚠️ Note:</strong> Deposit submitted but could not be saved to database: ' + JSON.stringify(r.error) + '<br>Please contact support with ref: ' + depRef;
-            console.error('Deposit insert error:', r.error);
-          } else {
-            console.log('✅ Deposit saved to Supabase successfully. Ref:', depRef);
-          }
-        }).catch(function (e) {
-          console.error('Deposit insert failed:', e);
-        });
-
-        sb.insert('transactions', {
-          user_id: uid,
-          type: 'deposit',
-          asset: asset,
-          amount: '+$' + depositAmount.toFixed(2),
-          status: 'pending',
-          ref: depRef
-        }).catch(function (e) { console.error('Transaction insert failed:', e); });
-      } else {
-        // uid is null — user session lost
-        console.error('No user ID found — session may have expired');
-        var errDiv = document.createElement('div');
-        errDiv.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 16px;font-size:13px;color:#dc2626;margin:16px 0';
-        errDiv.innerHTML = '⚠️ Session expired. Your deposit of $' + depositAmount.toFixed(2) + ' (Ref: ' + depRef + ') was submitted but could not be recorded. Please contact support.';
-        var panel = document.querySelector('.panel.active');
-        if (panel) panel.insertBefore(errDiv, panel.firstChild);
+      // Check if user is authenticated (currentUser is set by onAuthStateChanged)
+      if (!currentUser) {
+        console.error('No current user ID found — session may have expired');
+        showToast('Session expired. Please log in again.', 'error');
+        await firebaseLogout(); // Call the Firebase logout function
+        return;
       }
 
+      var asset = selectedMethod === 'crypto' ? (document.getElementById('crypto-coin') ? document.getElementById('crypto-coin').value : 'BTC') : 'USD';
+
+      // Call the Firebase-adapted saveDepositToDB function
+      const saveResult = await saveDepositToDB(selectedMethod, asset, depositAmount, fee, credited, depRef);
+
+      if (!saveResult.success) {
+        // Display error message if saving to Firestore failed
+        var errDiv = document.getElementById('deposit-save-error');
+        if (!errDiv) { // Create if it doesn't exist
+          errDiv = document.createElement('div');
+          errDiv.id = 'deposit-save-error';
+          errDiv.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 16px;font-size:13px;color:#dc2626;margin:16px 0;line-height:1.6';
+          var successPanel = document.getElementById('panel-success') || document.querySelector('.panel.active');
+          if (successPanel) successPanel.insertBefore(errDiv, successPanel.firstChild);
+        }
+        errDiv.innerHTML = `<strong>⚠️ Note:</strong> Deposit submitted but could not be saved to database: ${saveResult.error}<br>Please contact support with ref: ${depRef}`;
+        console.error('Deposit save failed:', saveResult.error);
+
+        // Even if DB save failed, you might still proceed to success panel
+        // but with a clear error message. Or, you might want to stop here.
+        // For now, mirroring your original logic to proceed but show error.
+      } else {
+        console.log('✅ Deposit saved to Firestore successfully. Ref:', depRef);
+      }
+
+
+      // Update client-side STATE (this part remains largely the same)
       var dep = {
         id: depRef,
         method: selectedMethod,
@@ -2503,22 +2640,21 @@
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
         ref: depRef,
-        status: 'pending'
+        status: 'pending' // Still pending until admin approval
       };
       if (!STATE.deposits) STATE.deposits = [];
       STATE.deposits.unshift(dep);
       STATE.transactions.unshift({
         id: dep.id, type: 'deposit',
         asset: asset,
-        amount: '$' + credited.toFixed(2),
+        amount: '+$' + credited.toFixed(2), // Use credited amount for transaction display
         date: dep.date, hash: dep.ref, status: 'pending'
       });
-      saveState();
+      saveState(); // Save updated local state
 
-      // Go to success
+      // Go to success panel and update step bar (UI logic, remains unchanged)
       document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('active'); });
       document.getElementById('panel-5').classList.add('active');
-      // Update step bar to step 5
       for (var i = 1; i <= 5; i++) {
         var s = document.getElementById('step' + i);
         s.classList.remove('active', 'done');
@@ -2527,6 +2663,7 @@
       }
       buildSuccessPanel();
     }
+No response
 
     /* ═══════════════════════════
        SUCCESS PANEL
@@ -2547,7 +2684,10 @@
           '<div class="ds-row"><span class="ds-key">Amount Submitted</span><span class="ds-val">$' + lastDep.amount.toFixed(2) + '</span></div>' +
           '<div class="ds-row"><span class="ds-key">Fee</span><span class="ds-val">' + (lastDep.fee > 0 ? '$' + lastDep.fee.toFixed(2) : 'Free') + '</span></div>' +
           '<div class="ds-row"><span class="ds-key">Reference</span><span class="ds-val">' + lastDep.ref + '</span></div>' +
-          '<div class="ds-row"><span class="ds-key">New Trading Balance</span><span class="ds-val" style="color:var(--teal)">$' + bal.toFixed(2) + '</span></div>';
+          //'<div class="ds-row"><span class="ds-key">New Trading Balance</span><span class="ds-val" style="color:var(--teal)">$' + bal.toFixed(2) + '</span></div>'
+         // Assuming userProfile is available from the onAuthStateChanged listener
+          const expectedNewBalance = userProfile ? userProfile.currentBalance + lastDep.credited : lastDep.credited;
+          '<div class="ds-row"><span class="ds-key">Estimated New Balance</span><span class="ds-val" style="color:var(--teal)">$' + expectedNewBalance.toFixed(2) + '</span></div>';
       }
 
       buildDepHistory();
@@ -2665,27 +2805,31 @@
     function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('open'); }
 
     /* ═══════════════════════════
-       LOGOUT
+       LOGOUT (Firebase Version)
     ═══════════════════════════ */
-    async function logout() {
+    async function firebaseLogout() { // Renamed to avoid conflicts if you have other logout calls
       try {
-        const tok = sb._tok();
-        if (tok) {
-          await fetch(SUPA_URL + '/auth/v1/logout', {
-            method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + tok, 'apikey': SUPA_KEY }
+        await signOut(auth); // Firebase method to sign out the current user
+        console.log("User signed out from Firebase.");
+      } catch (error) {
+        console.error("Error signing out from Firebase:", error);
+      } finally {
+        // Clear any local storage items that might be related to previous sessions
+        try { localStorage.removeItem('at_state'); } catch (e) { console.error("Error clearing at_state:", e); }
+        // Remove any Supabase-specific items if they somehow persisted
+        try {
+          Object.keys(localStorage).forEach(k => {
+            if (k.startsWith('sb-') || k.startsWith('supabase')) localStorage.removeItem(k);
           });
-        }
-      } catch (e) { }
-      try { localStorage.removeItem('sb_session'); } catch (e) { }
-      try { localStorage.removeItem('at_state'); } catch (e) { }
-      try {
-        Object.keys(localStorage).forEach(k => {
-          if (k.startsWith('sb-') || k.startsWith('supabase')) localStorage.removeItem(k);
-        });
-      } catch (e) { }
-      window.location.href = 'login.html';
+        } catch (e) { console.error("Error clearing old Supabase items:", e); }
+
+        // Redirect to the login page after logout (Firebase will handle clearing its own session tokens)
+        window.location.href = 'login.html';
+      }
     }
+    // Update any HTML elements calling 'logout()' to now call 'firebaseLogout()'
+    // For example, if you have <button onclick="logout()">Logout</button>
+    // It should become <button onclick="firebaseLogout()">Logout</button>
 
     /* spinner style */
     var style = document.createElement('style');
