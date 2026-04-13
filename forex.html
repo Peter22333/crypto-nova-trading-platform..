@@ -1305,33 +1305,140 @@
     <div class="toast-dot" id="toast-dot"></div><span id="toast-msg"></span>
   </div>
 
-  <script>
-    /* ═══════════════════════════════════════════════
-        SUPABASE — shared with dashboard, same credentials
-    ═══════════════════════════════════════════════ */
-    const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxa3VibGV0Z2lmcWR1dHliem56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NjA5OTMsImV4cCI6MjA4ODQzNjk5M30.TkweXseKRQuA7FoT7erYdUJMuGtYWYSZ7b7l9WCPq-8';
-    const sb = {
-      _h() { return { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (this._tok() || SUPA_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' }; },
-      _tok() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.access_token; } catch { return null; } },
-      _uid() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.user?.id; } catch { return null; } },
-      isLoggedIn() { return !!this._tok(); },
-      async get(t, f = '') { const r = await fetch(SUPA_URL + '/rest/v1/' + t + (f ? '?' + f : ''), { headers: this._h() }); return r.json(); },
-      async insert(t, b) { const r = await fetch(SUPA_URL + '/rest/v1/' + t, { method: 'POST', headers: this._h(), body: JSON.stringify(b) }); return r.json(); },
-      async update(t, b, f) { const r = await fetch(SUPA_URL + '/rest/v1/' + t + '?' + f, { method: 'PATCH', headers: this._h(), body: JSON.stringify(b) }); return r.json(); },
-      async getProfile() { const uid = this._uid(); if (!uid) return null; const r = await this.get('profiles', 'id=eq.' + uid + '&select=*'); return Array.isArray(r) ? r[0] : null; },
-      async syncBalance(b) { return this.update('profiles', { balance: b }, 'id=eq.' + this._uid()); }
-    };
+ <script type="module">
+  // ===============================================================================================
+  // FIREBASE CLIENT & AUTH GUARD (Forex.html)
+  // This replaces the Supabase client, sb object, and initial auth check.
+  // ===============================================================================================
 
-    /* ═══════════════════════════════════════════════
-        AUTH CHECK
-    ═══════════════════════════════════════════════ */
-    if (!sb.isLoggedIn()) {
-      document.getElementById('auth-wall').style.display = 'flex';
-    } else {
-      document.getElementById('app').style.display = 'flex';
-      document.getElementById('auth-wall').style.display = 'none';
+  // Firebase SDK Imports
+  // These lines bring in the necessary functions from the Firebase libraries.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    updateDoc,
+    collection, // Needed if you have forex-specific collections
+    query,      // Needed if you have forex-specific collections
+    where,      // Needed if you have forex-specific collections
+    getDocs,    // Needed if you have forex-specific collections
+    serverTimestamp // For consistent date/time stamps in Firestore
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+  // Your Firebase Configuration (This must be identical across all your Firebase-enabled pages)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBwdhzot1c6-3HMrAmYjVrpWtgRpFiysdk",
+    authDomain: "crypto-dashboard-12911.firebaseapp.com",
+    projectId: "crypto-dashboard-12911",
+    storageBucket: "crypto-dashboard-12911.firebasestorage.app",
+    messagingSenderId: "426133649845",
+    appId: "1:426133649845:web:6edc16f7031a1c934a41fc",
+    measurementId: "G-3744FSNNKK"
+  };
+
+  // Initialize Firebase App, Auth, and Firestore services
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentUser = null; // Stores the Firebase authenticated user object
+  let userProfile = null; // Stores the user's profile document from Firestore
+
+  // ===============================================================================================
+  // FIREBASE HELPER FUNCTIONS (replaces sb. functions like syncBalance, getProfile, etc.)
+  // These functions encapsulate common Firestore operations for user data.
+  // ===============================================================================================
+
+  // Replaces your `sb.syncBalance` and `sb.updateBalance` logic
+  async function updateBalanceInFirestore(newBalance) {
+    if (!currentUser) {
+      console.error("No authenticated user to update balance for.");
+      return;
     }
+    const userDocRef = doc(db, "users", currentUser.uid);
+    try {
+      await updateDoc(userDocRef, {
+        currentBalance: newBalance,
+        lastUpdated: serverTimestamp() // Optional: track when balance was last updated
+      });
+      console.log("User balance updated in Firestore successfully.");
+      // Update local profile and STATE to reflect change immediately
+      if (userProfile) userProfile.currentBalance = newBalance;
+      if (STATE) STATE.balance = newBalance;
+    } catch (error) {
+      console.error("Error updating user balance in Firestore:", error);
+      showToast("Failed to update balance in database.", "error");
+    }
+  }
+
+  // Firebase Logout Function (replaces sb.logout() logic)
+  async function firebaseLogout() {
+    try {
+      await signOut(auth);
+      console.log("User signed out from Firebase.");
+    } catch (error) {
+      console.error("Error signing out from Firebase:", error);
+    } finally {
+      // Clear any local storage items that might be related to previous sessions
+      localStorage.removeItem('at_state');
+      // Clear any old Supabase-specific items just in case
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith('sb-') || k.startsWith('supabase')) localStorage.removeItem(k);
+      });
+      // Redirect to the login page after logout
+      window.location.href = 'login.html';
+    }
+  }
+  
+  // Helper to show a toast message (assuming your HTML has a toast element with id="toast")
+  function showToast(msg, type = 'info') {
+      const t = document.getElementById('toast');
+      if (!t) { console.log(`Toast: ${msg} (${type})`); return; }
+      const ic = document.getElementById('toast-icon'); // If you have an icon element
+      const m = t.querySelector('#toast-msg') || t; // Fallback to toast itself if no inner element
+      m.textContent = msg;
+      t.className = 'toast ' + type; // Apply styling class
+      t.classList.add('show');
+      if (type === 'success') t.style.backgroundColor = '#16a34a'; // Example styling
+      else if (type === 'error') t.style.backgroundColor = '#dc2626';
+      else t.style.backgroundColor = '#f59e0b';
+      setTimeout(function () { t.classList.remove('show'); }, 3500);
+  }
+
+   // ===============================================================================================
+  // FIREBASE AUTHENTICATION STATE LISTENER (replaces sb.isLoggedIn() and initial data loading)
+  // This listener handles checking if a user is logged in, fetching their profile,
+  // and then initializing the page UI.
+  // ===============================================================================================
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user; // Set the global currentUser object
+      // Fetch user's profile from Firestore
+      const userDocRef = doc(db, "users", currentUser.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        userProfile = userDocSnap.data(); // Store the user's profile data
+        // Populate local STATE object with data from fetched profile
+        STATE.balance = userProfile.currentBalance || 0; // Set initial balance from Firestore
+        
+        // --- Add any specific data loading for this page from Firestore here ---
+        // For example, if there are specific forex trades or settings to load:
+        // await loadForexDataFromFirestore(); 
+
+        // Initial UI updates that depend on loaded user data
+        // This function will need to be defined on this page
+        initializeForexPageUI(); // You'll define this function to update all page-specific UI
+        loadForexBalance(); // This is a placeholder for your existing loadFromDB() equivalent
+
+      } else {
+        console.error("User profile not found in Firestore for UID:", currentUser.uid);
+        showToast("Your user profile is incomplete. Please contact support.", "error");
+        await firebaseLogout(); // Force logout if profile is missing
+      }No response
 
     /* ═══════════════════════════════════════════════
         LOCAL STATE  — forex trades only
@@ -1347,10 +1454,12 @@
     var masterBalance = 0;
     var userInitials = 'FX';
 
-    /* ═══════════════════════════════════════════════
+      /* ═══════════════════════════════════════════════
         FOREX PAIRS DATA
     ═══════════════════════════════════════════════ */
-    var PAIRS = {
+    var PAIRS = { /* ... large object ... */ };
+    Object.keys(PAIRS).forEach(function (k) { /* ... */ });
+    function genHistory(base, count, vol) { /* ... */ }
       EURUSD: { name: 'EUR/USD', price: 1.08420, pip: 0.0001, digits: 5, spread: 0.8, daily: 1.2, lotSize: 100000, base: 'EUR', quote: 'USD', minLot: 0.01, category: 'Major' },
       GBPUSD: { name: 'GBP/USD', price: 1.27105, pip: 0.0001, digits: 5, spread: 1.2, daily: 1.8, lotSize: 100000, base: 'GBP', quote: 'USD', minLot: 0.01, category: 'Major' },
       USDJPY: { name: 'USD/JPY', price: 149.820, pip: 0.01, digits: 3, spread: 0.7, daily: 1.5, lotSize: 100000, base: 'USD', quote: 'JPY', minLot: 0.01, category: 'Major' },
@@ -1464,6 +1573,33 @@
         if (span) { span.textContent = (up ? '+' : '') + p.chgPct + '%'; span.style.color = up ? 'var(--green)' : 'var(--red)'; }
       });
     }
+  // ===============================================================================================
+  // FOREX.HTML SPECIFIC FUNCTIONS (Adaptation of your existing logic)
+  // ===============================================================================================
+
+  // Function to initialize the UI of the Forex page after user data is loaded
+  function initializeForexPageUI() {
+    // Update masterBalance and userInitials from the global STATE/userProfile
+    masterBalance = STATE.balance;
+    userInitials = (userProfile?.displayName || userProfile?.email || 'FX').charAt(0).toUpperCase();
+
+    // Now, call the functions that render your UI using these values
+    updateTopBar();    // This will now use the correct masterBalance
+    buildPairTabs();   // Initial build of pair tabs
+    // ... any other functions that need to be called once to render the page ...
+
+    // Finally, show the main app content and hide any loading/auth screen
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('auth-wall').style.display = 'none'; 
+  }
+
+  // Placeholder function for loading balance (replaces old loadFromDB() for balance part)
+  function loadForexBalance() {
+    // This function will typically just ensure masterBalance is synced with STATE.balance
+    // and then update the UI.
+    masterBalance = STATE.balance;
+    updateTopBar(); // Refresh the top bar with the latest balance
+  }
 
     /* ═══════════════════════════════════════════════
       CHART
@@ -1657,27 +1793,39 @@
           return '<div class="mi-row"><span class="mi-key">' + r[0] + '</span><span class="mi-val">' + r[1] + '</span></div>';
         }).join('');
     }
-
     /* ═══════════════════════════════════════════════
-      PLACE ORDER  — deducts margin from Supabase balance
+      PLACE ORDER  — deducts margin from Firebase balance
     ═══════════════════════════════════════════════ */
-    function placeOrder() {
+    async function placeOrder() { // Make it an async function
       var errEl = document.getElementById('order-err');
       errEl.style.display = 'none';
+
+      if (!currentUser) {
+        errEl.textContent = 'You must be logged in to place an order.';
+        errEl.style.display = 'block';
+        return;
+      }
+
       var p = PAIRS[currentPair];
       var lots = parseFloat(document.getElementById('lot-input').value) || 0;
       var lev = parseInt(document.getElementById('lev-select').value) || 100;
       var sl = parseFloat(document.getElementById('sl-input').value) || 0;
       var tp = parseFloat(document.getElementById('tp-input').value) || 0;
-      // Validate
+
+      // --- Client-side validation (remains unchanged) ---
       if (lots < 0.01) { errEl.textContent = 'Minimum lot size is 0.01.'; errEl.style.display = 'block'; return; }
       if (lots > 100) { errEl.textContent = 'Maximum lot size is 100.'; errEl.style.display = 'block'; return; }
+      
       var posSize = lots * p.lotSize;
-      var posUSD = posSize * (p.base === 'USD' ? 1 : p.price);
+      var posUSD = posSize * (p.quote === 'USD' ? 1 : p.price);
+      if (p.base !== 'USD' && p.quote !== 'USD') posUSD = posSize * p.price; // Correct for non-USD quotes
+      if (p.base === 'USD') posUSD = posSize;
+
       var margin = posUSD / lev;
       var fee = posUSD * 0.00005; // 0.005% fee
       var totalDeduct = margin + fee;
-      if (totalDeduct > masterBalance) {
+
+      if (totalDeduct > masterBalance) { // Check against the locally synced masterBalance
         errEl.textContent = 'Insufficient margin. Required: $' + totalDeduct.toFixed(2) + '. Available: $' + masterBalance.toFixed(2);
         errEl.style.display = 'block'; return;
       }
@@ -1693,8 +1841,12 @@
         ? +(p.price + p.spread * p.pip / 2).toFixed(p.digits)  // buy at ask
         : +(p.price - p.spread * p.pip / 2).toFixed(p.digits); // sell at bid
 
-      var trade = {
-        id: 'FX' + Date.now(),
+      var tradeId = 'FX' + Date.now(); // Unique ID for the trade
+
+      // Prepare trade data for Firestore
+      var tradeData = {
+        id: tradeId,
+        userId: currentUser.uid,
         pair: currentPair,
         name: p.name,
         dir: currentDir,
@@ -1710,55 +1862,16 @@
         openTime: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
         openTs: Date.now(),
         status: 'open',
-        pnl: 0
+        pnl: 0,
+        timestamp: serverTimestamp() // Use server timestamp for creation
       };
 
-      // Deduct margin + fee from master balance
-      masterBalance = +(masterBalance - totalDeduct).toFixed(2);
-
-      // Save to Supabase
-      sb.syncBalance(masterBalance).catch(function () { });
-      sb.insert('transactions', {
-        user_id: sb._uid(), type: 'trade',
-        asset: p.name + ' ' + currentDir.toUpperCase() + ' ' + lots + 'L',
-        amount: '-$' + totalDeduct.toFixed(2),
-        status: 'active', ref: trade.id
-      }).catch(function () { });
-
-      // Update local at_state balance so dashboard sees it immediately
-      try {
-        var st = JSON.parse(localStorage.getItem('at_state') || '{}');
-        st.balance = masterBalance;
-        if (!st.trades) st.trades = [];
-        st.trades.unshift({
-          id: trade.id, sym: currentPair, type: currentDir,
-          amount: margin, leverage: lev, entryPrice: entryPrice,
-          positionSize: posUSD, fee: fee,
-          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          status: 'open', pnl: 0, source: 'forex'
-        });
-        st.transactions = st.transactions || [];
-        st.transactions.unshift({
-          id: trade.id, type: 'trade', asset: p.name,
-          amount: '-$' + totalDeduct.toFixed(2),
-          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          hash: trade.id, status: 'active'
-        });
-        localStorage.setItem('at_state', JSON.stringify(st));
-      } catch (e) { }
-
-      // Save to forex local state
-      fxState.trades.unshift(trade);
-      saveFX();
-
-      setTimeout(function () {
-        btn.disabled = false;
-        updateSubmitBtn();
-        renderBottomPanel();
-        updateOrderSummary();
-        showToast(p.name + ' ' + currentDir.toUpperCase() + ' ' + lots + ' lots @ ' + entryPrice, 'success');
-      }, 600);
-    }
+      // Prepare transaction data for Firestore
+      var transactionData = {
+        id: 'TXN' + Date.now(),
+        userId: currentUser.uid,
+        type: 'trade',
+        asset: p.name + ' 'No response
 
     /* ═══════════════════════════════════════════════
        POSITIONS P&L LIVE UPDATE
@@ -1797,28 +1910,99 @@
       });
     }
 
-    function autoCloseTrade(trade, reason) {
+     // ===============================================================================================
+    // Function: autoCloseTrade (Firebase Firestore Version)
+    // ===============================================================================================
+    async function autoCloseTrade(trade, reason) { // Make it async
+      if (!currentUser) {
+        console.error("No authenticated user to auto-close trade for.");
+        showToast("Session expired. Please log in again.", "error");
+        await firebaseLogout();
+        return;
+      }
+
       trade.status = 'closed';
       trade.pnl = calcPnL(trade);
       trade.closePrice = PAIRS[trade.pair].price;
       trade.closeTime = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      // Return margin + pnl
-      var returns = trade.margin + trade.pnl;
-      masterBalance = +(masterBalance + returns).toFixed(2);
-      sb.syncBalance(masterBalance).catch(function () { });
-      // Update at_state
+      trade.closeTs = Date.now(); // Add a timestamp for when it was closed
+      
+      var returns = trade.margin + trade.pnl; // Margin released + P&L
+
       try {
-        var st = JSON.parse(localStorage.getItem('at_state') || '{}');
-        st.balance = masterBalance;
-        var tr = st.trades && st.trades.find(function (x) { return x.id === trade.id; });
-        if (tr) { tr.status = 'closed'; tr.pnl = trade.pnl; }
-        localStorage.setItem('at_state', JSON.stringify(st));
-      } catch (e) { }
-      fxState.closedTrades.unshift(trade);
-      fxState.trades = fxState.trades.filter(function (t) { return t.id !== trade.id; });
-      saveFX();
-      renderBottomPanel();
-      showToast(reason + '. P&L: ' + (trade.pnl >= 0 ? '+' : '') + '$' + trade.pnl.toFixed(2), trade.pnl >= 0 ? 'success' : 'error');
+        // Use a Firestore Transaction to atomically update user balance and trade/transaction records
+        await runTransaction(db, async (transaction) => {
+          const userDocRef = doc(db, "users", currentUser.uid);
+          const tradeDocRef = doc(db, "forex_trades", trade.id); // Assuming trade.id is the Firestore document ID
+
+          // 1. Get current user balance
+          const userDoc = await transaction.get(userDocRef);
+          if (!userDoc.exists()) throw new Error("User document not found during transaction!");
+          const currentBalance = parseFloat(userDoc.data().currentBalance) || 0;
+
+          // 2. Update user balance
+          const newBalance = currentBalance + returns;
+          transaction.update(userDocRef, {
+            currentBalance: newBalance,
+            lastUpdated: serverTimestamp()
+          });
+          masterBalance = newBalance; // Update local masterBalance immediately
+
+          // 3. Update the trade document in Firestore to 'closed'
+          transaction.update(tradeDocRef, {
+            status: 'closed',
+            pnl: trade.pnl,
+            closePrice: trade.closePrice,
+            closeTime: trade.closeTime,
+            closeTs: trade.closeTs,
+            closedAt: serverTimestamp() // Official server-side timestamp
+          });
+
+          // 4. Add a transaction record for closing the trade (P&L transaction)
+          const transactionData = {
+            userId: currentUser.uid,
+            type: 'trade_close', // Indicate it's a trade closure transaction
+            asset: trade.name + ' closed',
+            amount: (trade.pnl >= 0 ? '+' : '') + '$' + trade.pnl.toFixed(2) + ' P&L',
+            status: 'completed',
+            ref: trade.id + '_close', // Reference to the original trade ID
+            timestamp: serverTimestamp()
+          };
+          const transactionDocRef = doc(collection(db, "transactions"));
+          transaction.set(transactionDocRef, transactionData);
+        });
+
+        // --- Update local STATE and UI after successful transaction ---
+        // Update local at_state balance so dashboard sees it immediately
+        try {
+          var st = JSON.parse(localStorage.getItem('at_state') || '{}');
+          st.balance = masterBalance;
+          var tr = st.trades && st.trades.find(function (x) { return x.id === trade.id; });
+          if (tr) { tr.status = 'closed'; tr.pnl = trade.pnl; }
+          // Add the trade close transaction to at_state transactions
+          st.transactions = st.transactions || [];
+          st.transactions.unshift({
+            id: trade.id + '_close', type: 'trade', asset: trade.name,
+            amount: (trade.pnl >= 0 ? '+' : '') + '$' + trade.pnl.toFixed(2) + ' P&L',
+            date: new Date(trade.closeTs).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            hash: trade.id + '_close', status: 'completed'
+          });
+          localStorage.setItem('at_state', JSON.stringify(st));
+        } catch (e) { console.error("Error updating localStorage 'at_state':", e); }
+
+        // Update local fxState
+        fxState.closedTrades.unshift(trade);
+        fxState.trades = fxState.trades.filter(function (t) { return t.id !== trade.id; });
+        saveFX(); // Save forex local state
+
+        renderBottomPanel(); // Refresh UI
+        updateOrderSummary(); // Refresh order summary
+        showToast(reason + '. P&L: ' + (trade.pnl >= 0 ? '+' : '') + '$' + trade.pnl.toFixed(2), trade.pnl >= 0 ? 'success' : 'error');
+
+      } catch (ex) {
+        console.error("Error auto-closing trade:", ex);
+        showToast('Error auto-closing trade: ' + ex.message, 'error');
+      }
     }
 
     /* ═══════════════════════════════════════════════
@@ -1851,51 +2035,99 @@
       document.getElementById('close-modal').style.display = 'flex';
     }
 
-    function confirmClose() {
+      // ===============================================================================================
+    // Function: confirmClose (Firebase Firestore Version)
+    // ===============================================================================================
+    async function confirmClose() { // Make it async
       if (!tradeToClose) return;
+
+      if (!currentUser) {
+        showToast("Session expired. Please log in again.", "error");
+        await firebaseLogout();
+        return;
+      }
+
       var t = tradeToClose;
       t.status = 'closed';
-      t.pnl = calcPnL(t);
+      t.pnl = calcPnL(t); // Calculate final P&L
       t.closePrice = PAIRS[t.pair] ? PAIRS[t.pair].price : t.entryPrice;
       t.closeTime = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      var returns = t.margin + t.pnl;
-      masterBalance = +(masterBalance + returns).toFixed(2);
-      sb.syncBalance(masterBalance).catch(function () { });
-      // Sync back to at_state
-      try {
-        var st = JSON.parse(localStorage.getItem('at_state') || '{}');
-        st.balance = masterBalance;
-        if (st.trades) { var idx = st.trades.findIndex(function (x) { return x.id === t.id; }); if (idx >= 0) { st.trades[idx].status = 'closed'; st.trades[idx].pnl = t.pnl; } }
-        st.transactions = st.transactions || [];
-        st.transactions.unshift({
-          id: t.id + '_close', type: 'trade', asset: t.name,
-          amount: (t.pnl >= 0 ? '+' : '') + '$' + t.pnl.toFixed(2) + ' P&L',
-          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          hash: t.id, status: 'completed'
-        });
-        localStorage.setItem('at_state', JSON.stringify(st));
-      } catch (e) { }
-      // Save pnl transaction to Supabase
-      sb.insert('transactions', {
-        user_id: sb._uid(), type: 'trade',
-        asset: t.name + ' closed',
-        amount: (t.pnl >= 0 ? '+' : '') + '$' + t.pnl.toFixed(2) + ' P&L',
-        status: 'completed', ref: t.id + '_close'
-      }).catch(function () { });
-      fxState.closedTrades.unshift(t);
-      fxState.trades = fxState.trades.filter(function (x) { return x.id !== t.id; });
-      saveFX();
-      closeModal();
-      renderBottomPanel();
-      updateOrderSummary();
-      showToast(t.name + ' closed. P&L: ' + (t.pnl >= 0 ? '+' : '') + '$' + t.pnl.toFixed(2), t.pnl >= 0 ? 'success' : 'error');
-    }
+      t.closeTs = Date.now(); // Add a timestamp for when it was closed
+      
+      var returns = t.margin + t.pnl; // Margin released + P&L
 
-    function closeModal() {
-      document.getElementById('close-modal').style.display = 'none';
-      tradeToClose = null;
-    }
-    document.getElementById('close-modal').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
+      try {
+        // Use a Firestore Transaction to atomically update user balance and trade/transaction records
+        await runTransaction(db, async (transaction) => {
+          const userDocRef = doc(db, "users", currentUser.uid);
+          const tradeDocRef = doc(db, "forex_trades", t.id); // Assuming t.id is the Firestore document ID
+
+          // 1. Get current user balance
+          const userDoc = await transaction.get(userDocRef);
+          if (!userDoc.exists()) throw new Error("User document does not exist during transaction!");
+          const currentBalance = parseFloat(userDoc.data().currentBalance) || 0;
+
+          // 2. Update user balance
+          const newBalance = currentBalance + returns;
+          transaction.update(userDocRef, {
+            currentBalance: newBalance,
+            lastUpdated: serverTimestamp()
+          });
+          masterBalance = newBalance; // Update local masterBalance immediately
+
+          // 3. Update the trade document in Firestore to 'closed'
+          transaction.update(tradeDocRef, {
+            status: 'closed',
+            pnl: t.pnl,
+            closePrice: t.closePrice,
+            closeTime: t.closeTime,
+            closeTs: t.closeTs,
+            closedAt: serverTimestamp() // Official server-side timestamp
+          });
+
+          // 4. Add a transaction record for closing the trade (P&L transaction)
+          const transactionData = {
+            userId: currentUser.uid,
+            type: 'trade_close', // Indicate it's a trade closure transaction
+            asset: t.name + ' closed', // Example asset description
+            amount: (t.pnl >= 0 ? '+' : '') + '$' + t.pnl.toFixed(2) + ' P&L',
+            status: 'completed',
+            ref: t.id + '_close', // Reference to the original trade ID
+            timestamp: serverTimestamp()
+          };
+          const transactionDocRef = doc(collection(db, "transactions"));
+          transaction.set(transactionDocRef, transactionData);
+        });
+
+        // --- Update local STATE and UI after successful transaction ---
+        // Update local at_state balance so dashboard sees it immediately
+        try {
+          var st = JSON.parse(localStorage.getItem('at_state') || '{}');
+          st.balance = masterBalance;
+          if (st.trades) { // Find and update the trade in shared STATE.trades
+            var idx = st.trades.findIndex(function (x) { return x.id === t.id; });
+            if (idx >= 0) { st.trades[idx].status = 'closed'; st.trades[idx].pnl = t.pnl; }
+          }
+          // Add the trade close transaction to at_state transactions
+          st.transactions = st.transactions || [];
+          st.transactions.unshift({
+            id: t.id + '_close', type: 'trade', asset: t.name,
+            amount: (t.pnl >= 0 ? '+' : '') + '$' + t.pnl.toFixed(2) + ' P&L',
+            date: new Date(t.closeTs).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            hash: t.id + '_close', status: 'completed'
+          });
+          localStorage.setItem('at_state', JSON.stringify(st));
+        } catch (e) { console.error("Error updating localStorage 'at_state':", e); }
+
+        // Update local fxState
+        fxState.closedTrades.unshift(t);
+        fxState.trades = fxState.trades.filter(function (x) { return x.id !== t.id; });
+        saveFX(); // Save forex local state
+
+        closeModal(); // Close the UI modal
+        renderBottomPanel(); // Refresh UI
+        updateOrderSummary(); // Refresh order summary
+        showToast(t.name + ' closed. P&L: ' + (t.pnl >= 0 ? '+' : '') + '$' + t.pnl.No response
 
     /* ═══════════════════════════════════════════════
        BOTTOM PANEL RENDER
@@ -1986,42 +2218,18 @@
       setTimeout(function () { t.classList.remove('show'); }, 3500);
     }
 
-    /* ═══════════════════════════════════════════════
-       INIT
-    ═══════════════════════════════════════════════ */
-    async function init() {
-      // Resize chart canvas
-      var ro = new ResizeObserver(function () { drawChart(); });
-      ro.observe(document.getElementById('main-chart').parentElement);
+   // ... (inside onAuthStateChanged listener) ...
+  if (userDocSnap.exists()) {
+    userProfile = userDocSnap.data();
+    STATE.balance = userProfile.currentBalance || 0;
+    
+    // --- Define these functions where your other page-specific functions are ---
+    initializeForexPageUI(); // This function will contain your UI initialization
+    loadForexBalance();      // This function will set masterBalance and update related UI
+  }
+  // ... rest of onAuthStateChanged ...
+No response
 
-      buildPairTabs();
-      changePair('EURUSD');
-      updateMarketInfo();
-      renderBottomPanel();
-      updateOrderSummary();
-      updateSubmitBtn();
-
-      // Load balance FRESH from Supabase
-      try {
-        var profile = await sb.getProfile();
-        if (profile) {
-          masterBalance = parseFloat(profile.balance) || 0;
-          var n = profile.full_name || 'FX';
-          userInitials = (n.split(' ').map(function (w) { return w[0] || ''; }).join('').toUpperCase().slice(0, 2)) || 'FX';
-          document.getElementById('user-av').textContent = userInitials;
-          // Sync local at_state so other pages see same balance
-          try { var st = JSON.parse(localStorage.getItem('at_state') || '{}'); st.balance = masterBalance; localStorage.setItem('at_state', JSON.stringify(st)); } catch (e) { }
-        }
-      } catch (e) {
-        // Fallback to cached balance
-        try { var st = JSON.parse(localStorage.getItem('at_state') || '{}'); masterBalance = parseFloat(st.balance) || 0; } catch (e2) { }
-      }
-      updateTopBar();
-      updateOrderSummary();
-      document.getElementById('sum-avail').textContent = '$' + masterBalance.toFixed(2);
-    }
-
-    if (sb.isLoggedIn()) { init(); }
   </script>
 </body>
 
