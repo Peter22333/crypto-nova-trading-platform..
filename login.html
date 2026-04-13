@@ -646,51 +646,164 @@
     </div>
   </div>
 
-  <script>
-    const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxa3VibGV0Z2lmcWR1dHliem56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NjA5OTMsImV4cCI6MjA4ODQzNjk5M30.TkweXseKRQuA7FoT7erYdUJMuGtYWYSZ7b7l9WCPq-8';
+ <script type="module">
+  // Firebase SDK Imports
+  // These imports fetch the necessary Firebase modules from Google's CDN.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    onAuthStateChanged, 
+    GoogleAuthProvider, 
+    signInWithPopup 
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  // If you plan to use Firestore or other services on this page, import them here.
+  // import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // If already logged in, go straight to dashboard
-    try { if (JSON.parse(localStorage.getItem('sb_session'))?.access_token) window.location.href = 'userdashboard.html'; } catch (e) { }
 
-    function togglePassword() {
-      const pw = document.getElementById('password'), icon = document.getElementById('eye-icon');
-      if (pw.type === 'password') { pw.type = 'text'; icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'; }
-      else { pw.type = 'password'; icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'; }
+  // Your Firebase Configuration
+  // This is the specific configuration for your 'crypto-dashboard-12911' project.
+  const firebaseConfig = {
+    apiKey: "AIzaSyBwdhzot1c6-3HMrAmYjVrpWtgRpFiysdk",
+    authDomain: "crypto-dashboard-12911.firebaseapp.com",
+    projectId: "crypto-dashboard-12911",
+    storageBucket: "crypto-dashboard-12911.firebasestorage.app",
+    messagingSenderId: "426133649845",
+    appId: "1:426133649845:web:6edc16f7031a1c934a41fc",
+    measurementId: "G-3744FSNNKK"
+  };
+
+  // Initialize Firebase App and Auth Service
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app); // Get the Authentication service instance
+
+
+  // Firebase Authentication State Listener
+  // This listens for changes in the user's sign-in state. If a user is
+  // already signed in (or successfully signs in), it redirects them to the dashboard.
+  // This replaces your previous localStorage 'sb_session' check.
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // User is signed in, redirect to the user dashboard
+      window.location.href = 'userdashboard.html';
     }
-    document.querySelector('.remember').addEventListener('click', function () {
-      const cb = document.getElementById('remember'), box = document.getElementById('check-box');
-      cb.checked = !cb.checked; box.style.background = cb.checked ? 'var(--teal)' : 'transparent';
-      box.style.border = cb.checked ? 'none' : '1.5px solid var(--border)';
-    });
+    // If no user is signed in, stay on the login page
+  });
 
-    async function handleLogin(e) {
-      e.preventDefault();
-      const btn = document.getElementById('login-btn'), err = document.getElementById('err-box');
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      err.style.display = 'none';
-      btn.disabled = true; btn.textContent = 'Logging in…';
-      try {
-        const res = await fetch(SUPA_URL + '/auth/v1/token?grant_type=password', {
-          method: 'POST', headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-        if (data.access_token) {
-          localStorage.setItem('sb_session', JSON.stringify(data));
-          window.location.href = 'userdashboard.html';
-        } else {
-          err.style.display = 'block';
-          err.textContent = data.error_description || data.msg || 'Invalid email or password.';
-          btn.disabled = false; btn.textContent = 'Log In';
-        }
-      } catch (ex) {
-        err.style.display = 'block'; err.textContent = 'Network error. Please try again.';
-        btn.disabled = false; btn.textContent = 'Log In';
+
+  // --- Existing UI-related functions (no changes needed here) ---
+
+  // Toggles password visibility
+  function togglePassword() {
+    const pw = document.getElementById('password');
+    const icon = document.getElementById('eye-icon');
+    if (pw.type === 'password') {
+      pw.type = 'text';
+      icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    } else {
+      pw.type = 'password';
+      icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    }
+  }
+
+  // Handles "Remember me" checkbox interaction
+  document.querySelector('.remember').addEventListener('click', function () {
+    const cb = document.getElementById('remember');
+    const box = document.getElementById('check-box');
+    cb.checked = !cb.checked;
+    box.style.background = cb.checked ? 'var(--teal)' : 'transparent';
+    box.style.border = cb.checked ? 'none' : '1.5px solid var(--border)';
+  });
+
+
+  // --- Firebase Login Function (replaces Supabase auth sign-in) ---
+
+  async function handleLogin(e) {
+    e.preventDefault(); // Prevent default form submission
+    
+    const btn = document.getElementById('login-btn');
+    const err = document.getElementById('err-box'); // Ensure this div exists in your HTML for error messages
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    err.style.display = 'none'; // Hide any previous error messages
+    btn.disabled = true; // Disable button to prevent multiple submissions
+    btn.textContent = 'Logging in…'; // Update button text for feedback
+
+    try {
+      // Firebase Email/Password Sign-in
+      await signInWithEmailAndPassword(auth, email, password);
+      // If sign-in is successful, the onAuthStateChanged listener above will detect it
+      // and automatically redirect the user to 'userdashboard.html'.
+      // Firebase automatically manages the user session (e.g., in browser cookies/session storage),
+      // so you no longer need `localStorage.setItem('sb_session')`.
+
+    } catch (error) {
+      console.error("Firebase Auth Error:", error.code, error.message);
+      err.style.display = 'block'; // Show the error box
+      
+      // Customize error messages for user-friendliness based on Firebase error codes
+      switch (error.code) {
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential': // Modern Firebase uses this for combined invalid creds
+          err.textContent = 'Invalid email or password.';
+          break;
+        case 'auth/invalid-email':
+          err.textContent = 'Please enter a valid email address.';
+          break;
+        case 'auth/user-disabled':
+          err.textContent = 'Your account has been disabled.';
+          break;
+        case 'auth/too-many-requests':
+          err.textContent = 'Too many failed login attempts. Please try again later.';
+          break;
+        default:
+          err.textContent = `Login failed: ${error.message}`; // Generic fallback
       }
+      btn.disabled = false; // Re-enable button
+      btn.textContent = 'Log In'; // Reset button text
     }
-  </script>
+  }
+
+
+  // --- Optional: Firebase Social Login Functions (if you want these buttons to work) ---
+  // You need to enable the corresponding providers (e.g., Google) in your
+  // Firebase Console (Authentication -> Sign-in method tab) for these to function.
+
+  async function signInWithGoogle() {
+    const provider = new GoogleAuthProvider(); // Create a new Google Auth provider
+    try {
+      await signInWithPopup(auth, provider); // Open Google sign-in popup
+      // The onAuthStateChanged listener will handle redirection upon success
+    } catch (error) {
+      console.error("Google Sign-in Error:", error.code, error.message);
+      const err = document.getElementById('err-box');
+      err.style.display = 'block';
+      err.textContent = `Google sign-in failed: ${error.message || 'Please try again.'}`;
+      // You can add more specific error handling here if needed
+    }
+  }
+
+  async function signInWithApple() {
+    // Apple sign-in also uses a provider (AppleAuthProvider) and signInWithPopup.
+    // It requires more involved setup in the Firebase Console and Apple Developer account.
+    // Refer to Firebase documentation for full implementation: https://firebase.google.com/docs/auth/web/apple
+    console.warn("Apple Sign-in is not yet implemented in this code.");
+    const err = document.getElementById('err-box');
+    err.style.display = 'block';
+    err.textContent = "Apple Sign-in is not yet configured or implemented.";
+  }
+
+  // Attach event listeners to your social login buttons
+  // Assuming your Google button is the first button in .social-btns
+  document.querySelector('.social-btns button:nth-child(1)').addEventListener('click', signInWithGoogle);
+  // Uncomment the line below if you implement Apple Sign-in and it's the second button
+  // document.querySelector('.social-btns button:nth-child(2)').addEventListener('click', signInWithApple);
+
+</script>
+
 </body>
 
 </html>
