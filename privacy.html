@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — Crypto Nova</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --teal: #00e5c3;
+            --teal-d: #00c4a7;
+            --red: #ff4d6d;
+            --bg: #050e14;
+            --bg2: #071520;
+            --card: #0b1e2d;
+            --border: rgba(0, 229, 195, .13);
+            --text: #e8f4f0;
+            --tm: #8ba8a0;
+            --green: #16a34a;
+            --font: "Sora", sans-serif;
+            --body: "DM Sans", sans-serif;
+            --mono: "DM Mono", monospace;
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: var(--body);
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.7
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit
+        }
+
+        /* TICKER */
+        .ticker {
+            background: #071a27;
+            border-bottom: 1px solid var(--border);
+            height: 36px;
+            overflow: hidden;
+            display: flex;
+            align-items: center
+        }
+
+        .ttrack {
+            display: flex;
+            white-space: nowrap;
+            animation: tick 35s linear infinite
+        }
+
+        .ttrack:hover {
+            animation-play-state: paused
+        }
+
+        .ti {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 24px;
+            font-family: var(--mono);
+            font-size: 12px;
+            border-right: 1px solid var(--border)
+        }
+
+        .ti .sym {
+            color: var(--teal);
+            font-weight: 600
+        }
+
+        .up {
+            color: var(--teal)
+        }
+
+        .dn {
+            color: var(--red)
+        }
+
+        @keyframes tick {
+            from {
+                transform: translateX(0)
+            }
+
+            to {
+                transform: translateX(-50%)
+            }
+        }
+
+        /* NAV */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(5, 14, 20, .95);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            transition: box-shadow .3s
+        }
+
+        .nav.sc {
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .4)
+        }
+
+        .ni {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            gap: 32px
+        }
+
+        .nlogo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font);
+            font-size: 17px;
+            font-weight: 900;
+            color: var(--text);
+            letter-spacing: -.02em;
+            flex-shrink: 0
+        }
+
+        .nicon {
+            width: 34px;
+            height: 34px;
+            background: #16a34a;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0
+        }
+
+        .nlinks {
+            display: flex;
+            gap: 4px;
+            flex: 1;
+            justify-content: center
+        }
+
+        .nlinks a {
+            padding: 7px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--tm);
+            border-radius: 8px;
+            transition: color .2s, background .2s
+        }
+
+        .nlinks a:hover,
+        .nlinks a.ac {
+            color: var(--text);
+            background: rgba(255, 255, 255, .06)
+        }
+
+        .nr {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0
+        }
+
+        .ng {
+            background: transparent;
+            border: 1.5px solid var(--border);
+            color: var(--text);
+            padding: 9px 20px;
+            border-radius: 9px;
+            font-family: var(--font);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .ng:hover {
+            border-color: var(--teal);
+            color: var(--teal)
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font);
+            font-weight: 700;
+            border-radius: 9px;
+            cursor: pointer;
+            border: none;
+            transition: all .22s
+        }
+
+        .bp {
+            background: var(--teal);
+            color: #050e14
+        }
+
+        .bp:hover {
+            background: var(--teal-d);
+            transform: translateY(-1px)
+        }
+
+        .ddlink {
+            display: block;
+            padding: 9px 14px;
+            color: var(--tm);
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all .2s
+        }
+
+        .ddlink:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, .06)
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px
+        }
+
+        .hbar {
+            width: 22px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all .3s
+        }
+
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            padding: 20px 24px;
+            border-top: 1px solid var(--border);
+            background: rgba(5, 14, 20, .98)
+        }
+
+        .mobile-links {
+            display: flex;
+            flex-direction: column;
+            gap: 4px
+        }
+
+        .mobile-links a {
+            padding: 12px 16px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--tm);
+            border-radius: 8px;
+            transition: all .2s
+        }
+
+        .mobile-links a:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, .06)
+        }
+
+        .mobile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        /* PAGE HEADER */
+        .page-hero {
+            background: linear-gradient(135deg, #071520 0%, #0b2034 50%, #071520 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 72px 24px 60px;
+            text-align: center
+        }
+
+        .page-hero .ey {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            color: var(--teal);
+            margin-bottom: 14px
+        }
+
+        .page-hero h1 {
+            font-family: var(--font);
+            font-size: clamp(28px, 4vw, 48px);
+            font-weight: 900;
+            letter-spacing: -.03em;
+            margin-bottom: 16px;
+            line-height: 1.1
+        }
+
+        .page-hero p {
+            font-size: 16px;
+            color: var(--tm);
+            max-width: 580px;
+            margin: 0 auto;
+            line-height: 1.7
+        }
+
+        /* CONTENT */
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 24px
+        }
+
+        .content-wrap {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 72px 24px
+        }
+
+        .content-wrap h2 {
+            font-family: var(--font);
+            font-size: 22px;
+            font-weight: 800;
+            margin: 40px 0 12px;
+            color: var(--text)
+        }
+
+        .content-wrap h2:first-child {
+            margin-top: 0
+        }
+
+        .content-wrap h3 {
+            font-family: var(--font);
+            font-size: 17px;
+            font-weight: 700;
+            margin: 28px 0 8px;
+            color: var(--teal)
+        }
+
+        .content-wrap p {
+            font-size: 15px;
+            color: var(--tm);
+            margin-bottom: 14px;
+            line-height: 1.75
+        }
+
+        .content-wrap ul {
+            padding-left: 20px;
+            margin-bottom: 14px
+        }
+
+        .content-wrap ul li {
+            font-size: 15px;
+            color: var(--tm);
+            margin-bottom: 8px;
+            line-height: 1.7
+        }
+
+        .content-wrap ul li::marker {
+            color: var(--teal)
+        }
+
+        /* CARDS */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 72px 24px
+        }
+
+        .card-grid.c2 {
+            grid-template-columns: repeat(2, 1fr)
+        }
+
+        .card-grid.c3 {
+            grid-template-columns: repeat(3, 1fr)
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 28px;
+            transition: border-color .3s, transform .3s
+        }
+
+        .card:hover {
+            border-color: rgba(0, 229, 195, .35);
+            transform: translateY(-3px)
+        }
+
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 16px
+        }
+
+        .card h3 {
+            font-family: var(--font);
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 10px
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--tm);
+            line-height: 1.65
+        }
+
+        .card .tag {
+            display: inline-block;
+            background: rgba(0, 229, 195, .1);
+            color: var(--teal);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 50px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: .06em
+        }
+
+        /* SECTION */
+        .section {
+            padding: 72px 0
+        }
+
+        .section-alt {
+            background: var(--bg2)
+        }
+
+        .sec-label {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            color: var(--teal);
+            margin-bottom: 14px;
+            display: block
+        }
+
+        .sec-title {
+            font-family: var(--font);
+            font-size: clamp(24px, 3vw, 36px);
+            font-weight: 900;
+            letter-spacing: -.03em;
+            margin-bottom: 16px;
+            line-height: 1.1
+        }
+
+        .sec-sub {
+            font-size: 16px;
+            color: var(--tm);
+            max-width: 560px;
+            line-height: 1.7;
+            margin-bottom: 40px
+        }
+
+        /* FOOTER */
+        .footer {
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            padding: 64px 0 32px
+        }
+
+        .fg {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 48px
+        }
+
+        .fb p {
+            font-size: 14px;
+            color: var(--tm);
+            line-height: 1.7;
+            margin-top: 16px;
+            max-width: 280px
+        }
+
+        .fc h4 {
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text);
+            margin-bottom: 18px
+        }
+
+        .fc ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .fc ul li a {
+            font-size: 14px;
+            color: var(--tm);
+            transition: color .2s
+        }
+
+        .fc ul li a:hover {
+            color: var(--teal)
+        }
+
+        .fbot {
+            border-top: 1px solid var(--border);
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--tm)
+        }
+
+        /* ANIM */
+        .rev {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity .6s ease, transform .6s ease
+        }
+
+        .rev.vis {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        /* DIVIDER */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 40px 0
+        }
+
+        /* BADGE */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 229, 195, .1);
+            border: 1px solid rgba(0, 229, 195, .2);
+            color: var(--teal);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px
+        }
+
+        /* RESPONSIVE */
+        @media(max-width:1024px) {
+            .fg {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .nlinks {
+                display: none
+            }
+
+            .nr {
+                display: none
+            }
+
+            .hamburger {
+                display: flex;
+                margin-left: auto
+            }
+
+            .card-grid.c3 {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .card-grid.c2 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:600px) {
+            .fg {
+                grid-template-columns: 1fr
+            }
+
+            .fbot {
+                flex-direction: column;
+                text-align: center
+            }
+
+            .container {
+                padding: 0 16px
+            }
+
+            .content-wrap {
+                padding: 48px 16px
+            }
+
+            .card-grid {
+                padding: 48px 16px
+            }
+
+            .card-grid.c3,
+            .card-grid.c2 {
+                grid-template-columns: 1fr
+            }
+
+            .page-hero {
+                padding: 48px 16px 40px
+            }
+
+            .section {
+                padding: 48px 0
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ticker">
+        <div class="ttrack" id="tt"></div>
+    </div>
+    <nav class="nav" id="nav">
+        <div class="ni">
+            <a href="index.html" class="nlogo">
+                <div class="nicon"><svg width="20" height="20" viewBox="0 0 44 44" fill="none">
+                        <path d="M22 3L39 12.5V31.5L22 41L5 31.5V12.5L22 3Z" stroke="white" stroke-width="3.2"
+                            stroke-linejoin="round" fill="none" />
+                        <path
+                            d="M30 16C30 16 25.5 14.5 21 16C16.5 17.5 15 20.5 18.5 22.5C22 24.5 28 23 29.5 25.5C31 28 28 29.5 22 29.5"
+                            stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"
+                            fill="none" />
+                    </svg></div>
+                Crypto Nova
+            </a>
+            <div class="nlinks">
+                <a href="market.html">Markets</a>
+                <a href="services.html">Services</a>
+                <a href="investment.html">Investment Plans</a>
+                <div style="position:relative;display:inline-block">
+                    <a href="#" onclick="toggleDD(event,&#39;company-menu&#39;)">Company &#9662;</a>
+                    <div id="company-menu"
+                        style="display:none;position:absolute;top:100%;left:0;background:#0b1e2d;border:1px solid rgba(0,229,195,.15);border-radius:12px;padding:8px;min-width:180px;z-index:200;box-shadow:0 16px 48px rgba(0,0,0,.4)">
+                        <a href="About.html" class="ddlink">About Us</a>
+                        <a href="security.html" class="ddlink">Security</a>
+                        <a href="career.html" class="ddlink">Careers</a>
+                        <a href="contact.html" class="ddlink">Contact</a>
+                    </div>
+                </div>
+            </div>
+            <div class="nr">
+                <a href="login.html"><button class="ng">Sign In</button></a>
+                <a href="signup.html" class="btn bp" style="padding:10px 20px;font-size:14px;">Open Account</a>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span class="hbar"></span><span class="hbar"></span><span class="hbar"></span>
+            </button>
+        </div>
+        <div class="mobile-menu" id="mobile-menu">
+            <div class="mobile-links">
+                <a href="market.html">Markets</a>
+                <a href="services.html">Services</a>
+                <a href="investment.html">Investment Plans</a>
+                <a href="About.html">About Us</a>
+                <a href="security.html">Security</a>
+                <a href="career.html">Careers</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="mobile-actions">
+                <a href="login.html" style="width:100%"><button class="ng" style="width:100%;padding:13px">Sign
+                        In</button></a>
+                <a href="signup.html" class="btn bp"
+                    style="width:100%;justify-content:center;padding:13px 20px;font-size:15px;">Open Account</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-hero">
+        <div class="container">
+            <span class="ey">Legal</span>
+            <h1>Privacy Policy</h1>
+            <p>Last updated: January 1, 2025 · We are committed to protecting your personal data in full compliance with
+                GDPR and applicable privacy laws.</p>
+        </div>
+    </div>
+    <div class="content-wrap">
+        <h2>1. Who We Are</h2>
+        <p>Crypto Nova Trading Limited ("Crypto Nova", "we", "us", "our") is the data controller responsible for your
+            personal information. We are incorporated in Ireland and regulated by the Central Bank of Ireland. Contact:
+            <a href="contact.html" style="color:var(--teal)">privacy@cryptonova.com</a>
+        </p>
+
+        <h2>2. Information We Collect</h2>
+        <p>We collect information you provide directly to us, as well as certain information automatically when you use
+            our services:</p>
+        <ul>
+            <li><strong style="color:var(--text)">Identity data:</strong> Full name, date of birth, nationality,
+                government ID details</li>
+            <li><strong style="color:var(--text)">Contact data:</strong> Email address, phone number, postal address
+            </li>
+            <li><strong style="color:var(--text)">Financial data:</strong> Bank account details, transaction history,
+                wallet addresses</li>
+            <li><strong style="color:var(--text)">Technical data:</strong> IP address, browser type, device information,
+                login timestamps</li>
+            <li><strong style="color:var(--text)">Usage data:</strong> Pages viewed, features used, trading activity
+            </li>
+        </ul>
+
+        <h2>3. How We Use Your Information</h2>
+        <p>We use your information for the following purposes:</p>
+        <ul>
+            <li>To create and manage your account and verify your identity</li>
+            <li>To process transactions, deposits, and withdrawals</li>
+            <li>To comply with legal and regulatory obligations (KYC/AML)</li>
+            <li>To provide customer support and resolve disputes</li>
+            <li>To detect, prevent, and investigate fraud and security incidents</li>
+            <li>To send service-related communications and updates</li>
+            <li>To improve our platform and services</li>
+        </ul>
+
+        <h2>4. Legal Basis for Processing</h2>
+        <p>We process your personal data on the following legal bases: performance of a contract (account services),
+            legal obligation (KYC/AML compliance), legitimate interests (fraud prevention, security), and consent (where
+            explicitly obtained for marketing communications).</p>
+
+        <h2>5. Data Sharing</h2>
+        <p>We do not sell your personal data. We may share your information with:</p>
+        <ul>
+            <li>Regulatory authorities and law enforcement where required by law</li>
+            <li>KYC/AML verification service providers</li>
+            <li>Banking partners for payment processing</li>
+            <li>Cloud infrastructure providers (with data processing agreements)</li>
+        </ul>
+
+        <h2>6. Data Retention</h2>
+        <p>We retain your personal data for as long as your account is active and for a minimum of 5 years after account
+            closure, as required by financial regulations. Transaction records are kept for 7 years in accordance with
+            anti-money laundering laws.</p>
+
+        <h2>7. Your Rights</h2>
+        <p>Under GDPR you have the right to access, rectify, erase, restrict, and port your personal data. You may also
+            object to processing and withdraw consent where processing is consent-based. To exercise any of these
+            rights, contact us at <a href="contact.html" style="color:var(--teal)">privacy@cryptonova.com</a>.</p>
+
+        <h2>8. Cookies</h2>
+        <p>We use essential cookies required for platform operation, and optional analytics cookies to improve user
+            experience. You may control cookie preferences through your browser settings. We do not use advertising or
+            tracking cookies.</p>
+
+        <h2>9. Security</h2>
+        <p>We implement industry-leading technical and organisational measures to protect your personal data. See our <a
+                href="security.html" style="color:var(--teal)">Security page</a> for full details.</p>
+
+        <h2>10. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy periodically. We will notify you of material changes via email or a
+            prominent notice on our platform prior to the change taking effect.</p>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="fg">
+                <div class="fb">
+                    <a href="index.html" class="nlogo">
+                        <div class="nicon"><svg width="20" height="20" viewBox="0 0 44 44" fill="none">
+                                <path d="M22 3L39 12.5V31.5L22 41L5 31.5V12.5L22 3Z" stroke="white" stroke-width="3.2"
+                                    stroke-linejoin="round" fill="none" />
+                                <path
+                                    d="M30 16C30 16 25.5 14.5 21 16C16.5 17.5 15 20.5 18.5 22.5C22 24.5 28 23 29.5 25.5C31 28 28 29.5 22 29.5"
+                                    stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"
+                                    fill="none" />
+                            </svg></div>
+                        <span style="color:var(--text);font-size:17px;font-weight:900">Crypto Nova</span>
+                    </a>
+                    <p>The unified platform for Crypto, Forex, and Managed Wealth. Trade with confidence, backed by
+                        bank-grade security.</p>
+                </div>
+                <div class="fc">
+                    <h4>Products</h4>
+                    <ul>
+                        <li><a href="forex.html">Forex Trading</a></li>
+                        <li><a href="crpto.html">Cryptocurrency</a></li>
+                        <li><a href="cloud.html">Cloud Mining</a></li>
+                        <li><a href="investment.html">Investment Plans</a></li>
+                        <li><a href="managedport.html">Managed Portfolios</a></li>
+                    </ul>
+                </div>
+                <div class="fc">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="marketnews.html">Market News</a></li>
+                        <li><a href="tradingGuide.html">Trading Guides</a></li>
+                        <li><a href="EconomicCa.html">Economic Calendar</a></li>
+                        <li><a href="Affiliate.html">Affiliate Program</a></li>
+                        <li><a href="systems.html">System Status</a></li>
+                    </ul>
+                </div>
+                <div class="fc">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="Terms.html">Terms of Service</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="Risk.html">Risk Disclosure</a></li>
+                        <li><a href="Aml.html">AML Policy</a></li>
+                        <li><a href="security.html">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="fbot">
+                <span>&copy; 2025 Crypto Nova Trading Limited. All rights reserved.</span>
+                <span>Risk Warning: Trading involves significant risk of loss.</span>
+            </div>
+        </div>
+    </footer>
+    <script>
+        const TDATA = [{ s: 'BTC/USD', p: '$84,230', c: '+2.45%', u: 1 }, { s: 'ETH/USD', p: '$3,210', c: '+1.87%', u: 1 }, { s: 'BNB/USD', p: '$412', c: '-0.54%', u: 0 }, { s: 'SOL/USD', p: '$178', c: '+3.21%', u: 1 }, { s: 'XRP/USD', p: '$0.621', c: '+0.98%', u: 1 }, { s: 'EUR/USD', p: '1.0842', c: '+0.12%', u: 1 }, { s: 'GBP/USD', p: '1.2634', c: '-0.08%', u: 0 }, { s: 'USD/JPY', p: '149.82', c: '+0.31%', u: 1 }, { s: 'DOGE/USD', p: '$0.142', c: '+5.14%', u: 1 }, { s: 'ADA/USD', p: '$0.489', c: '-1.23%', u: 0 }];
+        (() => { document.getElementById('tt').innerHTML = [...TDATA, ...TDATA].map(t => `<div class="ti"><span class="sym">${t.s}</span><span>${t.p}</span><span class="${t.u ? 'up' : 'dn'}">${t.u ? '▲' : '▼'} ${t.c}</span></div>`).join(''); })();
+        (() => { const obs = new IntersectionObserver(e => e.forEach(x => { if (x.isIntersecting) { x.target.classList.add('vis'); obs.unobserve(x.target); } }), { threshold: .1 }); document.querySelectorAll('.rev').forEach(el => obs.observe(el)); })();
+        window.addEventListener('scroll', () => { document.getElementById('nav').classList.toggle('sc', scrollY > 40); }, { passive: true });
+        (() => {
+            const btn = document.getElementById('hamburger'), menu = document.getElementById('mobile-menu');
+            if (!btn || !menu) return;
+            btn.addEventListener('click', () => { const o = btn.classList.toggle('open'); btn.setAttribute('aria-expanded', o); if (o) { menu.style.display = 'flex'; requestAnimationFrame(() => requestAnimationFrame(() => menu.classList.add('open'))); } else { menu.classList.remove('open'); menu.addEventListener('transitionend', () => { if (!menu.classList.contains('open')) menu.style.display = 'none'; }, { once: true }); } });
+            document.addEventListener('click', e => { if (!btn.contains(e.target) && !menu.contains(e.target) && menu.classList.contains('open')) { btn.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); menu.classList.remove('open'); menu.addEventListener('transitionend', () => { if (!menu.classList.contains('open')) menu.style.display = 'none'; }, { once: true }); } });
+            window.addEventListener('resize', () => { if (window.innerWidth > 960) { btn.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); menu.classList.remove('open'); menu.style.display = 'none'; } });
+        })();
+        function toggleDD(e, id) { e.preventDefault(); e.stopPropagation(); const m = document.getElementById(id); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
+        document.addEventListener('click', () => { document.querySelectorAll('[id$="-menu"]').forEach(m => m.style.display = 'none'); });
+    </script>
+</body>
+
+</html>

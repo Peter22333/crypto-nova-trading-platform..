@@ -1,0 +1,3264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Nova — Fund Your Account</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        :root {
+            --teal: #0db89e;
+            --teal-d: #0a9a84;
+            --teal-l: #e6f9f6;
+            --teal-s: rgba(13, 184, 158, .12);
+            --blue: #1a6bff;
+            --blue-l: #e8f0ff;
+            --bg: #f0f4f8;
+            --white: #fff;
+            --text: #0d1421;
+            --muted: #6b7a99;
+            --dim: #9ba8c0;
+            --border: #e2e8f0;
+            --green: #16a34a;
+            --green-l: rgba(22, 163, 74, .1);
+            --red: #dc2626;
+            --red-l: rgba(220, 38, 38, .1);
+            --orange: #f59e0b;
+            --orange-l: rgba(245, 158, 11, .1);
+            --font: 'Sora', sans-serif;
+            --body: 'DM Sans', sans-serif;
+            --r: 12px;
+            --rl: 16px;
+            --sh: 0 2px 16px rgba(0, 0, 0, .07);
+            --sidebar: 240px;
+        }
+
+        body {
+            font-family: var(--body);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none
+        }
+
+        ul {
+            list-style: none
+        }
+
+        button,
+        input,
+        select {
+            cursor: pointer;
+            font-family: inherit
+        }
+
+        input[type=text],
+        input[type=number],
+        input[type=email] {
+            cursor: text
+        }
+
+        /* ── LAYOUT ── */
+        .app {
+            display: flex;
+            min-height: 100vh
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: var(--sidebar);
+            background: #fff;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            font-family: var(--font);
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .logo-box {
+            width: 34px;
+            height: 34px;
+            background: var(--teal);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px
+        }
+
+        .nav-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--dim);
+            padding: 10px 10px 6px;
+            font-family: var(--font)
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 12px;
+            border-radius: var(--r);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all .18s;
+            margin-bottom: 2px;
+            font-family: var(--font)
+        }
+
+        .nav-item:hover {
+            background: var(--bg);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: var(--teal-l);
+            color: var(--teal);
+            font-weight: 700
+        }
+
+        .nav-item svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            opacity: .7
+        }
+
+        .nav-item.active svg {
+            opacity: 1
+        }
+
+        .sidebar-user {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0
+        }
+
+        .user-av {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--teal), var(--blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0
+        }
+
+        .user-name {
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.2
+        }
+
+        .user-tier {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .user-logout {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--dim);
+            padding: 6px;
+            border-radius: 6px;
+            transition: color .2s
+        }
+
+        .user-logout:hover {
+            color: var(--red)
+        }
+
+        /* ── MAIN ── */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0
+        }
+
+        .topbar {
+            height: 64px;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            gap: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        .page-title {
+            font-family: var(--font);
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text)
+        }
+
+        .bal-pill {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--teal-l);
+            border: 1px solid rgba(13, 184, 158, .2);
+            border-radius: 50px;
+            padding: 6px 14px;
+            margin-left: auto;
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--teal)
+        }
+
+        .ham-btn {
+            display: none;
+            background: none;
+            border: none;
+            padding: 6px;
+            color: var(--text)
+        }
+
+        .content {
+            padding: 32px;
+            max-width: 1000px;
+            width: 100%
+        }
+
+        /* ── STEP INDICATOR ── */
+        .steps {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 36px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--rl);
+            padding: 4px;
+            box-shadow: var(--sh)
+        }
+
+        .step {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 12px 8px;
+            border-radius: 12px;
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dim);
+            transition: all .3s;
+            cursor: default
+        }
+
+        .step.done {
+            color: var(--teal)
+        }
+
+        .step.active {
+            background: var(--teal);
+            color: #fff;
+            box-shadow: 0 3px 12px rgba(13, 184, 158, .3)
+        }
+
+        .step-num {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            background: rgba(255, 255, 255, .25);
+            flex-shrink: 0
+        }
+
+        .step.done .step-num {
+            background: var(--teal-l);
+            color: var(--teal)
+        }
+
+        .step.active .step-num {
+            background: rgba(255, 255, 255, .25);
+            color: #fff
+        }
+
+        .step:not(.active) .step-num {
+            background: var(--bg);
+            color: var(--dim)
+        }
+
+        .step-divider {
+            width: 24px;
+            height: 2px;
+            background: var(--border);
+            flex-shrink: 0
+        }
+
+        .step-divider.done {
+            background: var(--teal)
+        }
+
+        /* ── PANELS ── */
+        .panel {
+            display: none;
+            animation: fadeIn .3s ease
+        }
+
+        .panel.active {
+            display: block
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* ── METHOD SELECTION ── */
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 28px
+        }
+
+        .method-card {
+            background: #fff;
+            border: 2px solid var(--border);
+            border-radius: var(--rl);
+            padding: 24px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .22s;
+            position: relative
+        }
+
+        .method-card:hover {
+            border-color: var(--teal);
+            box-shadow: 0 4px 20px rgba(13, 184, 158, .12);
+            transform: translateY(-2px)
+        }
+
+        .method-card.selected {
+            border-color: var(--teal);
+            background: var(--teal-l);
+            box-shadow: 0 4px 20px rgba(13, 184, 158, .15)
+        }
+
+        .method-card.selected .method-check {
+            display: flex
+        }
+
+        .method-check {
+            display: none;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--teal);
+            color: #fff;
+            align-items: center;
+            justify-content: center
+        }
+
+        .method-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 22px
+        }
+
+        .method-title {
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 5px
+        }
+
+        .method-desc {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5
+        }
+
+        .method-badge {
+            display: inline-block;
+            font-family: var(--font);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 50px;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: .06em
+        }
+
+        /* ── AMOUNT CARD ── */
+        .amount-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--rl);
+            padding: 28px;
+            box-shadow: var(--sh);
+            margin-bottom: 20px
+        }
+
+        .card-title {
+            font-family: var(--font);
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 18px
+        }
+
+        .quick-amounts {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px
+        }
+
+        .qa-btn {
+            padding: 9px 18px;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r);
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--muted);
+            transition: all .2s
+        }
+
+        .qa-btn:hover,
+        .qa-btn.sel {
+            background: var(--teal-l);
+            border-color: rgba(13, 184, 158, .35);
+            color: var(--teal)
+        }
+
+        .amount-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 14px
+        }
+
+        .currency-flag {
+            position: absolute;
+            left: 14px;
+            font-size: 18px
+        }
+
+        .amount-input {
+            width: 100%;
+            padding: 16px 50px 16px 46px;
+            background: #fff;
+            border: 2px solid var(--border);
+            border-radius: var(--r);
+            font-family: var(--font);
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s
+        }
+
+        .amount-input:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 4px var(--teal-s)
+        }
+
+        .currency-code {
+            position: absolute;
+            right: 14px;
+            font-family: var(--font);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--muted)
+        }
+
+        .amount-equiv {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 6px
+        }
+
+        .amount-equiv span {
+            font-weight: 700;
+            color: var(--teal)
+        }
+
+        .min-note {
+            font-size: 12px;
+            color: var(--dim)
+        }
+
+        .form-field {
+            margin-bottom: 18px
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .09em;
+            margin-bottom: 8px;
+            font-family: var(--font)
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-radius: var(--r);
+            font-family: var(--body);
+            font-size: 14px;
+            color: var(--text);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            appearance: none
+        }
+
+        .form-select {
+            background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239ba8c0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px var(--teal-s)
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px
+        }
+
+        /* ── CRYPTO ADDRESS BOX ── */
+        .addr-box {
+            background: linear-gradient(135deg, #0d1a2e, #0a2040);
+            border-radius: var(--rl);
+            padding: 24px;
+            color: #fff;
+            margin-bottom: 20px
+        }
+
+        .addr-box-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px
+        }
+
+        .addr-box-title {
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 700
+        }
+
+        .addr-network {
+            background: rgba(13, 184, 158, .2);
+            color: #0db89e;
+            font-family: var(--font);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(13, 184, 158, .3)
+        }
+
+        .qr-addr-layout {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start
+        }
+
+        .qr-wrap {
+            background: #fff;
+            border-radius: 10px;
+            padding: 8px;
+            flex-shrink: 0
+        }
+
+        .addr-details {}
+
+        .addr-label-small {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: rgba(255, 255, 255, .5);
+            margin-bottom: 6px;
+            font-family: var(--font);
+            font-weight: 700
+        }
+
+        .addr-string {
+            font-family: monospace;
+            font-size: 12px;
+            color: #fff;
+            word-break: break-all;
+            line-height: 1.6;
+            background: rgba(255, 255, 255, .07);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, .1)
+        }
+
+        .copy-addr-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(13, 184, 158, .2);
+            color: var(--teal);
+            border: 1px solid rgba(13, 184, 158, .3);
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-family: var(--font);
+            font-size: 12px;
+            font-weight: 700;
+            transition: all .2s
+        }
+
+        .copy-addr-btn:hover {
+            background: rgba(13, 184, 158, .3)
+        }
+
+        .addr-warning {
+            background: rgba(245, 158, 11, .12);
+            border: 1px solid rgba(245, 158, 11, .25);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #d97706;
+            line-height: 1.6;
+            display: flex;
+            gap: 8px;
+            margin-top: 14px
+        }
+
+        /* ── BANK DETAILS ── */
+        .bank-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--rl);
+            padding: 24px;
+            box-shadow: var(--sh);
+            margin-bottom: 20px
+        }
+
+        .bank-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .bank-row:last-child {
+            border-bottom: none
+        }
+
+        .bank-key {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .06em
+        }
+
+        .bank-val {
+            font-family: var(--font);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .copy-mini {
+            background: none;
+            border: none;
+            color: var(--teal);
+            padding: 3px;
+            transition: opacity .2s;
+            font-size: 11px;
+            font-family: var(--font);
+            font-weight: 700;
+            cursor: pointer
+        }
+
+        .copy-mini:hover {
+            opacity: .7
+        }
+
+        /* ── CARD FORM ── */
+        .card-icons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 28px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            font-family: var(--font)
+        }
+
+        /* ── REVIEW PANEL ── */
+        .review-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--rl);
+            padding: 28px;
+            box-shadow: var(--sh);
+            margin-bottom: 20px
+        }
+
+        .review-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .review-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0
+        }
+
+        .review-key {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .review-val {
+            font-family: var(--font);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text)
+        }
+
+        .review-total .review-key {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text)
+        }
+
+        .review-total .review-val {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--teal)
+        }
+
+        /* ── SUCCESS PANEL ── */
+        .success-wrap {
+            text-align: center;
+            padding: 20px 0 10px
+        }
+
+        .success-anim {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--teal), var(--teal-d));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 32px rgba(13, 184, 158, .35);
+            animation: popIn .5s cubic-bezier(.17, .67, .3, 1.3)
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+                opacity: 0
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .success-title {
+            font-family: var(--font);
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 10px;
+            letter-spacing: -.03em
+        }
+
+        .success-sub {
+            font-size: 15px;
+            color: var(--muted);
+            line-height: 1.7;
+            max-width: 420px;
+            margin: 0 auto 28px
+        }
+
+        .deposit-summary {
+            background: var(--bg);
+            border-radius: var(--rl);
+            padding: 22px;
+            margin-bottom: 28px;
+            text-align: left
+        }
+
+        .ds-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .ds-row:last-child {
+            border-bottom: none;
+            font-weight: 800;
+            font-family: var(--font)
+        }
+
+        .ds-key {
+            color: var(--muted)
+        }
+
+        .ds-val {
+            font-weight: 600;
+            color: var(--text)
+        }
+
+        .balance-reveal {
+            background: linear-gradient(135deg, var(--teal), var(--teal-d));
+            border-radius: var(--rl);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .br-label {
+            font-size: 12px;
+            font-weight: 600;
+            opacity: .8;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-family: var(--font)
+        }
+
+        .br-amount {
+            font-family: var(--font);
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-top: 4px
+        }
+
+        .br-sub {
+            font-size: 12px;
+            opacity: .7;
+            margin-top: 2px
+        }
+
+        .br-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0
+        }
+
+        /* ── WITHDRAW LOCKED ── */
+        .wd-locked {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--rl);
+            padding: 36px;
+            text-align: center;
+            box-shadow: var(--sh)
+        }
+
+        .wd-locked-icon {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: var(--orange-l);
+            border: 2px solid rgba(245, 158, 11, .2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px
+        }
+
+        .wd-locked h3 {
+            font-family: var(--font);
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 10px
+        }
+
+        .wd-locked p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.75;
+            max-width: 380px;
+            margin: 0 auto 24px
+        }
+
+        .wd-contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--teal);
+            color: #fff;
+            font-family: var(--font);
+            font-size: 14px;
+            font-weight: 700;
+            padding: 12px 28px;
+            border-radius: var(--r);
+            border: none;
+            box-shadow: 0 4px 14px rgba(13, 184, 158, .3);
+            transition: all .22s
+        }
+
+        .wd-contact-btn:hover {
+            background: var(--teal-d);
+            transform: translateY(-1px)
+        }
+
+        .wd-steps {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+            margin-top: 28px;
+            text-align: left
+        }
+
+        .wd-step {
+            background: var(--bg);
+            border-radius: var(--r);
+            padding: 16px;
+            border: 1px solid var(--border)
+        }
+
+        .wd-step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--teal-l);
+            color: var(--teal);
+            font-family: var(--font);
+            font-size: 12px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px
+        }
+
+        .wd-step h4 {
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px
+        }
+
+        .wd-step p {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5
+        }
+
+        /* ── HISTORY TABLE ── */
+        .history-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--rl);
+            overflow: hidden;
+            box-shadow: var(--sh)
+        }
+
+        .hist-head {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            padding: 11px 22px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .hist-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            padding: 14px 22px;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            transition: background .18s
+        }
+
+        .hist-row:last-child {
+            border-bottom: none
+        }
+
+        .hist-row:hover {
+            background: #f8fafd
+        }
+
+        .th {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: var(--dim)
+        }
+
+        .badge {
+            display: inline-block;
+            font-family: var(--font);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 50px
+        }
+
+        .b-green {
+            background: var(--green-l);
+            color: var(--green)
+        }
+
+        .b-yellow {
+            background: var(--orange-l);
+            color: #b45309
+        }
+
+        .b-blue {
+            background: var(--blue-l);
+            color: var(--blue)
+        }
+
+        .empty-hist {
+            padding: 36px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px
+        }
+
+        /* ── BUTTONS ── */
+        .btn-next {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            width: 100%;
+            padding: 15px;
+            background: var(--teal);
+            color: #fff;
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 800;
+            border-radius: var(--r);
+            border: none;
+            box-shadow: 0 4px 18px rgba(13, 184, 158, .35);
+            transition: all .22s;
+            margin-top: 8px
+        }
+
+        .btn-next:hover {
+            background: var(--teal-d);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(13, 184, 158, .4)
+        }
+
+        .btn-next:disabled {
+            background: var(--border);
+            color: var(--dim);
+            box-shadow: none;
+            transform: none;
+            cursor: not-allowed
+        }
+
+        .btn-back {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: none;
+            border: 1.5px solid var(--border);
+            color: var(--muted);
+            font-family: var(--font);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: var(--r);
+            transition: all .2s
+        }
+
+        .btn-back:hover {
+            border-color: var(--text);
+            color: var(--text)
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 6px
+        }
+
+        .btn-row .btn-next {
+            flex: 1;
+            margin-top: 0
+        }
+
+        /* ── WAITING PANEL ── */
+        .wait-ring-wrap {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .wait-ring {
+            position: absolute;
+            inset: 0
+        }
+
+        .wait-ring-inner {
+            position: relative;
+            z-index: 2;
+            text-align: center
+        }
+
+        .wait-ring-time {
+            font-family: var(--font);
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--text);
+            letter-spacing: -1px;
+            line-height: 1
+        }
+
+        .wait-ring-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-family: var(--font);
+            margin-top: 3px
+        }
+
+        .wait-stages {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            text-align: left;
+            border: 1px solid var(--border);
+            border-radius: var(--rl);
+            overflow: hidden
+        }
+
+        .ws-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: #fff;
+            transition: background .3s
+        }
+
+        .ws-item:last-child {
+            border-bottom: none
+        }
+
+        .ws-item.ws-done {
+            background: #f8fffe
+        }
+
+        .ws-item.ws-active {
+            background: var(--teal-l)
+        }
+
+        .ws-item.ws-pending {
+            opacity: .5
+        }
+
+        .ws-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            transition: all .4s
+        }
+
+        .ws-item.ws-active .ws-dot {
+            background: var(--teal);
+            border-color: var(--teal);
+            animation: pulseDot 1.5s ease infinite
+        }
+
+        .ws-item.ws-done .ws-dot {
+            background: var(--green);
+            border-color: var(--green)
+        }
+
+        .ws-dot span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--dim);
+            display: block;
+            transition: all .4s
+        }
+
+        .ws-item.ws-active .ws-dot span {
+            background: #fff
+        }
+
+        .ws-item.ws-done .ws-dot span {
+            display: none
+        }
+
+        @keyframes pulseDot {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(13, 184, 158, .4)
+            }
+
+            60% {
+                box-shadow: 0 0 0 8px rgba(13, 184, 158, 0)
+            }
+        }
+
+        .ws-text {
+            flex: 1
+        }
+
+        .ws-title {
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 2px
+        }
+
+        .ws-sub {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .ws-status {
+            flex-shrink: 0
+        }
+
+        .b-gray {
+            background: var(--bg);
+            color: var(--dim)
+        }
+
+        .b-done {
+            background: var(--green-l);
+            color: var(--green)
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 9999;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all .3s;
+            max-width: 300px
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1
+        }
+
+        .t-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0
+        }
+
+        .t-success .t-icon {
+            background: var(--green-l);
+            color: var(--green)
+        }
+
+        .t-error .t-icon {
+            background: var(--red-l);
+            color: var(--red)
+        }
+
+        .t-info .t-icon {
+            background: var(--teal-l);
+            color: var(--teal)
+        }
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:900px) {
+            :root {
+                --sidebar: 240px
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                z-index: 300;
+                transform: translateX(-100%);
+                transition: transform .3s
+            }
+
+            .sidebar.open {
+                transform: translateX(0)
+            }
+
+            .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, .4);
+                z-index: 299;
+                display: none
+            }
+
+            .sidebar-overlay.open {
+                display: block
+            }
+
+            .ham-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center
+            }
+
+            .method-grid {
+                grid-template-columns: 1fr
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr
+            }
+
+            .wd-steps {
+                grid-template-columns: 1fr
+            }
+
+            .content {
+                padding: 18px
+            }
+
+            .steps {
+                overflow-x: auto;
+                gap: 0
+            }
+
+            .step-label {
+                display: none
+            }
+
+            .hist-head,
+            .hist-row {
+                grid-template-columns: 1fr 1fr 1fr
+            }
+
+            .th:nth-child(4),
+            .th:nth-child(5),
+            .hist-row>*:nth-child(4),
+            .hist-row>*:nth-child(5) {
+                display: none
+            }
+        }
+
+        @media(max-width:600px) {
+            .qr-addr-layout {
+                flex-direction: column
+            }
+
+            .qr-wrap {
+                align-self: center
+            }
+
+            .btn-row {
+                flex-direction: column
+            }
+
+            .btn-back {
+                width: 100%
+            }
+
+            .balance-reveal {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px
+            }
+
+            .wd-steps {
+                grid-template-columns: 1fr
+            }
+
+            .method-grid {
+                grid-template-columns: 1fr
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- ── SIDEBAR ── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-box">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
+                        stroke-linecap="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+                    </svg>
+                </div>
+                Crypto Nova
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Main Menu</div>
+                <a href="dashboard.html" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                    Overview
+                </a>
+                <a href="dashboard.html" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                    </svg>
+                    Live Markets
+                </a>
+                <a href="dashboard.html" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <polyline points="17 1 21 5 17 9" />
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                        <polyline points="7 23 3 19 7 15" />
+                    </svg>
+                    Trade
+                </a>
+                <div class="nav-section-label">Finance</div>
+                <a href="deposit-page.html" class="nav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <line x1="2" y1="10" x2="22" y2="10" />
+                    </svg>
+                    Deposit
+                </a>
+                <a href="#withdraw-section" class="nav-item" onclick="showWithdraw()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M12 19V5M5 12l7-7 7 7" />
+                    </svg>
+                    Withdraw
+                </a>
+                <a href="userdashboard.html" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    Transactions
+                </a>
+            </nav>
+            <div class="sidebar-user">
+                <div class="user-av" id="user-av">U</div>
+                <div>
+                    <div class="user-name" id="user-name-display">User</div>
+                    <div class="user-tier">Standard Tier</div>
+                </div>
+                <button class="user-logout" onclick="logout()" title="Log out">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                </button>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+        <!-- ── MAIN ── -->
+        <div class="main">
+            <div class="topbar">
+                <button class="ham-btn" onclick="openSidebar()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </button>
+                <div class="page-title" id="page-title-bar">Fund Your Account</div>
+                <div class="bal-pill">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <line x1="2" y1="10" x2="22" y2="10" />
+                    </svg>
+                    Balance: <strong id="topbar-balance">$0.00</strong>
+                </div>
+            </div>
+
+            <div class="content" id="deposit-section">
+
+                <!-- STEP BAR -->
+                <div class="steps" id="step-bar">
+                    <div class="step active" id="step1">
+                        <div class="step-num">1</div><span class="step-label">Choose Method</span>
+                    </div>
+                    <div class="step-divider" id="div1"></div>
+                    <div class="step" id="step2">
+                        <div class="step-num">2</div><span class="step-label">Enter Amount</span>
+                    </div>
+                    <div class="step-divider" id="div2"></div>
+                    <div class="step" id="step3">
+                        <div class="step-num">3</div><span class="step-label">Payment Details</span>
+                    </div>
+                    <div class="step-divider" id="div3"></div>
+                    <div class="step" id="step4">
+                        <div class="step-num">4</div><span class="step-label">Review</span>
+                    </div>
+                    <div class="step-divider" id="div4"></div>
+                    <div class="step" id="step5">
+                        <div class="step-num">5</div><span class="step-label">Done</span>
+                    </div>
+                </div>
+
+                <!-- ══ PANEL 1: METHOD ══ -->
+                <div class="panel active" id="panel-1">
+                    <div style="margin-bottom:20px">
+                        <div
+                            style="font-family:var(--font);font-size:22px;font-weight:900;margin-bottom:6px;letter-spacing:-.03em">
+                            How would you like to deposit?</div>
+                        <div style="font-size:14px;color:var(--muted)">Choose your preferred payment method. All
+                            deposits are
+                            reviewed and credited by our team after payment confirmation.</div>
+                    </div>
+                    <div class="method-grid">
+                        <div class="method-card" onclick="selectMethod('crypto',this)">
+                            <div class="method-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                    stroke="white" stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg></div>
+                            <div class="method-icon" style="background:#fff4e6">₿</div>
+                            <div class="method-title">Cryptocurrency</div>
+                            <div class="method-desc">Bitcoin, Ethereum, USDT, Solana and more</div>
+                            <div class="method-badge" style="background:var(--green-l);color:var(--green)">No Fees</div>
+                        </div>
+                        <div class="method-card" onclick="selectMethod('bank',this)">
+                            <div class="method-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                    stroke="white" stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg></div>
+                            <div class="method-icon" style="background:#e8f0ff">🏦</div>
+                            <div class="method-title">Bank Transfer</div>
+                            <div class="method-desc">Wire or local bank transfer (1–3 business days)</div>
+                            <div class="method-badge" style="background:var(--teal-l);color:var(--teal)">Recommended
+                            </div>
+                        </div>
+                        <div class="method-card" onclick="selectMethod('card',this)">
+                            <div class="method-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                    stroke="white" stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg></div>
+                            <div class="method-icon" style="background:#f5eeff">💳</div>
+                            <div class="method-title">Debit / Credit Card</div>
+                            <div class="method-desc">Visa, Mastercard — instant deposit</div>
+                            <div class="method-badge" style="background:var(--orange-l);color:#b45309">1.5% Fee</div>
+                        </div>
+                    </div>
+                    <button class="btn-next" id="btn-next-1" onclick="goStep(2)" disabled>
+                        Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- ══ PANEL 2: AMOUNT ══ -->
+                <div class="panel" id="panel-2">
+                    <div style="margin-bottom:20px">
+                        <div
+                            style="font-family:var(--font);font-size:22px;font-weight:900;margin-bottom:6px;letter-spacing:-.03em">
+                            How much do you want to deposit?</div>
+                        <div style="font-size:14px;color:var(--muted)">Enter the amount in USD. Your balance will be
+                            updated by our
+                            team after we confirm your payment.</div>
+                    </div>
+                    <div class="amount-card">
+                        <div class="quick-amounts">
+                            <button class="qa-btn" onclick="setAmount(100,this)">$100</button>
+                            <button class="qa-btn" onclick="setAmount(500,this)">$500</button>
+                            <button class="qa-btn" onclick="setAmount(1000,this)">$1,000</button>
+                            <button class="qa-btn" onclick="setAmount(5000,this)">$5,000</button>
+                            <button class="qa-btn" onclick="setAmount(10000,this)">$10,000</button>
+                            <button class="qa-btn" onclick="setAmount(25000,this)">$25,000</button>
+                        </div>
+                        <div class="amount-input-wrap">
+                            <span class="currency-flag">🇺🇸</span>
+                            <input class="amount-input" type="number" id="amount-in" placeholder="0.00" min="50"
+                                oninput="onAmountInput(this.value)">
+                            <span class="currency-code">USD</span>
+                        </div>
+                        <div class="amount-equiv" id="amount-equiv">≈ <span>0.0000 BTC</span></div>
+                        <div class="min-note">Minimum deposit: $50.00 · No maximum limit</div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn-back" onclick="goStep(1)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M19 12H5M12 19l-7-7 7-7" />
+                            </svg>
+                            Back
+                        </button>
+                        <button class="btn-next" id="btn-next-2" onclick="goStep(3)" disabled>
+                            Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ══ PANEL 3: PAYMENT DETAILS ══ -->
+                <div class="panel" id="panel-3">
+                    <!-- CRYPTO -->
+                    <div id="crypto-details">
+                        <div style="margin-bottom:20px">
+                            <div
+                                style="font-family:var(--font);font-size:22px;font-weight:900;margin-bottom:6px;letter-spacing:-.03em">
+                                Send crypto to your deposit address</div>
+                            <div style="font-size:14px;color:var(--muted)">Select your coin and send the exact amount to
+                                the address
+                                below.</div>
+                        </div>
+                        <div class="amount-card" style="margin-bottom:20px">
+                            <div class="form-field" style="margin-bottom:0">
+                                <label class="form-label">Select Coin to Send</label>
+                                <select class="form-select" id="crypto-coin" onchange="updateCryptoAddr()">
+                                    <option value="BTC">₿ Bitcoin (BTC)</option>
+                                    <option value="ETH">Ξ Ethereum (ETH)</option>
+                                    <option value="USDT">₮ Tether (USDT) — ERC-20</option>
+                                    <option value="SOL">◎ Solana (SOL)</option>
+                                    <option value="BNB">⬡ BNB (BEP-20)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="addr-box">
+                            <div class="addr-box-top">
+                                <div class="addr-box-title" id="crypto-addr-title">Bitcoin Deposit Address</div>
+                                <div class="addr-network" id="crypto-network">BTC Network</div>
+                            </div>
+                            <div class="qr-addr-layout">
+                                <div class="qr-wrap"><img id="dep-qr-img"
+                                        src="data:image/png;base64,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"
+                                        style="width:120px;height:120px;border-radius:6px;display:block;image-rendering:pixelated"
+                                        alt="BTC Deposit QR Code"></div>
+                                <div class="addr-details" style="flex:1">
+                                    <div class="addr-label-small">Your Deposit Address</div>
+                                    <div class="addr-string" id="dep-addr-string">
+                                        bc1q705yyxfpnkrr3nzu556nnnl4egv9kkr7xma4wc</div>
+                                    <button class="copy-addr-btn" onclick="copyDepAddr()">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5">
+                                            <rect x="9" y="9" width="13" height="13" rx="2" />
+                                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                        </svg>
+                                        Copy Address
+                                    </button>
+                                    <div class="addr-warning">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.2"
+                                            style="flex-shrink:0;margin-top:1px">
+                                            <path
+                                                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                            <line x1="12" y1="9" x2="12" y2="13" />
+                                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                                        </svg>
+                                        Only send <strong id="crypto-warn-coin">BTC</strong> to this address. Sending
+                                        the wrong coin may
+                                        result in permanent loss of funds.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BANK -->
+                    <div id="bank-details" style="display:none">
+                        <div style="margin-bottom:20px">
+                            <div
+                                style="font-family:var(--font);font-size:22px;font-weight:900;margin-bottom:6px;letter-spacing:-.03em">
+                                Bank Transfer Details</div>
+                            <div style="font-size:14px;color:var(--muted)">Transfer funds from your bank using the
+                                details below. Use
+                                your email as the reference.</div>
+                        </div>
+                        <div class="bank-card">
+                            <div class="bank-row"><span class="bank-key">Bank Name</span><span class="bank-val">Crypto
+                                    Nova Global
+                                    Bank<button class="copy-mini"
+                                        onclick="copyText('AuraTrade Global Bank')">Copy</button></span></div>
+                            <div class="bank-row"><span class="bank-key">Account Name</span><span
+                                    class="bank-val">Crypto Nova
+                                    Financial Ltd<button class="copy-mini"
+                                        onclick="copyText('AuraTrade Financial Ltd')">Copy</button></span></div>
+                            <div class="bank-row"><span class="bank-key">Account Number</span><span
+                                    class="bank-val">1234 5678
+                                    9012<button class="copy-mini"
+                                        onclick="copyText('123456789012')">Copy</button></span></div>
+                            <div class="bank-row"><span class="bank-key">Sort / Routing</span><span
+                                    class="bank-val">04-00-04<button class="copy-mini"
+                                        onclick="copyText('040004')">Copy</button></span></div>
+                            <div class="bank-row"><span class="bank-key">SWIFT / BIC</span><span
+                                    class="bank-val">ATRDGB2L<button class="copy-mini"
+                                        onclick="copyText('ATRDGB2L')">Copy</button></span></div>
+                            <div class="bank-row"><span class="bank-key">IBAN</span><span class="bank-val">GB29 NWBK
+                                    6016 1331 9268
+                                    19<button class="copy-mini"
+                                        onclick="copyText('GB29NWBK60161331926819')">Copy</button></span></div>
+                            <div class="bank-row"><span class="bank-key">Reference</span><span class="bank-val"
+                                    id="bank-ref" style="color:var(--teal)">—<button class="copy-mini"
+                                        id="bank-ref-copy" onclick="">Copy</button></span></div>
+                        </div>
+                        <div
+                            style="background:var(--orange-l);border:1px solid rgba(245,158,11,.25);border-radius:var(--r);padding:14px 16px;font-size:13px;color:#92400e;line-height:1.65;display:flex;gap:10px">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.2" style="flex-shrink:0;margin-top:1px">
+                                <path
+                                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                <line x1="12" y1="9" x2="12" y2="13" />
+                                <line x1="12" y1="17" x2="12.01" y2="17" />
+                            </svg>
+                            Always include your <strong>reference code</strong> when making the transfer. Processing
+                            takes 1–3
+                            business days. Your balance will be credited once payment is confirmed.
+                        </div>
+                    </div>
+
+                    <!-- CARD -->
+                    <div id="card-details" style="display:none">
+                        <div style="margin-bottom:20px">
+                            <div
+                                style="font-family:var(--font);font-size:22px;font-weight:900;margin-bottom:6px;letter-spacing:-.03em">
+                                Enter Card Details</div>
+                            <div style="font-size:14px;color:var(--muted)">Your card information is encrypted and
+                                secure. A 1.5%
+                                processing fee applies.</div>
+                        </div>
+                        <div class="amount-card">
+                            <div class="card-icons">
+                                <div class="card-icon" style="background:#1a1f71;color:#fff">VISA</div>
+                                <div class="card-icon" style="background:#eb001b;color:#fff">MC</div>
+                                <div class="card-icon" style="background:#ff5f00;color:#fff">⬤</div>
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label">Card Number</label>
+                                <input class="form-input" id="card-num" type="text" placeholder="0000  0000  0000  0000"
+                                    maxlength="19" oninput="formatCard(this)">
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-field">
+                                    <label class="form-label">Expiry Date</label>
+                                    <input class="form-input" id="card-exp" type="text" placeholder="MM / YY"
+                                        maxlength="7" oninput="formatExpiry(this)">
+                                </div>
+                                <div class="form-field">
+                                    <label class="form-label">CVV</label>
+                                    <input class="form-input" id="card-cvv" type="password" placeholder="•••"
+                                        maxlength="4">
+                                </div>
+                            </div>
+                            <div class="form-field" style="margin-bottom:0">
+                                <label class="form-label">Cardholder Name</label>
+                                <input class="form-input" id="card-name" type="text" placeholder="Name as on card">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-row" style="margin-top:20px">
+                        <button class="btn-back" onclick="goStep(2)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M19 12H5M12 19l-7-7 7-7" />
+                            </svg>
+                            Back
+                        </button>
+                        <button class="btn-next" onclick="goStep(4)">
+                            Review Deposit <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.5">
+                                <path d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ══ PANEL 4: REVIEW ══ -->
+                <div class="panel" id="panel-4">
+                    <div style="margin-bottom:20px">
+                        <div
+                            style="font-family:var(--font);font-size:22px;font-weight:900;margin-bottom:6px;letter-spacing:-.03em">
+                            Review Your Deposit</div>
+                        <div style="font-size:14px;color:var(--muted)">Double-check the details below before confirming.
+                        </div>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-row"><span class="review-key">Deposit Method</span><span class="review-val"
+                                id="rv-method">—</span></div>
+                        <div class="review-row"><span class="review-key">Asset / Currency</span><span class="review-val"
+                                id="rv-asset">USD</span></div>
+                        <div class="review-row"><span class="review-key">Amount</span><span class="review-val"
+                                id="rv-amount">—</span></div>
+                        <div class="review-row"><span class="review-key">Fee</span><span class="review-val"
+                                id="rv-fee">$0.00</span>
+                        </div>
+                        <div class="review-row review-total"><span class="review-key">You Will Receive</span><span
+                                class="review-val" id="rv-total">—</span></div>
+                    </div>
+                    <div
+                        style="background:var(--teal-l);border:1px solid rgba(13,184,158,.2);border-radius:var(--r);padding:14px 16px;font-size:13px;color:var(--teal-d);line-height:1.65;display:flex;gap:10px;margin-bottom:20px">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" style="flex-shrink:0;margin-top:1px">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        After the timer completes, submit your deposit. Our team will verify and credit your balance
+                        manually.
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn-back" onclick="goStep(3)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M19 12H5M12 19l-7-7 7-7" />
+                            </svg>
+                            Back
+                        </button>
+                        <button class="btn-next" id="btn-confirm" onclick="confirmDeposit()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <rect x="2" y="5" width="20" height="14" rx="2" />
+                                <line x1="2" y1="10" x2="22" y2="10" />
+                            </svg>
+                            Confirm &amp; Deposit
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ══ PANEL 4b: WAITING ══ -->
+                <div class="panel" id="panel-wait">
+                    <div class="review-card" style="text-align:center;padding:40px 28px">
+
+                        <!-- Animated ring -->
+                        <div class="wait-ring-wrap">
+                            <svg class="wait-ring" width="140" height="140" viewBox="0 0 140 140">
+                                <circle cx="70" cy="70" r="60" fill="none" stroke="var(--border)" stroke-width="8" />
+                                <circle id="wait-ring-prog" cx="70" cy="70" r="60" fill="none" stroke="var(--teal)"
+                                    stroke-width="8" stroke-linecap="round" stroke-dasharray="376.99"
+                                    stroke-dashoffset="376.99" transform="rotate(-90 70 70)"
+                                    style="transition:stroke-dashoffset .8s ease" />
+                            </svg>
+                            <div class="wait-ring-inner">
+                                <div class="wait-ring-time" id="wait-countdown">03:00</div>
+                                <div class="wait-ring-label">remaining</div>
+                            </div>
+                        </div>
+
+                        <div
+                            style="font-family:var(--font);font-size:22px;font-weight:900;letter-spacing:-.03em;margin-bottom:8px">
+                            Confirming Your Payment</div>
+                        <div
+                            style="font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 28px;line-height:1.75">
+                            We're verifying your transaction on the network. This usually takes up to <strong>3
+                                minutes</strong>.
+                            Please don't close this tab.
+                        </div>
+
+                        <!-- Progress stages -->
+                        <div class="wait-stages" id="wait-stages">
+                            <div class="ws-item" id="ws-1">
+                                <div class="ws-dot"><span></span></div>
+                                <div class="ws-text">
+                                    <div class="ws-title">Payment Received</div>
+                                    <div class="ws-sub">Deposit request logged in our system</div>
+                                </div>
+                                <div class="ws-status" id="ws-1-status"><span class="badge b-blue">In Progress</span>
+                                </div>
+                            </div>
+                            <div class="ws-item ws-pending" id="ws-2">
+                                <div class="ws-dot"><span></span></div>
+                                <div class="ws-text">
+                                    <div class="ws-title">Network Confirmation</div>
+                                    <div class="ws-sub">Waiting for blockchain / payment verification</div>
+                                </div>
+                                <div class="ws-status" id="ws-2-status"><span class="badge b-gray">Pending</span></div>
+                            </div>
+                            <div class="ws-item ws-pending" id="ws-3">
+                                <div class="ws-dot"><span></span></div>
+                                <div class="ws-text">
+                                    <div class="ws-title">Security Check</div>
+                                    <div class="ws-sub">Anti-fraud &amp; compliance verification</div>
+                                </div>
+                                <div class="ws-status" id="ws-3-status"><span class="badge b-gray">Pending</span></div>
+                            </div>
+                            <div class="ws-item ws-pending" id="ws-4">
+                                <div class="ws-dot"><span></span></div>
+                                <div class="ws-text">
+                                    <div class="ws-title">Balance Credited</div>
+                                    <div class="ws-sub">Funds added to your trading account</div>
+                                </div>
+                                <div class="ws-status" id="ws-4-status"><span class="badge b-gray">Pending</span></div>
+                            </div>
+                        </div>
+
+                        <div
+                            style="margin-top:24px;background:var(--bg);border-radius:var(--r);padding:14px 18px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;text-align:left">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--teal)"
+                                stroke-width="2.2" style="flex-shrink:0">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="8" x2="12" y2="12" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" />
+                            </svg>
+                            You can leave this page. Our team will verify your payment and update your balance.
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ══ PANEL 5: SUCCESS ══ -->
+                <div class="panel" id="panel-5">
+                    <div class="review-card">
+                        <div class="success-wrap">
+                            <div class="success-anim">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white"
+                                    stroke-width="2.8" stroke-linecap="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            </div>
+                            <div class="success-title">Payment Received ✓</div>
+                            <div class="success-sub">Your deposit has been submitted and is now <strong>pending admin
+                                    confirmation</strong>. Once we verify your payment, your balance will be updated —
+                                usually within a
+                                few hours.</div>
+
+                            <div class="balance-reveal" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+                                <div>
+                                    <div class="br-label">Deposit Amount</div>
+                                    <div class="br-amount" id="success-balance">$0.00</div>
+                                    <div class="br-sub" id="success-btc-equiv">Pending admin approval</div>
+                                </div>
+                                <div class="br-icon">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white"
+                                        stroke-width="2.2">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <polyline points="12 6 12 12 16 14" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div
+                                style="background:#fefce8;border:1.5px solid #fde68a;border-radius:12px;padding:16px 20px;margin-bottom:20px;text-align:left">
+                                <div
+                                    style="font-family:var(--font);font-size:13px;font-weight:800;color:#92400e;margin-bottom:6px">
+                                    ⏳
+                                    What happens next?</div>
+                                <div style="font-size:13px;color:#78350f;line-height:1.7">
+                                    1. Our team verifies your payment<br>
+                                    2. Your balance is manually updated by admin<br>
+                                    3. You will see the new balance in your dashboard<br>
+                                    4. This typically takes <strong>a few hours</strong> during business hours
+                                </div>
+                            </div>
+
+                            <div class="deposit-summary" id="deposit-summary"></div>
+
+                            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+                                <a href="userdashboard.html"
+                                    style="display:inline-flex;align-items:center;gap:8px;background:var(--teal);color:#fff;font-family:var(--font);font-size:14px;font-weight:700;padding:13px 28px;border-radius:var(--r);border:none;box-shadow:0 4px 14px rgba(13,184,158,.3);transition:all .22s;text-decoration:none">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.5">
+                                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                                    </svg>
+                                    Start Trading
+                                </a>
+                                <button onclick="resetDeposit()"
+                                    style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--text);font-family:var(--font);font-size:14px;font-weight:600;padding:13px 24px;border-radius:var(--r);border:1.5px solid var(--border);transition:all .22s">
+                                    Make Another Deposit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deposit History -->
+                    <div style="margin-top:24px">
+                        <div style="font-family:var(--font);font-size:17px;font-weight:800;margin-bottom:14px">Deposit
+                            History</div>
+                        <div class="history-card" id="dep-history-wrap">
+                            <div class="hist-head">
+                                <div class="th">Method</div>
+                                <div class="th">Amount</div>
+                                <div class="th">Date</div>
+                                <div class="th">Ref / Hash</div>
+                                <div class="th">Status</div>
+                            </div>
+                            <div id="dep-history-body"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ══ WITHDRAW LOCKED PANEL ══ -->
+                <div id="withdraw-section" style="display:none;margin-top:8px">
+                    <div
+                        style="font-family:var(--font);font-size:22px;font-weight:900;margin-bottom:6px;letter-spacing:-.03em">
+                        Withdraw Funds</div>
+                    <div style="font-size:14px;color:var(--muted);margin-bottom:24px">Request a withdrawal from your
+                        trading
+                        account.</div>
+                    <div class="wd-locked">
+                        <div class="wd-locked-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f59e0b"
+                                stroke-width="2.2" stroke-linecap="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                <line x1="12" y1="8" x2="12" y2="12" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" />
+                            </svg>
+                        </div>
+                        <h3>Withdrawals Are Manually Processed</h3>
+                        <p>For your security, all withdrawals are reviewed and approved by our team before processing.
+                            This
+                            typically takes <strong>1–24 hours</strong> on business days.<br><br>To initiate a
+                            withdrawal, contact our
+                            support team with your withdrawal details and we'll process it promptly.</p>
+                        <button class="wd-contact-btn" onclick="contactSupport()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                            Contact Support to Withdraw
+                        </button>
+                        <div class="wd-steps">
+                            <div class="wd-step">
+                                <div class="wd-step-num">1</div>
+                                <h4>Submit Request</h4>
+                                <p>Contact support with your wallet address and withdrawal amount.</p>
+                            </div>
+                            <div class="wd-step">
+                                <div class="wd-step-num">2</div>
+                                <h4>Admin Review</h4>
+                                <p>Our team verifies your identity and account details within 24 hours.</p>
+                            </div>
+                            <div class="wd-step">
+                                <div class="wd-step-num">3</div>
+                                <h4>Funds Released</h4>
+                                <p>Approved withdrawals are processed directly to your wallet or bank.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /content -->
+        </div><!-- /main -->
+    </div><!-- /app -->
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+        <div class="t-icon" id="t-icon"></div>
+        <span id="t-msg"></span>
+    </div>
+
+    <script>
+        const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
+        const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxa3VibGV0Z2lmcWR1dHliem56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NjA5OTMsImV4cCI6MjA4ODQzNjk5M30.TkweXseKRQuA7FoT7erYdUJMuGtYWYSZ7b7l9WCPq-8';
+        const sb = {
+            _h() { return { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (sb._tok() || SUPA_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' }; },
+            _tok() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.access_token; } catch { return null; } },
+            _uid() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.user?.id; } catch { return null; } },
+            isLoggedIn() { return !!sb._tok(); },
+            requireAuth() { if (!sb.isLoggedIn()) { window.location.href = 'login.html'; return false; } return true; },
+            async get(table, filters = '') { const r = await fetch(SUPA_URL + '/rest/v1/' + table + (filters ? '?' + filters : ''), { headers: sb._h() }); return r.json(); },
+            async insert(table, body) { const r = await fetch(SUPA_URL + '/rest/v1/' + table, { method: 'POST', headers: sb._h(), body: JSON.stringify(body) }); return r.json(); },
+            async update(table, body, filters) { const r = await fetch(SUPA_URL + '/rest/v1/' + table + '?' + filters, { method: 'PATCH', headers: sb._h(), body: JSON.stringify(body) }); return r.json(); },
+            async getProfile() { const uid = sb._uid(); if (!uid) return null; const r = await sb.get('profiles', 'id=eq.' + uid + '&select=*'); return Array.isArray(r) ? r[0] : null; },
+            async updateBalance(newBal) { const uid = sb._uid(); if (!uid) return; return sb.update('profiles', { balance: newBal }, 'id=eq.' + uid); }
+        };
+        if (!sb.isLoggedIn()) { window.location.href = 'login.html'; }
+
+        /* Save deposit to Supabase after crediting */
+        async function saveDepositToDB(method, asset, amount, fee, credited, ref) {
+            const uid = sb._uid(); if (!uid) return;
+            await sb.insert('deposits', { user_id: uid, method, asset, amount, fee, credited: false, ref, status: 'pending' });
+            await sb.insert('transactions', { user_id: uid, type: 'deposit', asset, amount: '+$' + amount.toFixed(2), status: 'pending', ref });
+        }
+
+        /* ═══════════════════════════
+           STATE
+        ═══════════════════════════ */
+        var STATE = {};
+        try { STATE = JSON.parse(localStorage.getItem('at_state')) || {}; } catch (e) { }
+        if (!STATE.user) STATE.user = { name: 'User', email: '', initials: 'U' };
+        if (!STATE.balance) STATE.balance = 0;
+        if (!STATE.transactions) STATE.transactions = [];
+        if (!STATE.deposits) STATE.deposits = [];
+
+        function saveState() { try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { } }
+
+        // Set user info
+        document.getElementById('user-av').textContent = STATE.user.initials || 'U';
+        document.getElementById('user-name-display').textContent = STATE.user.name || 'User';
+        document.getElementById('topbar-balance').textContent = '$' + STATE.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        // Bank ref from email
+        var bankRef = 'AT-' + (STATE.user.email || '').split('@')[0].toUpperCase().slice(0, 8) + '-' + Math.floor(Math.random() * 9000 + 1000);
+        document.getElementById('bank-ref').childNodes[0].textContent = bankRef + ' ';
+        document.getElementById('bank-ref-copy').setAttribute('onclick', "copyText('" + bankRef + "')");
+
+        /* ═══════════════════════════
+           CRYPTO PRICES (for equiv)
+        ═══════════════════════════ */
+        var PRICES = { BTC: 64230, ETH: 3450, SOL: 145, USDT: 1, BNB: 599 };
+        var CRYPTO_ADDRS = {
+            BTC: 'bc1q705yyxfpnkrr3nzu556nnnl4egv9kkr7xma4wc',
+            ETH: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+            USDT: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+            SOL: '5xHoBdL8UgGj4r4bTkFxS8Y8mNjkpGKkJdQWer9bKzmn',
+            BNB: 'bnb1grpf0955h0ykzq3ar5nmum7y6gdfl6lxfn46h2'
+        };
+        var CRYPTO_NAMES = { BTC: 'Bitcoin', ETH: 'Ethereum', USDT: 'Tether (USDT)', SOL: 'Solana', BNB: 'BNB' };
+        var CRYPTO_NETWORKS = { BTC: 'BTC Network', ETH: 'ERC-20', USDT: 'ERC-20', SOL: 'Solana Network', BNB: 'BEP-20' };
+
+        /* ═══════════════════════════
+           DEPOSIT FLOW STATE
+        ═══════════════════════════ */
+        var selectedMethod = '';
+        var depositAmount = 0;
+        var currentStep = 1;
+
+        /* ═══════════════════════════
+           STEP NAVIGATION
+        ═══════════════════════════ */
+        function goStep(n) {
+            // Validate
+            if (n === 3 && depositAmount < 50) { showToast('Minimum deposit is $50', 'error'); return; }
+
+            // Hide all panels
+            document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('active'); });
+            document.getElementById('panel-' + n).classList.add('active');
+
+            // Update step bar
+            for (var i = 1; i <= 5; i++) {
+                var s = document.getElementById('step' + i);
+                s.classList.remove('active', 'done');
+                if (i < n) s.classList.add('done');
+                else if (i === n) s.classList.add('active');
+                if (i < 5) {
+                    var d = document.getElementById('div' + i);
+                    d.classList.toggle('done', i < n);
+                }
+            }
+
+            // Update done step nums to checkmark
+            document.querySelectorAll('.step.done .step-num').forEach(function (el) {
+                el.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+            });
+            // Active/future step nums back to numbers
+            document.querySelectorAll('.step:not(.done) .step-num').forEach(function (el, idx) {
+                var stepEl = el.closest('.step');
+                var allSteps = Array.from(document.querySelectorAll('.step'));
+                var num = allSteps.indexOf(stepEl) + 1;
+                if (!stepEl.classList.contains('done')) el.textContent = num;
+            });
+
+            currentStep = n;
+
+            if (n === 3) buildPaymentPanel();
+            if (n === 4) buildReviewPanel();
+            if (n === 5) buildSuccessPanel();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ═══════════════════════════
+           METHOD SELECTION
+        ═══════════════════════════ */
+        function selectMethod(m, el) {
+            selectedMethod = m;
+            document.querySelectorAll('.method-card').forEach(function (c) { c.classList.remove('selected'); });
+            el.classList.add('selected');
+            document.getElementById('btn-next-1').disabled = false;
+        }
+
+        /* ═══════════════════════════
+           AMOUNT
+        ═══════════════════════════ */
+        function setAmount(amt, el) {
+            depositAmount = amt;
+            document.getElementById('amount-in').value = amt;
+            document.querySelectorAll('.qa-btn').forEach(function (b) { b.classList.remove('sel'); });
+            el.classList.add('sel');
+            updateEquiv(amt);
+            document.getElementById('btn-next-2').disabled = false;
+        }
+
+        function onAmountInput(val) {
+            depositAmount = parseFloat(val) || 0;
+            document.querySelectorAll('.qa-btn').forEach(function (b) { b.classList.remove('sel'); });
+            updateEquiv(depositAmount);
+            document.getElementById('btn-next-2').disabled = depositAmount < 50;
+        }
+
+        function updateEquiv(amt) {
+            var btc = (amt / PRICES.BTC).toFixed(6);
+            document.getElementById('amount-equiv').innerHTML = '≈ <span>' + btc + ' BTC</span> · <span>' + (amt / PRICES.ETH).toFixed(4) + ' ETH</span>';
+        }
+
+        /* ═══════════════════════════
+           PAYMENT PANEL
+        ═══════════════════════════ */
+        function buildPaymentPanel() {
+            document.getElementById('crypto-details').style.display = selectedMethod === 'crypto' ? 'block' : 'none';
+            document.getElementById('bank-details').style.display = selectedMethod === 'bank' ? 'block' : 'none';
+            document.getElementById('card-details').style.display = selectedMethod === 'card' ? 'block' : 'none';
+            if (selectedMethod === 'crypto') updateCryptoAddr();
+        }
+
+        function updateCryptoAddr() {
+            var coin = document.getElementById('crypto-coin').value;
+            var addr = CRYPTO_ADDRS[coin];
+            document.getElementById('dep-addr-string').textContent = addr;
+            document.getElementById('crypto-addr-title').textContent = CRYPTO_NAMES[coin] + ' Deposit Address';
+            document.getElementById('crypto-network').textContent = CRYPTO_NETWORKS[coin];
+            document.getElementById('crypto-warn-coin').textContent = coin;
+            // QR via embedded image
+        }
+
+        /* ═══════════════════════════
+           REVIEW PANEL
+        ═══════════════════════════ */
+        function buildReviewPanel() {
+            var methodLabels = { crypto: 'Cryptocurrency', bank: 'Bank Transfer', card: 'Debit / Credit Card' };
+            var feeRates = { crypto: 0, bank: 0, card: 0.015 };
+            var fee = depositAmount * (feeRates[selectedMethod] || 0);
+            var net = depositAmount - fee;
+
+            var assetLabel = 'USD';
+            if (selectedMethod === 'crypto') {
+                var coin = document.getElementById('crypto-coin').value;
+                assetLabel = CRYPTO_NAMES[coin] + ' (' + coin + ')';
+            }
+
+            document.getElementById('rv-method').textContent = methodLabels[selectedMethod] || '—';
+            document.getElementById('rv-asset').textContent = assetLabel;
+            document.getElementById('rv-amount').textContent = '$' + depositAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('rv-fee').textContent = fee > 0 ? '$' + fee.toFixed(2) + ' (1.5%)' : 'Free';
+            document.getElementById('rv-total').textContent = '$' + net.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        /* ═══════════════════════════
+           CONFIRM DEPOSIT → 15-MIN WAIT
+        ═══════════════════════════ */
+        var waitInterval = null;
+
+        function confirmDeposit() {
+            var btn = document.getElementById('btn-confirm');
+            btn.disabled = true;
+            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Starting…';
+
+            // Small delay so button feedback is seen, then switch to wait panel
+            setTimeout(function () {
+                // Show wait panel (not via goStep so step-bar stays at step 4)
+                document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('active'); });
+                document.getElementById('panel-wait').classList.add('active');
+                startWaitCountdown();
+            }, 600);
+        }
+
+        function startWaitCountdown() {
+            var TOTAL = 3 * 60; // 3 minutes in seconds
+            var remaining = TOTAL;
+            var circumference = 2 * Math.PI * 60; // r=60
+
+            // Stage timing (seconds elapsed when each stage activates)
+            var stageTimes = { 2: 30, 3: Math.round(TOTAL * 0.55), 4: Math.round(TOTAL * 0.88) };
+            // Stage 1 is already active from the start
+
+            function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+            function tick() {
+                remaining--;
+
+                // Update countdown display
+                var mins = Math.floor(remaining / 60);
+                var secs = remaining % 60;
+                document.getElementById('wait-countdown').textContent = pad(mins) + ':' + pad(secs);
+
+                // Update ring progress (fills as time passes)
+                var elapsed = TOTAL - remaining;
+                var progress = elapsed / TOTAL;
+                var offset = circumference - (progress * circumference);
+                document.getElementById('wait-ring-prog').style.strokeDashoffset = offset;
+
+                // Advance stages
+                if (elapsed === stageTimes[2]) activateStage(2);
+                if (elapsed === stageTimes[3]) activateStage(3);
+                if (elapsed === stageTimes[4]) activateStage(4);
+
+                // Done
+                if (remaining <= 0) {
+                    clearInterval(waitInterval);
+                    waitInterval = null;
+                    // Complete last stage
+                    completeStage(4);
+                    setTimeout(function () {
+                        finishDeposit();
+                    }, 1200);
+                }
+            }
+
+            // Mark stage 1 active immediately
+            activateStage(1);
+            waitInterval = setInterval(tick, 1000);
+        }
+
+        function activateStage(n) {
+            // Complete previous stage
+            if (n > 1) completeStage(n - 1);
+            var item = document.getElementById('ws-' + n);
+            if (!item) return;
+            item.classList.remove('ws-pending');
+            item.classList.add('ws-active');
+            var statusEl = document.getElementById('ws-' + n + '-status');
+            if (statusEl) statusEl.innerHTML = '<span class="badge b-blue">In Progress</span>';
+        }
+
+        function completeStage(n) {
+            var item = document.getElementById('ws-' + n);
+            if (!item) return;
+            item.classList.remove('ws-active', 'ws-pending');
+            item.classList.add('ws-done');
+            var dot = item.querySelector('.ws-dot');
+            if (dot) dot.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>';
+            var statusEl = document.getElementById('ws-' + n + '-status');
+            if (statusEl) statusEl.innerHTML = '<span class="badge b-done">Complete</span>';
+            item.style.opacity = '1';
+        }
+
+        function finishDeposit() {
+            // DO NOT credit balance — admin will approve manually
+            var feeRates = { crypto: 0, bank: 0, card: 0.015 };
+            var fee = depositAmount * (feeRates[selectedMethod] || 0);
+            var credited = depositAmount - fee;
+            var depRef = 'DEP' + Math.random().toString(36).substr(2, 8).toUpperCase();
+
+            // Save deposit to Supabase as PENDING (not credited)
+            var uid = sb._uid();
+            var asset = selectedMethod === 'crypto' ? (document.getElementById('crypto-coin') ? document.getElementById('crypto-coin').value : 'BTC') : 'USD';
+            if (uid) {
+                // Insert deposit — show visible error if it fails
+                sb.insert('deposits', {
+                    user_id: uid,
+                    method: selectedMethod || 'crypto',
+                    asset: asset,
+                    amount: depositAmount,
+                    fee: fee,
+                    credited: false,
+                    ref: depRef,
+                    status: 'pending'
+                }).then(function (r) {
+                    if (r && r.error) {
+                        // Visible error on the success screen
+                        var errDiv = document.getElementById('deposit-save-error');
+                        if (!errDiv) {
+                            errDiv = document.createElement('div');
+                            errDiv.id = 'deposit-save-error';
+                            errDiv.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 16px;font-size:13px;color:#dc2626;margin:16px 0;line-height:1.6';
+                            var successPanel = document.getElementById('panel-success') || document.querySelector('.panel.active');
+                            if (successPanel) successPanel.insertBefore(errDiv, successPanel.firstChild);
+                        }
+                        errDiv.innerHTML = '<strong>⚠️ Note:</strong> Deposit submitted but could not be saved to database: ' + JSON.stringify(r.error) + '<br>Please contact support with ref: ' + depRef;
+                        console.error('Deposit insert error:', r.error);
+                    } else {
+                        console.log('✅ Deposit saved to Supabase successfully. Ref:', depRef);
+                    }
+                }).catch(function (e) {
+                    console.error('Deposit insert failed:', e);
+                });
+
+                sb.insert('transactions', {
+                    user_id: uid,
+                    type: 'deposit',
+                    asset: asset,
+                    amount: '+$' + depositAmount.toFixed(2),
+                    status: 'pending',
+                    ref: depRef
+                }).catch(function (e) { console.error('Transaction insert failed:', e); });
+            } else {
+                // uid is null — user session lost
+                console.error('No user ID found — session may have expired');
+                var errDiv = document.createElement('div');
+                errDiv.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 16px;font-size:13px;color:#dc2626;margin:16px 0';
+                errDiv.innerHTML = '⚠️ Session expired. Your deposit of $' + depositAmount.toFixed(2) + ' (Ref: ' + depRef + ') was submitted but could not be recorded. Please contact support.';
+                var panel = document.querySelector('.panel.active');
+                if (panel) panel.insertBefore(errDiv, panel.firstChild);
+            }
+
+            var dep = {
+                id: depRef,
+                method: selectedMethod,
+                amount: depositAmount,
+                fee: fee,
+                credited: credited,
+                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+                ref: depRef,
+                status: 'pending'
+            };
+            if (!STATE.deposits) STATE.deposits = [];
+            STATE.deposits.unshift(dep);
+            STATE.transactions.unshift({
+                id: dep.id, type: 'deposit',
+                asset: asset,
+                amount: '$' + credited.toFixed(2),
+                date: dep.date, hash: dep.ref, status: 'pending'
+            });
+            saveState();
+
+            // Go to success
+            document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('active'); });
+            document.getElementById('panel-5').classList.add('active');
+            // Update step bar to step 5
+            for (var i = 1; i <= 5; i++) {
+                var s = document.getElementById('step' + i);
+                s.classList.remove('active', 'done');
+                if (i < 5) s.classList.add('done'); else s.classList.add('active');
+                if (i < 5) document.getElementById('div' + i).classList.add('done');
+            }
+            buildSuccessPanel();
+        }
+
+        /* ═══════════════════════════
+           SUCCESS PANEL
+        ═══════════════════════════ */
+        function buildSuccessPanel() {
+            var lastDep = STATE.deposits && STATE.deposits[0];
+            var amt = lastDep ? lastDep.amount : depositAmount;
+            document.getElementById('success-balance').textContent = '$' + amt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('success-btc-equiv').textContent = 'Pending admin approval';
+            // Do NOT update topbar balance — it hasn't changed yet
+
+            // Summary
+            var lastDep = STATE.deposits && STATE.deposits[0];
+            if (lastDep) {
+                var methodLabels = { crypto: 'Cryptocurrency', bank: 'Bank Transfer', card: 'Card Payment' };
+                document.getElementById('deposit-summary').innerHTML =
+                    '<div class="ds-row"><span class="ds-key">Deposit Method</span><span class="ds-val">' + (methodLabels[lastDep.method] || '—') + '</span></div>' +
+                    '<div class="ds-row"><span class="ds-key">Amount Submitted</span><span class="ds-val">$' + lastDep.amount.toFixed(2) + '</span></div>' +
+                    '<div class="ds-row"><span class="ds-key">Fee</span><span class="ds-val">' + (lastDep.fee > 0 ? '$' + lastDep.fee.toFixed(2) : 'Free') + '</span></div>' +
+                    '<div class="ds-row"><span class="ds-key">Reference</span><span class="ds-val">' + lastDep.ref + '</span></div>' +
+                    '<div class="ds-row"><span class="ds-key">New Trading Balance</span><span class="ds-val" style="color:var(--teal)">$' + bal.toFixed(2) + '</span></div>';
+            }
+
+            buildDepHistory();
+        }
+
+        /* ═══════════════════════════
+           DEPOSIT HISTORY
+        ═══════════════════════════ */
+        function buildDepHistory() {
+            var deps = STATE.deposits || [];
+            if (!deps.length) {
+                document.getElementById('dep-history-body').innerHTML = '<div class="empty-hist">No deposits yet</div>';
+                return;
+            }
+            var methodLabels = { crypto: 'Crypto', bank: 'Bank Wire', card: 'Card' };
+            var html = deps.map(function (d) {
+                return '<div class="hist-row">' +
+                    '<div style="font-size:13px;font-weight:600">' + (methodLabels[d.method] || d.method) + '</div>' +
+                    '<div style="font-family:var(--font);font-size:13px;font-weight:700;color:var(--green)">+$' + d.credited.toFixed(2) + '</div>' +
+                    '<div style="font-size:13px;color:var(--muted)">' + d.date + '</div>' +
+                    '<div style="font-family:monospace;font-size:11px;color:var(--dim)">' + d.ref + '</div>' +
+                    '<div><span class="badge ' + (d.status === 'completed' ? 'b-green' : 'b-yellow') + '">' + d.status + '</span></div>' +
+                    '</div>';
+            }).join('');
+            document.getElementById('dep-history-body').innerHTML = html;
+        }
+
+        /* ═══════════════════════════
+           WITHDRAW SECTION
+        ═══════════════════════════ */
+        function showWithdraw() {
+            document.getElementById('withdraw-section').style.display = 'block';
+            setTimeout(function () {
+                document.getElementById('withdraw-section').scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        function contactSupport() {
+            showToast('Opening support chat…', 'info');
+            setTimeout(function () {
+                window.open('mailto:support@auratrade.com?subject=Withdrawal Request&body=Hi,%20I%20would%20like%20to%20withdraw%20funds%20from%20my%20account.%0A%0AAccount%20Email:%20' + encodeURIComponent(STATE.user.email || '') + '%0AWithdrawal%20Amount:%20%0ADestination%20Address/Account:%20', '_blank');
+            }, 600);
+        }
+
+        /* ═══════════════════════════
+           CARD FORMATTING
+        ═══════════════════════════ */
+        function formatCard(el) {
+            var v = el.value.replace(/\D/g, '').substring(0, 16);
+            el.value = v.replace(/(.{4})/g, '$1  ').trim();
+        }
+        function formatExpiry(el) {
+            var v = el.value.replace(/\D/g, '').substring(0, 4);
+            if (v.length >= 2) v = v.substring(0, 2) + ' / ' + v.substring(2);
+            el.value = v;
+        }
+
+        /* ═══════════════════════════
+           QR CODE
+        ═══════════════════════════ */
+        // QR rendered via embedded image
+        // QR via embedded image
+
+        /* ═══════════════════════════
+           COPY UTILITIES
+        ═══════════════════════════ */
+        function copyDepAddr() {
+            var addr = document.getElementById('dep-addr-string').textContent;
+            copyText(addr);
+        }
+        function copyText(text) {
+            try { navigator.clipboard.writeText(text); } catch (e) { }
+            showToast('Copied to clipboard!', 'success');
+        }
+
+        /* ═══════════════════════════
+           RESET
+        ═══════════════════════════ */
+        function resetDeposit() {
+            selectedMethod = '';
+            depositAmount = 0;
+            document.getElementById('amount-in').value = '';
+            document.querySelectorAll('.method-card').forEach(function (c) { c.classList.remove('selected'); });
+            document.querySelectorAll('.qa-btn').forEach(function (b) { b.classList.remove('sel'); });
+            document.getElementById('btn-next-1').disabled = true;
+            document.getElementById('btn-next-2').disabled = true;
+            goStep(1);
+        }
+
+        /* ═══════════════════════════
+           TOAST
+        ═══════════════════════════ */
+        var toastT = null;
+        function showToast(msg, type) {
+            var t = document.getElementById('toast');
+            var ic = document.getElementById('t-icon');
+            var mc = document.getElementById('t-msg');
+            t.className = 'toast t-' + (type || 'info');
+            mc.textContent = msg;
+            var icons = {
+                success: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>',
+                error: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+                info: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+            };
+            ic.innerHTML = icons[type] || icons.info;
+            t.classList.add('show');
+            if (toastT) clearTimeout(toastT);
+            toastT = setTimeout(function () { t.classList.remove('show'); }, 3200);
+        }
+
+        /* ═══════════════════════════
+           SIDEBAR (mobile)
+        ═══════════════════════════ */
+        function openSidebar() { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('open'); }
+        function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('open'); }
+
+        /* ═══════════════════════════
+           LOGOUT
+        ═══════════════════════════ */
+        async function logout() {
+            try {
+                const tok = sb._tok();
+                if (tok) {
+                    await fetch(SUPA_URL + '/auth/v1/logout', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + tok, 'apikey': SUPA_KEY }
+                    });
+                }
+            } catch (e) { }
+            try { localStorage.removeItem('sb_session'); } catch (e) { }
+            try { localStorage.removeItem('at_state'); } catch (e) { }
+            try {
+                Object.keys(localStorage).forEach(k => {
+                    if (k.startsWith('sb-') || k.startsWith('supabase')) localStorage.removeItem(k);
+                });
+            } catch (e) { }
+            window.location.href = 'login.html';
+        }
+
+        /* spinner style */
+        var style = document.createElement('style');
+        style.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>
+
+
+
+<script>
+    const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
+    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxa3VibGV0Z2lmcWR1dHliem56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NjA5OTMsImV4cCI6MjA4ODQzNjk5M30.TkweXseKRQuA7FoT7erYdUJMuGtYWYSZ7b7l9WCPq-8';
+
+    // 🔒 ONLY this email can access the admin panel
+    const ADMIN_EMAIL = 'adeotipeter434@gmail.com';
+
+    let ADMIN_TOKEN = null;
+    let allUsers = [], allWithdrawals = [], allDeposits = [], allInvestments = [];
+    let wFilter = 'pending';
+
+    function adminH() { return { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + ADMIN_TOKEN, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }; }
+
+    async function doAdminLogin() {
+        const email = document.getElementById('admin-email').value.trim();
+        const pw = document.getElementById('admin-pw').value;
+        const err = document.getElementById('admin-err');
+        const btn = document.getElementById('admin-login-btn');
+        err.style.display = 'none'; btn.disabled = true; btn.textContent = 'Signing in…';
+
+        // First try: standard password auth
+        try {
+            const r = await fetch(SUPA_URL + '/auth/v1/token?grant_type=password', {
+                method: 'POST',
+                headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password: pw })
+            });
+            const d = await r.json();
+
+            if (d.access_token) {
+                ADMIN_TOKEN = d.access_token;
+                document.getElementById('admin-login-screen').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'block';
+                document.getElementById('admin-name-label').textContent = d.user?.email || 'Admin';
+                loadAll();
+                return;
+            }
+
+            // Show detailed error to help debug
+            let msg = d.error_description || d.msg || d.message || d.error || 'Login failed.';
+
+            // Common fixes guidance
+            if (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('credentials')) {
+                msg = 'Invalid email or password. Make sure you are using the email & password of a Supabase user account (not your Supabase dashboard login). Click "Create Admin Account" below if you have not done this yet.';
+            } else if (msg.toLowerCase().includes('confirm') || msg.toLowerCase().includes('email')) {
+                msg = 'Email not confirmed. Go to Supabase → Authentication → Users, find your account and click the 3-dot menu → "Send confirmation email", then confirm it and try again.';
+            }
+
+            err.style.display = 'block'; err.textContent = msg;
+            btn.disabled = false; btn.textContent = 'Sign In to Admin';
+
+        } catch (ex) {
+            err.style.display = 'block';
+            err.textContent = 'Network error — check your internet connection and try again.';
+            btn.disabled = false; btn.textContent = 'Sign In to Admin';
+        }
+    }
+
+    async function createAdminAccount() {
+        const email = document.getElementById('admin-email').value.trim();
+        const pw = document.getElementById('admin-pw').value;
+        const err = document.getElementById('admin-err');
+        if (!email || !pw) { err.style.display = 'block'; err.textContent = 'Enter your email and a password first.'; return; }
+        if (pw.length < 6) { err.style.display = 'block'; err.textContent = 'Password must be at least 6 characters.'; return; }
+        err.style.display = 'none';
+        try {
+            const r = await fetch(SUPA_URL + '/auth/v1/signup', {
+                method: 'POST',
+                headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password: pw })
+            });
+            const d = await r.json();
+            if (d.id || d.access_token) {
+                err.style.display = 'block';
+                err.style.background = '#f0fdf4'; err.style.borderColor = '#86efac'; err.style.color = '#166534';
+                if (d.access_token) {
+                    // Auto-login if no email confirmation needed
+                    ADMIN_TOKEN = d.access_token;
+                    document.getElementById('admin-login-screen').style.display = 'none';
+                    document.getElementById('admin-dashboard').style.display = 'block';
+                    document.getElementById('admin-name-label').textContent = d.user?.email || 'Admin';
+                    loadAll();
+                } else {
+                    err.textContent = '✓ Admin account created! Check your email to confirm it, then log in.';
+                }
+            } else {
+                err.style.display = 'block';
+                err.textContent = d.error_description || d.msg || 'Could not create account. It may already exist — try logging in.';
+            }
+        } catch (ex) { err.style.display = 'block'; err.textContent = 'Network error.'; }
+    }
+
+    function adminLogout() { ADMIN_TOKEN = null; document.getElementById('admin-login-screen').style.display = 'flex'; document.getElementById('admin-dashboard').style.display = 'none'; }
+
+    async function dbGet(table, params = '') {
+        const r = await fetch(SUPA_URL + '/rest/v1/' + table + (params ? '?' + params : ''), { headers: adminH() });
+        return r.json();
+    }
+    async function dbInsert(table, body) {
+        const r = await fetch(SUPA_URL + '/rest/v1/' + table, { method: 'POST', headers: adminH(), body: JSON.stringify(body) });
+        if (!r.ok) { const e = await r.json(); throw new Error(e.message || r.statusText); }
+        return r.json();
+    }
+
+    async function dbPatch(table, body, params) {
+        const r = await fetch(SUPA_URL + '/rest/v1/' + table + '?' + params, { method: 'PATCH', headers: adminH(), body: JSON.stringify(body) });
+        return r.json();
+    }
+
+    async function loadAll() {
+        try {
+            const [users, withdrawals, deposits, investments] = await Promise.all([
+                dbGet('profiles', 'select=*&order=created_at.desc'),
+                dbGet('withdrawals', 'select=*&order=created_at.desc'),
+                dbGet('deposits', 'select=*,profiles(full_name,email)&order=created_at.desc'),
+                dbGet('investments', 'select=*&order=created_at.desc'),
+            ]);
+            allUsers = Array.isArray(users) ? users : [];
+            allWithdrawals = Array.isArray(withdrawals) ? withdrawals : [];
+            allDeposits = Array.isArray(deposits) ? deposits : [];
+            allInvestments = Array.isArray(investments) ? investments : [];
+            updateStats(); renderUsers(); renderWithdrawals(); renderDeposits(); renderDepositsPending(); renderInvestments(); renderOverviewWithdrawals(); renderOverviewDeposits(); populateCreditUserSelect();
+        } catch (ex) { showToast('Error loading data: ' + ex.message); }
+    }
+
+    function isPending(status) {
+        if (status == null || status === '') return true;
+        var s = String(status).toLowerCase().trim();
+        return ['pending', 'processing', 'submitted', 'awaiting', 'unconfirmed', 'new'].includes(s);
+    }
+
+    function fmt(n) { return '$' + (parseFloat(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function fmtDate(d) { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    function avatarColor(name) { const cols = ['#1a6bff', '#0db89e', '#7c3aed', '#f59e0b', '#16a34a', '#dc2626']; let h = 0; for (let c of (name || 'AT')) h += c.charCodeAt(0); return cols[h % cols.length]; }
+    function initials(name) { return (name || 'AT').split(' ').map(w => w[0] || '').join('').slice(0, 2).toUpperCase(); }
+
+    function updateStats() {
+        document.getElementById('st-users').textContent = allUsers.length;
+        const total = allUsers.reduce((s, u) => s + (parseFloat(u.balance) || 0), 0);
+        document.getElementById('st-balance').textContent = fmt(total);
+        const pending = allWithdrawals.filter(w => w.status === 'pending').length;
+        document.getElementById('st-pending').textContent = pending;
+        document.getElementById('pending-count-badge').textContent = pending + ' pending';
+        const pendingDeps = allDeposits.filter(d => isPending(d.status)).length;
+        const depBadge = document.getElementById('dep-pending-badge');
+        if (depBadge) depBadge.textContent = pendingDeps + ' pending';
+        const active = allInvestments.filter(i => i.status === 'active').length;
+        document.getElementById('st-investments').textContent = active;
+    }
+
+    function renderUsers() {
+        const q = (document.getElementById('user-search')?.value || '').toLowerCase();
+        const list = allUsers.filter(u => (u.full_name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q));
+        if (!list.length) { document.getElementById('users-table').innerHTML = '<div class="empty">No users found</div>'; return; }
+        let h = '<table><thead><tr><th>User</th><th>Email</th><th>Balance</th><th>Tier</th><th>Joined</th><th>Edit Balance</th></tr></thead><tbody>';
+        list.forEach(u => {
+            const col = avatarColor(u.full_name), ini = initials(u.full_name);
+            h += `<tr>
+      <td><div class="user-cell"><div class="avatar" style="background:${col}">${ini}</div><span style="font-weight:600">${u.full_name || '—'}</span></div></td>
+      <td style="color:var(--muted)">${u.email || '—'}</td>
+      <td style="font-weight:700;font-family:var(--font)">${fmt(u.balance)}</td>
+      <td><span class="badge badge-active">${u.tier || 'Standard'}</span></td>
+      <td style="color:var(--muted)">${fmtDate(u.created_at)}</td>
+      <td>
+        <div class="edit-bal-wrap">
+          <input type="number" id="bal-${u.id}" value="${parseFloat(u.balance || 0).toFixed(2)}" step="0.01">
+          <button class="btn btn-primary" onclick="updateUserBalance('${u.id}')">Save</button>
+        </div>
+      </td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        document.getElementById('users-table').innerHTML = h;
+    }
+
+    function filterUsers() { renderUsers(); }
+
+    async function updateUserBalance(uid) {
+        const input = document.getElementById('bal-' + uid);
+        const newBal = parseFloat(input.value);
+        if (isNaN(newBal)) { showToast('Invalid amount'); return; }
+        try {
+            await dbPatch('profiles', { balance: newBal }, 'id=eq.' + uid);
+            const u = allUsers.find(u => u.id === uid);
+            if (u) u.balance = newBal;
+            updateStats();
+            showToast('✓ Balance updated to ' + fmt(newBal));
+        } catch (ex) { showToast('Error: ' + ex.message); }
+    }
+
+    function renderWithdrawals() {
+        const list = wFilter === 'all' ? allWithdrawals : allWithdrawals.filter(w => w.status === wFilter);
+        if (!list.length) { document.getElementById('withdrawals-table').innerHTML = '<div class="empty">No ' + wFilter + ' withdrawals</div>'; return; }
+        let h = '<table><thead><tr><th>User</th><th>Amount</th><th>Asset</th><th>Address</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+        list.forEach(w => {
+            const badgeClass = w.status === 'pending' ? 'badge-pending' : w.status === 'approved' ? 'badge-active' : 'badge-rejected';
+            const addr = w.address ? w.address.slice(0, 14) + '…' + w.address.slice(-6) : '—';
+            h += `<tr>
+      <td>
+        <div style="font-weight:700;font-size:13px">${getUserName(w.user_id)}</div>
+        <div style="font-size:11px;color:var(--muted)">${getUserEmail(w.user_id)}</div>
+      </td>
+      <td style="font-weight:700;font-family:var(--font)">${fmt(w.amount)}</td>
+      <td><span class="badge badge-active">${w.asset || '—'}</span></td>
+      <td style="font-family:monospace;font-size:12px" title="${w.address || ''}">${addr}</td>
+      <td style="color:var(--muted)">${fmtDate(w.created_at)}</td>
+      <td><span class="badge ${badgeClass}">${w.status}</span></td>
+      <td>
+        ${w.status === 'pending' ? `
+          <button class="btn btn-green" onclick="approveWithdrawal('${w.id}')">Approve</button>
+          <button class="btn btn-red" style="margin-left:6px" onclick="rejectWithdrawal('${w.id}')">Reject</button>
+        `: '<span style="color:var(--muted);font-size:12px">No action</span>'}
+      </td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        document.getElementById('withdrawals-table').innerHTML = h;
+    }
+
+    function filterWithdrawals(filter, el) {
+        wFilter = filter;
+        document.querySelectorAll('#view-withdrawals .tab').forEach(t => t.classList.remove('on'));
+        el.classList.add('on');
+        renderWithdrawals();
+    }
+
+    function renderOverviewDeposits() {
+        const pending = allDeposits.filter(d => isPending(d.status));
+        const badge = document.getElementById('dep-pending-badge-ov');
+        if (badge) badge.textContent = pending.length + ' pending';
+        const el = document.getElementById('overview-deposits');
+        if (!el) return;
+        if (!pending.length) {
+            el.innerHTML = '<div class="empty" style="padding:20px;text-align:center;color:var(--muted)">✅ No pending deposits</div>';
+            return;
+        }
+        let h = '<table><thead><tr><th>User</th><th>Asset</th><th>Submitted</th><th>Action</th></tr></thead><tbody>';
+        pending.slice(0, 8).forEach(d => {
+            h += `<tr class="dep-row-pending">
+      <td>
+        <div style="font-weight:700">${getUserName(d.user_id)}</div>
+        <div style="font-size:11px;color:var(--muted)">${getUserEmail(d.user_id)}</div>
+      </td>
+      <td><span class="badge badge-active">${d.asset || '—'}</span></td>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(d.created_at)}</td>
+      <td><button class="btn btn-primary" onclick="showTab('deposits',document.querySelector('.sb-item:nth-child(5)'))">Review →</button></td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        el.innerHTML = h;
+    }
+
+    function renderOverviewWithdrawals() {
+        const list = allWithdrawals.filter(w => w.status === 'pending').slice(0, 10);
+        if (!list.length) { document.getElementById('overview-withdrawals').innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>No pending withdrawals — all clear!</div>'; return; }
+        let h = '<table><thead><tr><th>User</th><th>Amount</th><th>Asset / Network</th><th>Address</th><th>Submitted</th><th>Actions</th></tr></thead><tbody>';
+        list.forEach(w => {
+            const addr = w.address ? w.address.slice(0, 14) + '…' + w.address.slice(-6) : '—';
+            h += `<tr>
+      <td style="font-family:monospace;font-size:11px;color:var(--muted)">${(w.user_id || '').slice(0, 16)}…</td>
+      <td style="font-weight:800;font-family:var(--font);color:var(--orange)">${fmt(w.amount)}</td>
+      <td><span class="badge badge-active">${w.asset || '—'}</span> <span style="font-size:11px;color:var(--muted)">${w.network || ''}</span></td>
+      <td style="font-family:monospace;font-size:12px" title="${w.address || ''}">${addr}</td>
+      <td style="color:var(--muted)">${fmtDate(w.created_at)}</td>
+      <td>
+        <button class="btn btn-green" onclick="approveWithdrawal('${w.id}')">✓ Approve</button>
+        <button class="btn btn-red" style="margin-left:6px" onclick="rejectWithdrawal('${w.id}')">✗ Reject</button>
+      </td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        document.getElementById('overview-withdrawals').innerHTML = h;
+    }
+
+    async function approveWithdrawal(id) {
+        if (!confirm('Approve this withdrawal? Make sure you have sent the funds first.')) return;
+        try {
+            await dbPatch('withdrawals', { status: 'approved', admin_note: 'Approved by admin on ' + new Date().toLocaleString() }, 'id=eq.' + id);
+            const w = allWithdrawals.find(w => w.id === id);
+            if (w) w.status = 'approved';
+            renderWithdrawals(); renderOverviewWithdrawals(); updateStats();
+            showToast('✓ Withdrawal approved');
+        } catch (ex) { showToast('Error: ' + ex.message); }
+    }
+
+    async function rejectWithdrawal(id) {
+        const note = prompt('Reason for rejection (optional):');
+        if (note === null) return;
+        try {
+            await dbPatch('withdrawals', { status: 'rejected', admin_note: note || 'Rejected by admin' }, 'id=eq.' + id);
+            const w = allWithdrawals.find(w => w.id === id);
+            if (w) w.status = 'rejected';
+            renderWithdrawals(); renderOverviewWithdrawals(); updateStats();
+            showToast('Withdrawal rejected');
+        } catch (ex) { showToast('Error: ' + ex.message); }
+    }
+
+    var depFilter = 'all';
+
+    function getUserName(uid) {
+        const u = allUsers.find(u => u.id === uid);
+        return u ? (u.full_name || u.email || uid.slice(0, 8) + '…') : uid.slice(0, 8) + '…';
+    }
+    function getUserEmail(uid) {
+        const u = allUsers.find(u => u.id === uid);
+        return u ? (u.email || '—') : '—';
+    }
+
+    function populateCreditUserSelect() {
+        const sel = document.getElementById('credit-user-sel');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">— Select user —</option>';
+        allUsers.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            opt.textContent = (u.full_name || u.email || u.id.slice(0, 8)) + ' — ' + fmt(u.balance);
+            sel.appendChild(opt);
+        });
+    }
+
+    async function creditDeposit() {
+        const uid = document.getElementById('credit-user-sel').value;
+        const amount = parseFloat(document.getElementById('credit-amount').value) || 0;
+        const asset = document.getElementById('credit-asset').value.trim() || 'Manual';
+        const res = document.getElementById('credit-result');
+
+        res.style.display = 'none';
+        if (!uid) { showToast('Please select a user'); return; }
+        if (amount <= 0) { showToast('Enter a valid amount'); return; }
+
+        const user = allUsers.find(u => u.id === uid);
+        if (!confirm('Credit $' + amount.toFixed(2) + ' (' + asset + ') to ' + getUserName(uid) + '? This will update their balance immediately.')) return;
+
+        try {
+            const newBal = (parseFloat(user.balance) || 0) + amount;
+            // 1. Update balance
+            await dbPatch('profiles', { balance: newBal }, 'id=eq.' + uid);
+            // 2. Insert deposit record
+            const ref = 'DEP_MANUAL_' + Date.now();
+            await dbInsert('deposits', {
+                user_id: uid, method: 'manual', asset: asset,
+                amount: amount, fee: 0, credited: true,
+                ref: ref, status: 'confirmed',
+                admin_note: 'Manually credited by admin'
+            });
+            // 3. Insert transaction record
+            await dbInsert('transactions', {
+                user_id: uid, type: 'deposit', asset: asset,
+                amount: '+$' + amount.toFixed(2), status: 'completed', ref: ref
+            });
+            // Update local state
+            user.balance = newBal;
+            updateStats();
+            populateCreditUserSelect();
+            document.getElementById('credit-amount').value = '';
+            document.getElementById('credit-asset').value = '';
+            res.style.display = 'block';
+            res.style.background = '#f0fdf4';
+            res.style.border = '1px solid #bbf7d0';
+            res.style.color = '#166534';
+            res.textContent = '✓ Successfully credited $' + amount.toFixed(2) + ' to ' + getUserName(uid) + '. New balance: ' + fmt(newBal);
+            showToast('✓ $' + amount.toFixed(2) + ' credited to ' + getUserName(uid));
+            await loadAll();
+        } catch (ex) {
+            res.style.display = 'block';
+            res.style.background = '#fef2f2';
+            res.style.border = '1px solid #fecaca';
+            res.style.color = '#dc2626';
+            res.textContent = '✗ Error: ' + ex.message;
+            showToast('Error: ' + ex.message);
+        }
+    }
+
+    function renderDepositsPending() {
+        const pending = allDeposits.filter(d => isPending(d.status));
+        document.getElementById('dep-pending-badge').textContent = pending.length + ' pending';
+        const el = document.getElementById('deposits-pending-table');
+        if (!el) return;
+        if (!pending.length) {
+            el.innerHTML = '<div class="empty" style="padding:20px;text-align:center;color:var(--muted)">✅ No pending deposits — all clear</div>';
+            return;
+        }
+        let h = '<table><thead><tr><th>User</th><th>Asset</th><th>Ref</th><th>Submitted</th><th>Credit Amount</th><th>Actions</th></tr></thead><tbody>';
+        pending.forEach(d => {
+            const name = getUserName(d.user_id);
+            const email = getUserEmail(d.user_id);
+            h += `<tr class="dep-row-pending">
+      <td>
+        <div style="font-weight:700;font-size:13px">${name}</div>
+        <div style="font-size:11px;color:var(--muted)">${email}</div>
+      </td>
+      <td><span class="badge badge-active">${d.asset || '—'}</span></td>
+      <td style="font-family:monospace;font-size:11px;color:var(--muted)">${(d.ref || d.id || '').slice(0, 16)}…</td>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(d.created_at)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="color:var(--muted);font-weight:600;font-size:13px">$</span>
+          <input type="number" id="dep-amt-${d.id}" placeholder="Enter amount" min="0" step="0.01"
+            style="width:120px;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-family:var(--font);font-size:13px;font-weight:600;outline:none">
+        </div>
+      </td>
+      <td style="display:flex;gap:8px;align-items:center;padding-top:12px">
+        <button class="btn btn-green" onclick="confirmPendingDeposit('${d.id}','${d.user_id}','${d.asset || 'Crypto'}')">✓ Confirm & Credit</button>
+        <button class="btn btn-red" onclick="rejectDeposit('${d.id}')">✗ Reject</button>
+      </td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        el.innerHTML = h;
+    }
+
+    async function confirmPendingDeposit(depId, userId, asset) {
+        const amtInput = document.getElementById('dep-amt-' + depId);
+        const amount = parseFloat(amtInput?.value) || 0;
+        if (amount <= 0) { showToast('Enter the confirmed amount first'); amtInput?.focus(); return; }
+        const user = allUsers.find(u => u.id === userId);
+        if (!user) { showToast('User not found'); return; }
+        if (!confirm('Confirm deposit of $' + amount.toFixed(2) + ' (' + asset + ') for ' + getUserName(userId) + '?')) return;
+        try {
+            const newBal = (parseFloat(user.balance) || 0) + amount;
+            await dbPatch('profiles', { balance: newBal }, 'id=eq.' + userId);
+            await dbPatch('deposits', { status: 'confirmed', credited: true, amount: amount, admin_note: 'Confirmed by admin' }, 'id=eq.' + depId);
+            await dbInsert('transactions', {
+                user_id: userId, type: 'deposit', asset: asset,
+                amount: '+$' + amount.toFixed(2), status: 'completed', ref: 'DEP_' + depId
+            });
+            user.balance = newBal;
+            const dep = allDeposits.find(d => d.id === depId);
+            if (dep) { dep.status = 'confirmed'; dep.credited = true; dep.amount = amount; }
+            updateStats(); renderDepositsPending(); renderDeposits(); populateCreditUserSelect();
+            showToast('✓ $' + amount.toFixed(2) + ' credited to ' + getUserName(userId));
+        } catch (ex) { showToast('Error: ' + ex.message); }
+    }
+
+    async function rejectDeposit(depId) {
+        const note = prompt('Reason for rejection (optional):');
+        if (note === null) return;
+        try {
+            await dbPatch('deposits', { status: 'rejected', admin_note: note || 'Rejected by admin' }, 'id=eq.' + depId);
+            const dep = allDeposits.find(d => d.id === depId);
+            if (dep) dep.status = 'rejected';
+            renderDepositsPending(); renderDeposits();
+            showToast('Deposit rejected');
+        } catch (ex) { showToast('Error: ' + ex.message); }
+    }
+
+    function filterDeposits(filter, el) {
+        depFilter = filter;
+        document.querySelectorAll('#view-deposits .tab-bar .tab').forEach(t => t.classList.remove('on'));
+        if (el) el.classList.add('on');
+        renderDeposits();
+    }
+
+    function renderDeposits() {
+        const list = depFilter === 'all' ? allDeposits : allDeposits.filter(d => d.status === depFilter);
+        if (!list.length) {
+            document.getElementById('deposits-table').innerHTML = '<div class="empty" style="padding:24px;text-align:center;color:var(--muted)">No deposits found</div>';
+            return;
+        }
+        let h = '<table><thead><tr><th>User</th><th>Asset</th><th>Amount</th><th>Status</th><th>Ref</th><th>Date</th><th>Note</th></tr></thead><tbody>';
+        list.forEach(d => {
+            const sc = d.status === 'confirmed' ? 'badge-active' : d.status === 'rejected' ? 'badge-rejected' : 'badge-pending';
+            h += `<tr>
+      <td>
+        <div style="font-weight:600;font-size:13px">${getUserName(d.user_id)}</div>
+        <div style="font-size:11px;color:var(--muted)">${getUserEmail(d.user_id)}</div>
+      </td>
+      <td><span class="badge badge-active">${d.asset || '—'}</span></td>
+      <td style="font-weight:700;font-family:var(--font)">${d.amount ? fmt(d.amount) : '—'}</td>
+      <td><span class="badge ${sc}">${d.status}</span></td>
+      <td style="font-family:monospace;font-size:11px;color:var(--muted)">${(d.ref || d.id || '').slice(0, 14)}…</td>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(d.created_at)}</td>
+      <td style="font-size:11px;color:var(--muted)">${d.admin_note || '—'}</td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        document.getElementById('deposits-table').innerHTML = h;
+    }
+
+    function renderInvestments() {
+        if (!allInvestments.length) { document.getElementById('investments-table').innerHTML = '<div class="empty">No investments yet</div>'; return; }
+        let h = '<table><thead><tr><th>User</th><th>Plan</th><th>Amount</th><th>Daily Rate</th><th>Earned</th><th>Status</th><th>Ends</th></tr></thead><tbody>';
+        allInvestments.forEach(i => {
+            const badgeClass = i.status === 'active' ? 'badge-active' : i.status === 'completed' ? 'badge-completed' : 'badge-rejected';
+            h += `<tr>
+      <td style="font-family:monospace;font-size:11px;color:var(--muted)">${(i.user_id || '').slice(0, 12)}…</td>
+      <td style="font-weight:700">${i.plan_name || i.plan || '—'}</td>
+      <td style="font-weight:700">${fmt(i.amount)}</td>
+      <td>${((parseFloat(i.daily_rate) || 0) * 100).toFixed(1)}%</td>
+      <td style="color:var(--green);font-weight:700">${fmt(i.earned)}</td>
+      <td><span class="badge ${badgeClass}">${i.status}</span></td>
+      <td style="color:var(--muted)">${i.end_date || '—'}</td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        document.getElementById('investments-table').innerHTML = h;
+    }
+
+    function showTab(name, el) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+        document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+        document.getElementById('view-' + name).classList.add('on');
+        el.classList.add('active');
+        const titles = { overview: 'Dashboard Overview', users: 'User Management', withdrawals: 'Withdrawal Requests', deposits: 'Deposit History', investments: 'Investment Plans' };
+        document.getElementById('main-title').textContent = titles[name] || name;
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // Allow Enter key on login
+    document.addEventListener('keydown', function (e) { if (e.key === 'Enter' && document.getElementById('admin-login-screen').style.display !== 'none') doAdminLogin(); });
+</script>

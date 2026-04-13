@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Nova Admin Panel</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --blue: #1a6bff;
+      --teal: #0db89e;
+      --green: #16a34a;
+      --red: #dc2626;
+      --orange: #f59e0b;
+      --bg: #f2f4f7;
+      --white: #fff;
+      --text: #0d1421;
+      --muted: #6b7a99;
+      --border: #e2e6ef;
+      --font: 'Sora', sans-serif;
+      --body: 'DM Sans', sans-serif
+    }
+
+    body {
+      font-family: var(--body);
+      background: var(--bg);
+      color: var(--text)
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh
+    }
+
+    .sidebar {
+      background: #0d1421;
+      color: #fff;
+      padding: 24px 0;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh
+    }
+
+    .sb-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, .1);
+      margin-bottom: 16px
+    }
+
+    .sb-logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #16a34a;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .sb-logo span {
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 800
+    }
+
+    .sb-section {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .35);
+      padding: 8px 20px;
+      margin-top: 8px
+    }
+
+    .sb-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .65);
+      cursor: pointer;
+      transition: all .2s;
+      border-left: 3px solid transparent;
+      font-family: var(--font)
+    }
+
+    .sb-item:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, .07)
+    }
+
+    .sb-item.active {
+      color: #fff;
+      background: rgba(13, 184, 158, .15);
+      border-left-color: var(--teal)
+    }
+
+    .sb-item svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0
+    }
+
+    .sb-bot {
+      margin-top: auto;
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255, 255, 255, .1)
+    }
+
+    .admin-badge {
+      background: rgba(220, 38, 38, .2);
+      color: #fca5a5;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-family: var(--font)
+    }
+
+    .main {
+      padding: 32px;
+      overflow-y: auto
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px
+    }
+
+    .page-title {
+      font-family: var(--font);
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -.03em
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .btn {
+      padding: 9px 20px;
+      border-radius: 10px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all .2s
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(26, 107, 255, .3)
+    }
+
+    .btn-primary:hover {
+      background: #1254d4
+    }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--muted);
+      border: 1px solid var(--border)
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--blue)
+    }
+
+    .btn-green {
+      background: #dcfce7;
+      color: var(--green);
+      border: none
+    }
+
+    .btn-green:hover {
+      background: var(--green);
+      color: #fff
+    }
+
+    .btn-red {
+      background: #fef2f2;
+      color: var(--red);
+      border: none
+    }
+
+    .btn-red:hover {
+      background: var(--red);
+      color: #fff
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px
+    }
+
+    .stat {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-family: var(--font)
+    }
+
+    .stat-val {
+      font-family: var(--font);
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -.02em
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 24px
+    }
+
+    .card-head {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .card-title {
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 800
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-family: var(--font)
+    }
+
+    .badge-pending {
+      background: #fef3c7;
+      color: #92400e
+    }
+
+    .badge-active {
+      background: #dcfce7;
+      color: var(--green)
+    }
+
+    .badge-completed {
+      background: #e8f0ff;
+      color: var(--blue)
+    }
+
+    .badge-rejected {
+      background: #fef2f2;
+      color: var(--red)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    th {
+      background: var(--bg);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      padding: 11px 16px;
+      text-align: left;
+      border-bottom: 2px solid var(--border)
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      vertical-align: middle
+    }
+
+    tr:last-child td {
+      border-bottom: none
+    }
+
+    tr:hover td {
+      background: #fafbfd
+    }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .tab-bar {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 0
+    }
+
+    .tab {
+      padding: 14px 20px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all .2s
+    }
+
+    .tab.on {
+      color: var(--blue);
+      border-bottom-color: var(--blue)
+    }
+
+    .view {
+      display: none
+    }
+
+    .view.on {
+      display: block
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 9px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: var(--body);
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s
+    }
+
+    .search-bar input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26, 107, 255, .08)
+    }
+
+    .edit-bal-wrap {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .edit-bal-wrap input {
+      width: 120px;
+      padding: 7px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      outline: none
+    }
+
+    .edit-bal-wrap input:focus {
+      border-color: var(--blue)
+    }
+
+    .loading {
+      text-align: center;
+      padding: 48px;
+      color: var(--muted);
+      font-size: 14px
+    }
+
+    .empty {
+      text-align: center;
+      padding: 48px;
+      color: var(--muted)
+    }
+
+    .empty svg {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 12px;
+      display: block;
+      opacity: .3
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0d1421;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
+      z-index: 999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all .3s
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1
+    }
+
+    .admin-login {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: var(--bg)
+    }
+
+    .login-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 40px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .08)
+    }
+
+    .login-card h2 {
+      font-family: var(--font);
+      font-size: 22px;
+      font-weight: 900;
+      margin-bottom: 6px
+    }
+
+    .login-card p {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px
+    }
+
+    .fi {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: var(--body);
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 14px;
+      transition: border-color .2s
+    }
+
+    .fi:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26, 107, 255, .08)
+    }
+
+    .btn-full {
+      width: 100%;
+      padding: 14px;
+      background: var(--blue);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(26, 107, 255, .3)
+    }
+
+    @media(max-width:1024px) {
+      .stats-row {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:768px) {
+      .layout {
+        grid-template-columns: 1fr
+      }
+
+      .sidebar {
+        display: none
+      }
+
+      .stats-row {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="admin-login-screen" class="admin-login">
+    <div class="login-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+        <div
+          style="width:36px;height:36px;background:var(--teal);border-radius:9px;display:flex;align-items:center;justify-content:center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
+            stroke-linecap="round">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+        </div>
+        <span style="font-family:var(--font);font-size:17px;font-weight:800">Crypto Nova</span>
+      </div>
+      <h2>Admin Access</h2>
+      <p>Enter your Supabase credentials to continue.</p>
+      <input class="fi" type="email" id="admin-email" placeholder="Admin email address">
+      <input class="fi" type="password" id="admin-pw" placeholder="Password (min 6 characters)">
+      <div id="admin-err"
+        style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px;line-height:1.5">
+      </div>
+      <button class="btn-full" id="admin-login-btn" onclick="doAdminLogin()" style="margin-bottom:10px">Sign In to
+        Admin</button>
+      <button type="button" onclick="createAdminAccount()"
+        style="width:100%;padding:12px;background:transparent;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s"
+        onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">First time? Create Admin
+        Account</button>
+      <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6">Use an email &
+        password you create here — <strong>not</strong> your Supabase dashboard login.</p>
+    </div>
+  </div>
+
+  <div id="admin-dashboard" style="display:none">
+    <div class="layout">
+      <div class="sidebar">
+        <div class="sb-logo">
+          <div class="sb-logo-icon"><svg width="20" height="20" viewBox="0 0 44 44" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 3L39 12.5V31.5L22 41L5 31.5V12.5L22 3Z" stroke="white" stroke-width="3.2"
+                stroke-linejoin="round" fill="none" />
+              <path
+                d="M30 16C30 16 25.5 14.5 21 16C16.5 17.5 15 20.5 18.5 22.5C22 24.5 28 23 29.5 25.5C31 28 28 29.5 22 29.5"
+                stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+            </svg></div>
+          <span>Admin Panel</span>
+        </div>
+        <div class="sb-section">Overview</div>
+        <div class="sb-item active" onclick="showTab('overview',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+          </svg>
+          Dashboard
+        </div>
+        <div class="sb-section">Management</div>
+        <div class="sb-item" onclick="showTab('users',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          Users
+        </div>
+        <div class="sb-item" onclick="showTab('withdrawals',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="12" y1="1" x2="12" y2="23" />
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+          </svg>
+          Withdrawals
+        </div>
+        <div class="sb-item" onclick="showTab('deposits',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6" />
+          </svg>
+          Deposits
+        </div>
+        <div class="sb-item" onclick="showTab('investments',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+            <polyline points="16 7 22 7 22 13" />
+          </svg>
+          Investments
+        </div>
+        <div class="sb-bot">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-family:var(--font);font-size:13px;font-weight:700;color:#fff" id="admin-name-label">Admin
+              </div>
+              <div class="admin-badge">ADMIN</div>
+            </div>
+            <button onclick="adminLogout()"
+              style="background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.6);padding:7px;border-radius:8px;cursor:pointer;font-size:12px">Logout</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="main">
+        <div class="top-bar">
+          <div class="page-title" id="main-title">Dashboard Overview</div>
+          <div class="top-right">
+            <button class="btn btn-ghost" onclick="loadAll()">⟳ Refresh</button>
+          </div>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div id="view-overview" class="view on">
+          <div class="stats-row">
+            <div class="stat">
+              <div class="stat-label">Total Users</div>
+              <div class="stat-val" id="st-users">—</div>
+              <div class="stat-sub">Registered accounts</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Total Balance</div>
+              <div class="stat-val" id="st-balance">—</div>
+              <div class="stat-sub">Across all users</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Pending Withdrawals</div>
+              <div class="stat-val" id="st-pending" style="color:var(--orange)">—</div>
+              <div class="stat-sub">Awaiting approval</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Active Investments</div>
+              <div class="stat-val" id="st-investments" style="color:var(--green)">—</div>
+              <div class="stat-sub">Running plans</div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-head">
+              <div class="card-title">⚠️ Pending Withdrawals — Action Required</div><span class="badge badge-pending"
+                id="pending-count-badge">0 pending</span>
+            </div>
+            <div id="overview-withdrawals">
+              <div class="loading">Loading…</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">📥 Pending Deposits — Credit Required</div>
+              <span class="badge badge-pending" id="dep-pending-badge-ov">0 pending</span>
+            </div>
+            <div id="overview-deposits">
+              <div class="loading">Loading…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- USERS -->
+        <div id="view-users" class="view">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">All Users</div>
+            </div>
+            <div class="search-bar"><input type="text" id="user-search" placeholder="Search by name or email…"
+                oninput="filterUsers()"></div>
+            <div id="users-table">
+              <div class="loading">Loading…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WITHDRAWALS -->
+        <div id="view-withdrawals" class="view">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">All Withdrawal Requests</div>
+            </div>
+            <div class="tab-bar">
+              <div class="tab on" onclick="filterWithdrawals('pending',this)">Pending</div>
+              <div class="tab" onclick="filterWithdrawals('approved',this)">Approved</div>
+              <div class="tab" onclick="filterWithdrawals('rejected',this)">Rejected</div>
+              <div class="tab" onclick="filterWithdrawals('all',this)">All</div>
+            </div>
+            <div id="withdrawals-table">
+              <div class="loading">Loading…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DEPOSITS -->
+        <div id="view-deposits" class="view">
+          <!-- Manual Credit Panel -->
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-head">
+              <div class="card-title">💳 Credit a Deposit Manually</div>
+              <span style="font-size:12px;color:var(--muted)">For payments made outside the platform</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:14px;padding:20px;align-items:end">
+              <div>
+                <div class="field-label">Select User</div>
+                <select class="field-input" id="credit-user-sel">
+                  <option value="">— Select user —</option>
+                </select>
+              </div>
+              <div>
+                <div class="field-label">Amount (USD)</div>
+                <div style="position:relative">
+                  <span
+                    style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:600">$</span>
+                  <input class="field-input" type="number" id="credit-amount" placeholder="0.00" min="1" step="0.01"
+                    style="padding-left:26px">
+                </div>
+              </div>
+              <div>
+                <div class="field-label">Asset / Note</div>
+                <input class="field-input" type="text" id="credit-asset" placeholder="e.g. BTC, USDT, Wire">
+              </div>
+              <button class="btn btn-green" style="padding:10px 22px;height:42px" onclick="creditDeposit()">
+                ✓ Credit Balance
+              </button>
+            </div>
+            <div id="credit-result"
+              style="display:none;margin:0 20px 16px;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600">
+            </div>
+          </div>
+          <!-- Pending deposits queue -->
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-head">
+              <div class="card-title">⏳ Pending Deposits — Review Queue</div>
+              <span class="badge badge-pending" id="dep-pending-badge">0 pending</span>
+            </div>
+            <div id="deposits-pending-table">
+              <div class="loading">Loading…</div>
+            </div>
+          </div>
+          <!-- All deposits history -->
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">All Deposit History</div>
+            </div>
+            <div class="tab-bar">
+              <div class="tab on" onclick="filterDeposits('all',this)">All</div>
+              <div class="tab" onclick="filterDeposits('pending',this)">Pending</div>
+              <div class="tab" onclick="filterDeposits('confirmed',this)">Confirmed</div>
+              <div class="tab" onclick="filterDeposits('rejected',this)">Rejected</div>
+            </div>
+            <div id="deposits-table">
+              <div class="loading">Loading…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INVESTMENTS -->
+        <div id="view-investments" class="view">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">All Investment Plans</div>
+            </div>
+            <div id="investments-table">
+              <div class="loading">Loading…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+
+
+<script>
+const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
+const SUPA_KEY = 'sb_publishable_9ENF_0EI8C_exZ7aDVhrXw_u0fYBM4I';
+let SERVICE_KEY = null;
+
+// 🔒 ONLY this email can access the admin panel
+const ADMIN_EMAIL = 'adeotipeter434@gmail.com';
+let ADMIN_TOKEN = null;
+let allUsers = [], allWithdrawals = [], allDeposits = [], allInvestments = [];
+let wFilter = 'pending';
+
+function adminH() {
+  return {
+    'apikey': SERVICE_KEY || SUPA_KEY,
+    'Authorization': 'Bearer ' + (SERVICE_KEY || ADMIN_TOKEN),
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
+}
+async function doAdminLogin() {
+  const email = document.getElementById('admin-email').value.trim();
+  const pw = document.getElementById('admin-pw').value;
+  const err = document.getElementById('admin-err');
+  const btn = document.getElementById('admin-login-btn');
+  err.style.display = 'none'; 
+  btn.disabled = true; 
+  btn.textContent = 'Signing in…';
+  try {
+    const r = await fetch(SUPA_URL + '/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pw })
+    });
+    const d = await r.json();
+    if (d.access_token) {
+      ADMIN_TOKEN = d.access_token;
+      SERVICE_KEY = 'sb_secret_I6U4M1d1wl0rC-wwp4PSmA_3i2uFaOl';
+      document.getElementById('admin-login-screen').style.display = 'none';
+      document.getElementById('admin-dashboard').style.display = 'block';
+      document.getElementById('admin-name-label').textContent = d.user?.email || 'Admin';
+      setTimeout(() => loadAll(), 800);
+      return;
+    }
+    let msg = d.error_description || d.message || 'Login failed.';
+    err.style.display = 'block'; 
+    err.textContent = msg;
+  } catch (ex) {
+    err.style.display = 'block';
+    err.textContent = 'Network error. Please try again.';
+  } finally {
+    btn.disabled = false; 
+    btn.textContent = 'Sign In to Admin';
+  }
+}
+    async function createAdminAccount() {
+        const email = document.getElementById('admin-email').value.trim();
+        const pw = document.getElementById('admin-pw').value;
+        const err = document.getElementById('admin-err');
+        if (!email || !pw) { err.style.display = 'block'; err.textContent = 'Enter your email and a password first.'; return; }
+        if (pw.length < 6) { err.style.display = 'block'; err.textContent = 'Password must be at least 6 characters.'; return; }
+        err.style.display = 'none';
+        try {
+            const r = await fetch(SUPA_URL + '/auth/v1/signup', {
+                method: 'POST',
+                headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password: pw })
+            });
+            const d = await r.json();
+            if (d.id || d.access_token) {
+                err.style.display = 'block';
+                err.style.background = '#f0fdf4'; err.style.borderColor = '#86efac'; err.style.color = '#166534';
+                if (d.access_token) {
+                    // Auto-login if no email confirmation needed
+                    ADMIN_TOKEN = d.access_token;
+                    document.getElementById('admin-login-screen').style.display = 'none';
+                    document.getElementById('admin-dashboard').style.display = 'block';
+                    document.getElementById('admin-name-label').textContent = d.user?.email || 'Admin';
+                    loadAll();
+                } else {
+                    err.textContent = '✓ Admin account created! Check your email to confirm it, then log in.';
+                }
+            } else {
+                err.style.display = 'block';
+                err.textContent = d.error_description || d.msg || 'Could not create account. It may already exist — try logging in.';
+            }
+        } catch (ex) { err.style.display = 'block'; err.textContent = 'Network error.'; }
+    }
+
+    function adminLogout() { ADMIN_TOKEN = null; document.getElementById('admin-login-screen').style.display = 'flex'; document.getElementById('admin-dashboard').style.display = 'none'; }
+
+   async function dbGet(table, params = '') {
+  const url = SUPA_URL + '/rest/v1/' + table + (params ? '?' + params : '');
+  const r = await fetch(url, {
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + ADMIN_TOKEN,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!r.ok) {
+    const err = await r.text();
+    console.error(`dbGet ${table} failed (${r.status}):`, err);
+    return [];
+  }
+
+  const data = await r.json();
+  return Array.isArray(data) ? data : [];
+}
+    async function dbInsert(table, body) {
+        const r = await fetch(SUPA_URL + '/rest/v1/' + table, { method: 'POST', headers: adminH(), body: JSON.stringify(body) });
+        if (!r.ok) { const e = await r.json(); throw new Error(e.message || r.statusText); }
+        return r.json();
+    }
+
+    async function dbPatch(table, body, params) {
+        const r = await fetch(SUPA_URL + '/rest/v1/' + table + '?' + params, { method: 'PATCH', headers: adminH(), body: JSON.stringify(body) });
+        return r.json();
+    }
+
+   async function loadAll() {
+  try {
+    console.log('🔄 Loading admin data...');
+    console.log('Admin token present:', !!ADMIN_TOKEN);
+
+    // Load each table individually so one failure doesn't block the rest
+    const results = await Promise.allSettled([
+      dbGet('profiles', 'select=*&order=created_at.desc'),
+      dbGet('deposits',  'select=*&order=created_at.desc'),
+      dbGet('withdrawals','select=*&order=created_at.desc'),
+      dbGet('investments','select=*&order=created_at.desc')
+    ]);
+
+    allUsers       = results[0].status === 'fulfilled' ? results[0].value : [];
+    allDeposits    = results[1].status === 'fulfilled' ? results[1].value : [];
+    allWithdrawals = results[2].status === 'fulfilled' ? results[2].value : [];
+    allInvestments = results[3].status === 'fulfilled' ? results[3].value : [];
+
+    console.log(`✅ profiles: ${allUsers.length}, deposits: ${allDeposits.length}, withdrawals: ${allWithdrawals.length}`);
+
+    if (allDeposits.length === 0) {
+      console.warn('⚠️  No deposits loaded — check Supabase RLS policies for the deposits table.');
+      console.warn('    The admin user needs SELECT permission on deposits for ALL rows.');
+    }
+
+    updateStats();
+    renderUsers();
+    renderWithdrawals();
+    renderDeposits();
+    renderDepositsPending();
+    renderInvestments();
+    renderOverviewWithdrawals();
+    renderOverviewDeposits();
+    populateCreditUserSelect();
+
+  } catch (ex) {
+    console.error('loadAll error:', ex);
+    showToast('Error loading data: ' + ex.message);
+  }
+}
+    function isPending(status) {
+        if (status == null || status === '') return true;
+        var s = String(status).toLowerCase().trim();
+        return ['pending', 'processing', 'submitted', 'awaiting', 'unconfirmed', 'new'].includes(s);
+    }
+
+    function fmt(n) { return '$' + (parseFloat(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function fmtDate(d) { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    function avatarColor(name) { const cols = ['#1a6bff', '#0db89e', '#7c3aed', '#f59e0b', '#16a34a', '#dc2626']; let h = 0; for (let c of (name || 'AT')) h += c.charCodeAt(0); return cols[h % cols.length]; }
+    function initials(name) { return (name || 'AT').split(' ').map(w => w[0] || '').join('').slice(0, 2).toUpperCase(); }
+
+    function updateStats() {
+        document.getElementById('st-users').textContent = allUsers.length;
+        const total = allUsers.reduce((s, u) => s + (parseFloat(u.balance) || 0), 0);
+        document.getElementById('st-balance').textContent = fmt(total);
+        const pending = allWithdrawals.filter(w => w.status === 'pending').length;
+        document.getElementById('st-pending').textContent = pending;
+        document.getElementById('pending-count-badge').textContent = pending + ' pending';
+        const pendingDeps = allDeposits.filter(d => isPending(d.status)).length;
+        const depBadge = document.getElementById('dep-pending-badge');
+        if (depBadge) depBadge.textContent = pendingDeps + ' pending';
+        const active = allInvestments.filter(i => i.status === 'active').length;
+        document.getElementById('st-investments').textContent = active;
+    }
+
+    function renderUsers() {
+        const q = (document.getElementById('user-search')?.value || '').toLowerCase();
+        const list = allUsers.filter(u => (u.full_name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q));
+        if (!list.length) { document.getElementById('users-table').innerHTML = '<div class="empty">No users found</div>'; return; }
+        let h = '<table><thead><tr><th>User</th><th>Email</th><th>Balance</th><th>Tier</th><th>Joined</th><th>Edit Balance</th></tr></thead><tbody>';
+        list.forEach(u => {
+            const col = avatarColor(u.full_name), ini = initials(u.full_name);
+            h += `<tr>
+      <td><div class="user-cell"><div class="avatar" style="background:${col}">${ini}</div><span style="font-weight:600">${u.full_name || '—'}</span></div></td>
+      <td style="color:var(--muted)">${u.email || '—'}</td>
+      <td style="font-weight:700;font-family:var(--font)">${fmt(u.balance)}</td>
+      <td><span class="badge badge-active">${u.tier || 'Standard'}</span></td>
+      <td style="color:var(--muted)">${fmtDate(u.created_at)}</td>
+      <td>
+        <div class="edit-bal-wrap">
+          <input type="number" id="bal-${u.id}" value="${parseFloat(u.balance || 0).toFixed(2)}" step="0.01">
+          <button class="btn btn-primary" onclick="updateUserBalance('${u.id}')">Save</button>
+        </div>
+      </td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        document.getElementById('users-table').innerHTML = h;
+    }
+
+    function filterUsers() { renderUsers(); }
+
+    async function updateUserBalance(uid) {
+        const input = document.getElementById('bal-' + uid);
+        const newBal = parseFloat(input.value);
+        if (isNaN(newBal)) { showToast('Invalid amount'); return; }
+        try {
+            await dbPatch('profiles', { balance: newBal }, 'id=eq.' + uid);
+            const u = allUsers.find(u => u.id === uid);
+            if (u) u.balance = newBal;
+            updateStats();
+            showToast('✓ Balance updated to ' + fmt(newBal));
+        } catch (ex) { showToast('Error: ' + ex.message); }
+    }
+
+    function renderWithdrawals() {
+        const list = wFilter === 'all' ? allWithdrawals : allWithdrawals.filter(w => w.status === wFilter);
+        if (!list.length) { document.getElementById('withdrawals-table').innerHTML = '<div class="empty">No ' + wFilter + ' withdrawals</div>'; return; }
+        let h = '<table><thead><tr><th>User</th><th>Amount</th><th>Asset</th><th>Address</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+        list.forEach(w => {
+            const badgeClass = w.status === 'pending' ? 'badge-pending' : w.status === 'approved' ? 'badge-active' : 'badge-rejected';
+            const addr = w.address ? w.address.slice(0, 14) + '…' + w.address.slice(-6) : '—';
+            h += `<tr>
+      <td>
+        <div style="font-weight:700;font-size:13px">${getUserName(w.user_id)}</div>
+        <div style="font-size:11px;color:var(--muted)">${getUserEmail(w.user_id)}</div>
+      </td>
+      <td style="font-weight:700;font-family:var(--font)">${fmt(w.amount)}</td>
+      <td><span class="badge badge-active">${w.asset || '—'}</span></td>
+      <td style="font-family:monospace;font-size:12px" title="${w.address || ''}">${addr}</td>
+      <td style="color:var(--muted)">${fmtDate(w.created_at)}</td>
+      <td><span class="badge ${badgeClass}">${w.status}</span></td>
+      <td>
+        ${w.status === 'pending' ? `
+          <button class="btn btn-green" onclick="approveWithdrawal('${w.id}')">Approve</button>
+          <button class="btn btn-red" style="margin-left:6px" onclick="rejectWithdrawal('${w.id}')">Reject</button>
+        `: '<span style="color:var(--muted);font-size:12px">No action</span>'}
+      </td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        document.getElementById('withdrawals-table').innerHTML = h;
+    }
+
+    function filterWithdrawals(filter, el) {
+        wFilter = filter;
+        document.querySelectorAll('#view-withdrawals .tab').forEach(t => t.classList.remove('on'));
+        el.classList.add('on');
+        renderWithdrawals();
+    }
+
+    function renderOverviewDeposits() {
+        const pending = allDeposits.filter(d => isPending(d.status));
+        const badge = document.getElementById('dep-pending-badge-ov');
+        if (badge) badge.textContent = pending.length + ' pending';
+        const el = document.getElementById('overview-deposits');
+        if (!el) return;
+        if (!pending.length) {
+            el.innerHTML = '<div class="empty" style="padding:20px;text-align:center;color:var(--muted)">✅ No pending deposits</div>';
+            return;
+        }
+        let h = '<table><thead><tr><th>User</th><th>Asset</th><th>Submitted</th><th>Action</th></tr></thead><tbody>';
+        pending.slice(0, 8).forEach(d => {
+            h += `<tr class="dep-row-pending">
+      <td>
+        <div style="font-weight:700">${getUserName(d.user_id)}</div>
+        <div style="font-size:11px;color:var(--muted)">${getUserEmail(d.user_id)}</div>
+      </td>
+      <td><span class="badge badge-active">${d.asset || '—'}</span></td>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(d.created_at)}</td>
+      <td><button class="btn btn-primary" onclick="showTab('deposits',document.querySelector('.sb-item:nth-child(5)'))">Review →</button></td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        el.innerHTML = h;
+    }
+
+    function renderOverviewWithdrawals() {
+        const list = allWithdrawals.filter(w => w.status === 'pending').slice(0, 10);
+        if (!list.length) { document.getElementById('overview-withdrawals').innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>No pending withdrawals — all clear!</div>'; return; }
+        let h = '<table><thead><tr><th>User</th><th>Amount</th><th>Asset / Network</th><th>Address</th><th>Submitted</th><th>Actions</th></tr></thead><tbody>';
+        list.forEach(w => {
+            const addr = w.address ? w.address.slice(0, 14) + '…' + w.address.slice(-6) : '—';
+            h += `<tr>
+      <td style="font-family:monospace;font-size:11px;color:var(--muted)">${(w.user_id || '').slice(0, 16)}…</td>
+      <td style="font-weight:800;font-family:var(--font);color:var(--orange)">${fmt(w.amount)}</td>
+      <td><span class="badge badge-active">${w.asset || '—'}</span> <span style="font-size:11px;color:var(--muted)">${w.network || ''}</span></td>
+      <td style="font-family:monospace;font-size:12px" title="${w.address || ''}">${addr}</td>
+      <td style="color:var(--muted)">${fmtDate(w.created_at)}</td>
+      <td>
+        <button class="btn btn-green" onclick="approveWithdrawal('${w.id}')">✓ Approve</button>
+        <button class="btn btn-red" style="margin-left:6px" onclick="rejectWithdrawal('${w.id}')">✗ Reject</button>
+      </td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        document.getElementById('overview-withdrawals').innerHTML = h;
+    }
+
+    async function approveWithdrawal(id) {
+        if (!confirm('Approve this withdrawal? Make sure you have sent the funds first.')) return;
+        try {
+            await dbPatch('withdrawals', { status: 'approved', admin_note: 'Approved by admin on ' + new Date().toLocaleString() }, 'id=eq.' + id);
+            const w = allWithdrawals.find(w => w.id === id);
+            if (w) w.status = 'approved';
+            renderWithdrawals(); renderOverviewWithdrawals(); updateStats();
+            showToast('✓ Withdrawal approved');
+        } catch (ex) { showToast('Error: ' + ex.message); }
+    }
+
+    async function rejectWithdrawal(id) {
+        const note = prompt('Reason for rejection (optional):');
+        if (note === null) return;
+        try {
+            await dbPatch('withdrawals', { status: 'rejected', admin_note: note || 'Rejected by admin' }, 'id=eq.' + id);
+            const w = allWithdrawals.find(w => w.id === id);
+            if (w) w.status = 'rejected';
+            renderWithdrawals(); renderOverviewWithdrawals(); updateStats();
+            showToast('Withdrawal rejected');
+        } catch (ex) { showToast('Error: ' + ex.message); }
+    }
+
+    var depFilter = 'all';
+
+    function getUserName(uid) {
+        const u = allUsers.find(u => u.id === uid);
+        return u ? (u.full_name || u.email || uid.slice(0, 8) + '…') : uid.slice(0, 8) + '…';
+    }
+    function getUserEmail(uid) {
+        const u = allUsers.find(u => u.id === uid);
+        return u ? (u.email || '—') : '—';
+    }
+
+    function populateCreditUserSelect() {
+        const sel = document.getElementById('credit-user-sel');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">— Select user —</option>';
+        allUsers.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            opt.textContent = (u.full_name || u.email || u.id.slice(0, 8)) + ' — ' + fmt(u.balance);
+            sel.appendChild(opt);
+        });
+    }
+
+    async function creditDeposit() {
+        const uid = document.getElementById('credit-user-sel').value;
+        const amount = parseFloat(document.getElementById('credit-amount').value) || 0;
+        const asset = document.getElementById('credit-asset').value.trim() || 'Manual';
+        const res = document.getElementById('credit-result');
+
+        res.style.display = 'none';
+        if (!uid) { showToast('Please select a user'); return; }
+        if (amount <= 0) { showToast('Enter a valid amount'); return; }
+
+        const user = allUsers.find(u => u.id === uid);
+        if (!confirm('Credit $' + amount.toFixed(2) + ' (' + asset + ') to ' + getUserName(uid) + '? This will update their balance immediately.')) return;
+
+        try {
+            const newBal = (parseFloat(user.balance) || 0) + amount;
+            // 1. Update balance
+            await dbPatch('profiles', { balance: newBal }, 'id=eq.' + uid);
+            // 2. Insert deposit record
+            const ref = 'DEP_MANUAL_' + Date.now();
+            await dbInsert('deposits', {
+                user_id: uid, method: 'manual', asset: asset,
+                amount: amount, fee: 0, credited: true,
+                ref: ref, status: 'confirmed',
+                admin_note: 'Manually credited by admin'
+            });
+            // 3. Insert transaction record
+            await dbInsert('transactions', {
+                user_id: uid, type: 'deposit', asset: asset,
+                amount: '+$' + amount.toFixed(2), status: 'completed', ref: ref
+            });
+            // Update local state
+            user.balance = newBal;
+            updateStats();
+            populateCreditUserSelect();
+            document.getElementById('credit-amount').value = '';
+            document.getElementById('credit-asset').value = '';
+            res.style.display = 'block';
+            res.style.background = '#f0fdf4';
+            res.style.border = '1px solid #bbf7d0';
+            res.style.color = '#166534';
+            res.textContent = '✓ Successfully credited $' + amount.toFixed(2) + ' to ' + getUserName(uid) + '. New balance: ' + fmt(newBal);
+            showToast('✓ $' + amount.toFixed(2) + ' credited to ' + getUserName(uid));
+            await loadAll();
+        } catch (ex) {
+            res.style.display = 'block';
+            res.style.background = '#fef2f2';
+            res.style.border = '1px solid #fecaca';
+            res.style.color = '#dc2626';
+            res.textContent = '✗ Error: ' + ex.message;
+            showToast('Error: ' + ex.message);
+        }
+    }
+
+    function renderDepositsPending() {
+        const pending = allDeposits.filter(d => isPending(d.status));
+        document.getElementById('dep-pending-badge').textContent = pending.length + ' pending';
+        const el = document.getElementById('deposits-pending-table');
+        if (!el) return;
+        if (!pending.length) {
+            el.innerHTML = '<div class="empty" style="padding:20px;text-align:center;color:var(--muted)">✅ No pending deposits — all clear</div>';
+            return;
+        }
+        let h = '<table><thead><tr><th>User</th><th>Asset</th><th>Ref</th><th>Submitted</th><th>Credit Amount</th><th>Actions</th></tr></thead><tbody>';
+        pending.forEach(d => {
+            const name = getUserName(d.user_id);
+            const email = getUserEmail(d.user_id);
+            h += `<tr class="dep-row-pending">
+      <td>
+        <div style="font-weight:700;font-size:13px">${name}</div>
+        <div style="font-size:11px;color:var(--muted)">${email}</div>
+      </td>
+      <td><span class="badge badge-active">${d.asset || '—'}</span></td>
+      <td style="font-family:monospace;font-size:11px;color:var(--muted)">${(d.ref || d.id || '').slice(0, 16)}…</td>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(d.created_at)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="color:var(--muted);font-weight:600;font-size:13px">$</span>
+          <input type="number" id="dep-amt-${d.id}" placeholder="Enter amount" min="0" step="0.01"
+            style="width:120px;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-family:var(--font);font-size:13px;font-weight:600;outline:none">
+        </div>
+      </td>
+      <td style="display:flex;gap:8px;align-items:center;padding-top:12px">
+        <button class="btn btn-green" onclick="confirmPendingDeposit('${d.id}','${d.user_id}','${d.asset || 'Crypto'}')">✓ Confirm & Credit</button>
+        <button class="btn btn-red" onclick="rejectDeposit('${d.id}')">✗ Reject</button>
+      </td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        el.innerHTML = h;
+    }
+
+    async function confirmPendingDeposit(depId, userId, asset) {
+        const amtInput = document.getElementById('dep-amt-' + depId);
+        const amount = parseFloat(amtInput?.value) || 0;
+        if (amount <= 0) { showToast('Enter the confirmed amount first'); amtInput?.focus(); return; }
+        const user = allUsers.find(u => u.id === userId);
+        if (!user) { showToast('User not found'); return; }
+        if (!confirm('Confirm deposit of $' + amount.toFixed(2) + ' (' + asset + ') for ' + getUserName(userId) + '?')) return;
+        try {
+            const newBal = (parseFloat(user.balance) || 0) + amount;
+            await dbPatch('profiles', { balance: newBal }, 'id=eq.' + userId);
+            await dbPatch('deposits', { status: 'confirmed', credited: true, amount: amount, admin_note: 'Confirmed by admin' }, 'id=eq.' + depId);
+            await dbInsert('transactions', {
+                user_id: userId, type: 'deposit', asset: asset,
+                amount: '+$' + amount.toFixed(2), status: 'completed', ref: 'DEP_' + depId
+            });
+            user.balance = newBal;
+            const dep = allDeposits.find(d => d.id === depId);
+            if (dep) { dep.status = 'confirmed'; dep.credited = true; dep.amount = amount; }
+            updateStats(); renderDepositsPending(); renderDeposits(); populateCreditUserSelect();
+            showToast('✓ $' + amount.toFixed(2) + ' credited to ' + getUserName(userId));
+        } catch (ex) { showToast('Error: ' + ex.message); }
+    }
+
+    async function rejectDeposit(depId) {
+        const note = prompt('Reason for rejection (optional):');
+        if (note === null) return;
+        try {
+            await dbPatch('deposits', { status: 'rejected', admin_note: note || 'Rejected by admin' }, 'id=eq.' + depId);
+            const dep = allDeposits.find(d => d.id === depId);
+            if (dep) dep.status = 'rejected';
+            renderDepositsPending(); renderDeposits();
+            showToast('Deposit rejected');
+        } catch (ex) { showToast('Error: ' + ex.message); }
+    }
+
+    function filterDeposits(filter, el) {
+        depFilter = filter;
+        document.querySelectorAll('#view-deposits .tab-bar .tab').forEach(t => t.classList.remove('on'));
+        if (el) el.classList.add('on');
+        renderDeposits();
+    }
+
+    function renderDeposits() {
+        const list = depFilter === 'all' ? allDeposits : allDeposits.filter(d => d.status === depFilter);
+        if (!list.length) {
+            document.getElementById('deposits-table').innerHTML = '<div class="empty" style="padding:24px;text-align:center;color:var(--muted)">No deposits found</div>';
+            return;
+        }
+        let h = '<table><thead><tr><th>User</th><th>Asset</th><th>Amount</th><th>Status</th><th>Ref</th><th>Date</th><th>Note</th></tr></thead><tbody>';
+        list.forEach(d => {
+            const sc = d.status === 'confirmed' ? 'badge-active' : d.status === 'rejected' ? 'badge-rejected' : 'badge-pending';
+            h += `<tr>
+      <td>
+        <div style="font-weight:600;font-size:13px">${getUserName(d.user_id)}</div>
+        <div style="font-size:11px;color:var(--muted)">${getUserEmail(d.user_id)}</div>
+      </td>
+      <td><span class="badge badge-active">${d.asset || '—'}</span></td>
+      <td style="font-weight:700;font-family:var(--font)">${d.amount ? fmt(d.amount) : '—'}</td>
+      <td><span class="badge ${sc}">${d.status}</span></td>
+      <td style="font-family:monospace;font-size:11px;color:var(--muted)">${(d.ref || d.id || '').slice(0, 14)}…</td>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(d.created_at)}</td>
+      <td style="font-size:11px;color:var(--muted)">${d.admin_note || '—'}</td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        document.getElementById('deposits-table').innerHTML = h;
+    }
+
+    function renderInvestments() {
+        if (!allInvestments.length) { document.getElementById('investments-table').innerHTML = '<div class="empty">No investments yet</div>'; return; }
+        let h = '<table><thead><tr><th>User</th><th>Plan</th><th>Amount</th><th>Daily Rate</th><th>Earned</th><th>Status</th><th>Ends</th></tr></thead><tbody>';
+        allInvestments.forEach(i => {
+            const badgeClass = i.status === 'active' ? 'badge-active' : i.status === 'completed' ? 'badge-completed' : 'badge-rejected';
+            h += `<tr>
+      <td style="font-family:monospace;font-size:11px;color:var(--muted)">${(i.user_id || '').slice(0, 12)}…</td>
+      <td style="font-weight:700">${i.plan_name || i.plan || '—'}</td>
+      <td style="font-weight:700">${fmt(i.amount)}</td>
+      <td>${((parseFloat(i.daily_rate) || 0) * 100).toFixed(1)}%</td>
+      <td style="color:var(--green);font-weight:700">${fmt(i.earned)}</td>
+      <td><span class="badge ${badgeClass}">${i.status}</span></td>
+      <td style="color:var(--muted)">${i.end_date || '—'}</td>
+    </tr>`;
+        });
+        h += '</tbody></table>';
+        document.getElementById('investments-table').innerHTML = h;
+    }
+
+    function showTab(name, el) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+        document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+        document.getElementById('view-' + name).classList.add('on');
+        el.classList.add('active');
+        const titles = { overview: 'Dashboard Overview', users: 'User Management', withdrawals: 'Withdrawal Requests', deposits: 'Deposit History', investments: 'Investment Plans' };
+        document.getElementById('main-title').textContent = titles[name] || name;
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // Allow Enter key on login
+    document.addEventListener('keydown', function (e) { if (e.key === 'Enter' && document.getElementById('admin-login-screen').style.display !== 'none') doAdminLogin(); });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Nova — Affiliate Program</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    :root {
+      --blue: #1a6bff;
+      --blue-d: #1254d4;
+      --blue-l: #e8f0ff;
+      --blue-s: rgba(26, 107, 255, .09);
+      --bg: #f2f4f7;
+      --white: #fff;
+      --text: #0d1421;
+      --muted: #6b7a99;
+      --dim: #9ba8c0;
+      --border: #e2e6ef;
+      --green: #16a34a;
+      --green-l: rgba(22, 163, 74, .1);
+      --red: #dc2626;
+      --red-l: rgba(220, 38, 38, .08);
+      --teal: #0db89e;
+      --teal-l: rgba(13, 184, 158, .1);
+      --orange: #f59e0b;
+      --orange-l: rgba(245, 158, 11, .1);
+      --font: 'Sora', sans-serif;
+      --body: 'DM Sans', sans-serif;
+      --r: 12px;
+      --rl: 18px;
+    }
+
+    body {
+      font-family: var(--body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--blue);
+      border-radius: 3px
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none
+    }
+
+    ul {
+      list-style: none
+    }
+
+    button {
+      cursor: pointer;
+      font-family: inherit
+    }
+
+    .wrap {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 40px
+    }
+
+    /* ── NAV ── */
+    .navbar {
+      background: rgba(255, 255, 255, .96);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      backdrop-filter: blur(14px);
+      transition: box-shadow .3s
+    }
+
+    .navbar.sc {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .08)
+    }
+
+    .nav-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      height: 62px;
+      padding: 0 40px;
+      position: relative
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-family: var(--font);
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      flex-shrink: 0
+    }
+
+    .logo-icon {
+      width: 30px;
+      height: 30px;
+      background: #16a34a;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%)
+    }
+
+    .nav-links a {
+      padding: 6px 15px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      border-radius: 8px;
+      transition: color .2s, background .2s;
+      font-family: var(--font)
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+      background: var(--bg)
+    }
+
+    .nav-links a.active {
+      color: var(--text);
+      font-weight: 700
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+      flex-shrink: 0
+    }
+
+    .btn-ghost-nav {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 14px;
+      font-family: var(--font);
+      transition: color .2s
+    }
+
+    .btn-ghost-nav:hover {
+      color: var(--text)
+    }
+
+    .btn-nav-solid {
+      background: var(--blue);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 9px 22px;
+      border-radius: var(--r);
+      border: none;
+      box-shadow: 0 3px 12px rgba(26, 107, 255, .3);
+      transition: all .22s
+    }
+
+    .btn-nav-solid:hover {
+      background: var(--blue-d);
+      transform: translateY(-1px)
+    }
+
+    .hbg {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 38px;
+      height: 38px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 7px;
+      flex-shrink: 0
+    }
+
+    .hbg span {
+      display: block;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform .3s, opacity .25s
+    }
+
+    .hbg.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg)
+    }
+
+    .hbg.open span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0)
+    }
+
+    .hbg.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg)
+    }
+
+    .mm {
+      display: none;
+      position: fixed;
+      top: 62px;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, .98);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px 24px;
+      z-index: 190;
+      flex-direction: column;
+      gap: 3px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, .1)
+    }
+
+    .mm.open {
+      display: flex
+    }
+
+    .mm a {
+      display: block;
+      padding: 11px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--muted);
+      border-radius: 10px;
+      font-family: var(--font);
+      transition: background .2s, color .2s
+    }
+
+    .mm a:hover {
+      background: var(--bg);
+      color: var(--text)
+    }
+
+    .mm a.active {
+      color: var(--blue)
+    }
+
+    .mm-div {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 0
+    }
+
+    .mm-cta {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--blue);
+      border-radius: 10px;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font);
+      box-shadow: 0 4px 14px rgba(26, 107, 255, .3);
+      margin-top: 4px
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 72px 40px 80px;
+      text-align: center;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(26, 107, 255, .06), transparent 70%);
+      pointer-events: none
+    }
+
+    .hero-in {
+      position: relative;
+      z-index: 2;
+      max-width: 680px;
+      margin: 0 auto
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+      font-family: var(--font)
+    }
+
+    .hero h1 {
+      font-family: var(--font);
+      font-size: clamp(32px, 6vw, 58px);
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -.04em;
+      line-height: 1.05;
+      margin-bottom: 18px
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 540px;
+      margin: 0 auto
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 28px
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      padding: 13px 28px;
+      border-radius: var(--r);
+      border: none;
+      box-shadow: 0 4px 16px rgba(26, 107, 255, .35);
+      cursor: pointer;
+      transition: all .22s
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-d);
+      transform: translateY(-2px)
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      padding: 13px 28px;
+      border-radius: var(--r);
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      transition: all .22s
+    }
+
+    .btn-outline:hover {
+      border-color: var(--blue);
+      color: var(--blue)
+    }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0
+    }
+
+    .bc-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .bc-inner a {
+      color: var(--muted);
+      transition: color .2s
+    }
+
+    .bc-inner a:hover {
+      color: var(--blue)
+    }
+
+    .bc-sep {
+      color: var(--dim)
+    }
+
+    /* ── LAYOUT ── */
+    .main-section {
+      padding: 72px 0 96px
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 48px;
+      align-items: start
+    }
+
+    .sticky-side {
+      position: sticky;
+      top: 82px
+    }
+
+    .sidebar-label {
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--dim);
+      margin-bottom: 12px
+    }
+
+    .sidebar-box {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      overflow: hidden
+    }
+
+    .slink {
+      display: block;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      font-family: var(--font);
+      border-left: 3px solid transparent;
+      transition: all .2s
+    }
+
+    .slink:hover {
+      color: var(--text);
+      background: var(--bg);
+      border-left-color: var(--blue)
+    }
+
+    .slink.on {
+      color: var(--blue);
+      background: var(--blue-l);
+      border-left-color: var(--blue)
+    }
+
+    .slink+.slink {
+      border-top: 1px solid var(--border)
+    }
+
+    /* ── CARDS & CONTENT ── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      box-shadow: 0 2px 16px rgba(0, 0, 0, .05)
+    }
+
+    .card-pad {
+      padding: 40px 44px
+    }
+
+    .sec {
+      margin-bottom: 44px;
+      padding-bottom: 44px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .sec:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none
+    }
+
+    h2.sh {
+      font-family: var(--font);
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      margin-bottom: 14px
+    }
+
+    h3.sh3 {
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      margin-top: 24px
+    }
+
+    p.body {
+      font-size: 15px;
+      color: #3d4a5c;
+      line-height: 1.8;
+      margin-bottom: 14px
+    }
+
+    p.body:last-child {
+      margin-bottom: 0
+    }
+
+    .ul-styled {
+      margin: 12px 0 16px
+    }
+
+    .ul-styled li {
+      font-size: 15px;
+      color: #3d4a5c;
+      line-height: 1.75;
+      padding: 5px 0 5px 24px;
+      position: relative
+    }
+
+    .ul-styled li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 14px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--blue)
+    }
+
+    /* ── BOXES ── */
+    .box {
+      border-radius: var(--r);
+      padding: 18px 20px;
+      margin: 18px 0;
+      font-size: 14px;
+      line-height: 1.75
+    }
+
+    .box-blue {
+      background: var(--blue-l);
+      border: 1px solid rgba(26, 107, 255, .2);
+      color: #1254d4
+    }
+
+    .box-green {
+      background: var(--green-l);
+      border: 1px solid rgba(22, 163, 74, .2);
+      color: #166534
+    }
+
+    .box-orange {
+      background: var(--orange-l);
+      border: 1px solid rgba(245, 158, 11, .25);
+      color: #92400e
+    }
+
+    .box-teal {
+      background: var(--teal-l);
+      border: 1px solid rgba(13, 184, 158, .25);
+      color: #0a7a6a
+    }
+
+    /* ── GRID ── */
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin: 20px 0
+    }
+
+    .feat-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 20px 0
+    }
+
+    .feat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px 20px
+    }
+
+    .feat-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      font-size: 19px
+    }
+
+    .feat-card h4 {
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 5px
+    }
+
+    .feat-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65;
+      margin: 0
+    }
+
+    /* ── TABLE ── */
+    .tbl {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px
+    }
+
+    .tbl th {
+      background: var(--bg);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      padding: 11px 16px;
+      text-align: left;
+      border-bottom: 2px solid var(--border)
+    }
+
+    .tbl td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: #3d4a5c;
+      vertical-align: middle
+    }
+
+    .tbl tr:last-child td {
+      border-bottom: none
+    }
+
+    .tbl tr:hover td {
+      background: #fafbfd
+    }
+
+    /* ── TAGS ── */
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-family: var(--font)
+    }
+
+    .tag-blue {
+      background: var(--blue-l);
+      color: var(--blue)
+    }
+
+    .tag-green {
+      background: var(--green-l);
+      color: var(--green)
+    }
+
+    .tag-teal {
+      background: var(--teal-l);
+      color: var(--teal)
+    }
+
+    .tag-orange {
+      background: var(--orange-l);
+      color: var(--orange)
+    }
+
+    .tag-red {
+      background: var(--red-l);
+      color: var(--red)
+    }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 24px 0
+    }
+
+    .stat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px;
+      text-align: center
+    }
+
+    .stat-val {
+      font-family: var(--font);
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -.02em;
+      line-height: 1;
+      margin-bottom: 6px
+    }
+
+    .stat-lbl {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      font-family: var(--font)
+    }
+
+    /* ── NEWS CARDS ── */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin: 20px 0
+    }
+
+    .news-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      overflow: hidden;
+      transition: all .25s;
+      cursor: pointer
+    }
+
+    .news-card:hover {
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .1);
+      transform: translateY(-3px);
+      border-color: var(--blue)
+    }
+
+    .news-img {
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .news-body {
+      padding: 18px 20px
+    }
+
+    .news-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px
+    }
+
+    .news-date {
+      font-size: 12px;
+      color: var(--dim)
+    }
+
+    .news-title {
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      color: var(--text)
+    }
+
+    .news-excerpt {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65
+    }
+
+    /* ── GUIDE CARDS ── */
+    .guide-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 20px 0
+    }
+
+    .guide-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .guide-item:hover {
+      border-color: var(--blue);
+      box-shadow: 0 4px 20px rgba(26, 107, 255, .1);
+      transform: translateX(4px)
+    }
+
+    .guide-num {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--blue-l);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--blue);
+      flex-shrink: 0
+    }
+
+    .guide-info {
+      flex: 1
+    }
+
+    .guide-title {
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3px
+    }
+
+    .guide-desc {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .guide-arr {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .2s
+    }
+
+    .guide-item:hover .guide-arr {
+      background: var(--blue);
+      border-color: var(--blue)
+    }
+
+    .guide-item:hover .guide-arr svg {
+      stroke: #fff
+    }
+
+    /* ── CALENDAR ── */
+    .cal-filter {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px
+    }
+
+    .fil-btn {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 16px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .fil-btn.on,
+    .fil-btn:hover {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff
+    }
+
+    .cal-row {
+      display: grid;
+      grid-template-columns: 100px 1fr 90px 90px 90px 70px;
+      gap: 12px;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      font-size: 13px
+    }
+
+    .cal-head {
+      background: var(--bg);
+      border-radius: 10px 10px 0 0;
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted)
+    }
+
+    .cal-row:last-child {
+      border-bottom: none
+    }
+
+    .cal-row:not(.cal-head):hover {
+      background: #fafbfd
+    }
+
+    .impact-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block
+    }
+
+    .imp-h {
+      background: #dc2626
+    }
+
+    .imp-m {
+      background: #f59e0b
+    }
+
+    .imp-l {
+      background: #16a34a
+    }
+
+    .cal-time {
+      color: var(--muted)
+    }
+
+    .cal-event {
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .cal-country {
+      font-weight: 700;
+      font-family: var(--font)
+    }
+
+    .cal-val {
+      font-family: 'Courier New', monospace;
+      font-size: 12px
+    }
+
+    .cal-actual.up {
+      color: var(--green);
+      font-weight: 700
+    }
+
+    .cal-actual.dn {
+      color: var(--red);
+      font-weight: 700
+    }
+
+    /* ── AFFILIATE ── */
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 20px 0
+    }
+
+    .tier-card {
+      border: 2px solid var(--border);
+      border-radius: var(--rl);
+      padding: 24px;
+      position: relative;
+      transition: all .25s
+    }
+
+    .tier-card:hover {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .09);
+      transform: translateY(-3px)
+    }
+
+    .tier-card.featured {
+      border-color: var(--blue);
+      box-shadow: 0 8px 32px rgba(26, 107, 255, .15)
+    }
+
+    .tier-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--blue);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 50px;
+      letter-spacing: .08em;
+      white-space: nowrap
+    }
+
+    .tier-name {
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 6px
+    }
+
+    .tier-rate {
+      font-family: var(--font);
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--blue);
+      letter-spacing: -.02em;
+      line-height: 1;
+      margin-bottom: 4px
+    }
+
+    .tier-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 18px
+    }
+
+    .tier-feats {
+      list-style: none;
+      padding: 0
+    }
+
+    .tier-feats li {
+      font-size: 13px;
+      color: #3d4a5c;
+      padding: 5px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .tier-feats li::before {
+      content: '✓';
+      color: var(--blue);
+      font-weight: 700;
+      flex-shrink: 0
+    }
+
+    /* ── STATUS ── */
+    .status-header {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px
+    }
+
+    .status-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .dot-green {
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(22, 163, 74, .15)
+    }
+
+    .dot-orange {
+      background: var(--orange);
+      box-shadow: 0 0 0 4px rgba(245, 158, 11, .15)
+    }
+
+    .dot-red {
+      background: var(--red);
+      box-shadow: 0 0 0 4px rgba(220, 38, 38, .12)
+    }
+
+    .status-txt h3 {
+      font-family: var(--font);
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 3px
+    }
+
+    .status-txt p {
+      font-size: 14px;
+      color: var(--muted)
+    }
+
+    .comp-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 12px
+    }
+
+    .comp-row:last-child {
+      border-bottom: none
+    }
+
+    .comp-name {
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700
+    }
+
+    .comp-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px
+    }
+
+    .comp-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: var(--font)
+    }
+
+    .comp-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      overflow: hidden;
+      margin-top: 8px
+    }
+
+    .comp-fill {
+      height: 100%;
+      border-radius: 3px
+    }
+
+    .uptime-grid {
+      display: grid;
+      grid-template-columns: repeat(90, 1fr);
+      gap: 2px;
+      margin: 10px 0
+    }
+
+    .uptime-bar {
+      height: 28px;
+      border-radius: 2px
+    }
+
+    .incident-card {
+      background: var(--orange-l);
+      border: 1px solid rgba(245, 158, 11, .25);
+      border-radius: var(--r);
+      padding: 16px 20px;
+      margin-bottom: 12px
+    }
+
+    .incident-card.resolved {
+      background: var(--green-l);
+      border-color: rgba(22, 163, 74, .2)
+    }
+
+    .incident-title {
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px
+    }
+
+    .incident-time {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .incident-body {
+      font-size: 13px;
+      color: #3d4a5c;
+      margin-top: 8px;
+      line-height: 1.65
+    }
+
+    /* ── FORM ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    .fg {
+      display: flex;
+      flex-direction: column;
+      gap: 6px
+    }
+
+    .fg.full {
+      grid-column: 1/-1
+    }
+
+    .fl {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-family: var(--font)
+    }
+
+    .fi,
+    .fs,
+    .fta {
+      padding: 12px 16px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      font-family: var(--body);
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      width: 100%
+    }
+
+    .fi:focus,
+    .fs:focus,
+    .fta:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26, 107, 255, .1)
+    }
+
+    .fta {
+      min-height: 110px;
+      resize: vertical
+    }
+
+    .btn-sub {
+      width: 100%;
+      padding: 14px;
+      background: var(--blue);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: var(--r);
+      border: none;
+      box-shadow: 0 4px 16px rgba(26, 107, 255, .35);
+      cursor: pointer;
+      transition: all .22s;
+      margin-top: 8px
+    }
+
+    .btn-sub:hover {
+      background: var(--blue-d);
+      transform: translateY(-1px)
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: #fff;
+      border-top: 1px solid var(--border);
+      padding: 56px 0 28px
+    }
+
+    .foot-g {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 40px
+    }
+
+    .fb p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 12px;
+      line-height: 1.75;
+      max-width: 240px
+    }
+
+    .fc h4 {
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 15px
+    }
+
+    .fc li {
+      margin-bottom: 10px
+    }
+
+    .fc a {
+      font-size: 13px;
+      color: var(--muted);
+      transition: color .2s
+    }
+
+    .fc a:hover {
+      color: var(--blue)
+    }
+
+    .fbot {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--dim)
+    }
+
+    /* ── REVEAL ── */
+    .rev {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .55s ease, transform .55s ease
+    }
+
+    .rev.in {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    .d1 {
+      transition-delay: .08s
+    }
+
+    .d2 {
+      transition-delay: .16s
+    }
+
+    .d3 {
+      transition-delay: .24s
+    }
+
+    .d4 {
+      transition-delay: .32s
+    }
+
+    @media(max-width:1000px) {
+      .two-col {
+        grid-template-columns: 1fr
+      }
+
+      .sticky-side {
+        position: static
+      }
+    }
+
+    @media(max-width:900px) {
+
+      .feat-grid,
+      .feat-grid-3,
+      .tier-grid {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .stats-row {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .news-grid {
+        grid-template-columns: 1fr
+      }
+
+      .foot-g {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .cal-row {
+        grid-template-columns: 80px 1fr 60px 60px 60px 50px;
+        gap: 6px;
+        font-size: 12px
+      }
+    }
+
+    @media(max-width:768px) {
+
+      .nav-links,
+      .btn-ghost-nav,
+      .btn-nav-solid {
+        display: none !important
+      }
+
+      .hbg {
+        display: flex !important
+      }
+
+      .wrap {
+        padding: 0 20px
+      }
+
+      .nav-inner {
+        padding: 0 20px
+      }
+
+      .hero {
+        padding: 52px 20px 60px
+      }
+
+      .main-section {
+        padding: 48px 0 72px
+      }
+
+      .card-pad {
+        padding: 22px 18px
+      }
+
+      .foot-g {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px
+      }
+
+      .fbot {
+        flex-direction: column;
+        gap: 6px;
+        text-align: center
+      }
+
+      .cal-row {
+        grid-template-columns: 70px 1fr 55px 55px;
+        gap: 4px
+      }
+
+      .cal-row>*:nth-child(5),
+      .cal-row>*:nth-child(6) {
+        display: none
+      }
+    }
+
+    @media(max-width:540px) {
+
+      .feat-grid,
+      .feat-grid-3,
+      .tier-grid,
+      .form-grid {
+        grid-template-columns: 1fr
+      }
+
+      .foot-g {
+        grid-template-columns: 1fr
+      }
+
+      .stats-row {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .hero-ctas {
+        flex-direction: column;
+        align-items: center
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="logo-icon"><svg width="20" height="20" viewBox="0 0 44 44" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 3L39 12.5V31.5L22 41L5 31.5V12.5L22 3Z" stroke="white" stroke-width="3.2"
+              stroke-linejoin="round" fill="none" />
+            <path
+              d="M30 16C30 16 25.5 14.5 21 16C16.5 17.5 15 20.5 18.5 22.5C22 24.5 28 23 29.5 25.5C31 28 28 29.5 22 29.5"
+              stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+          </svg></div>Crypto Nova
+      </a>
+      <div class="nav-links">
+        <a href="market.html">Markets</a>
+        <a href="services.html">Services</a>
+        <a href="investment.html">Plans</a>
+        <a href="about.html">Company</a>
+      </div>
+      <div class="nav-right">
+        <button class="btn-ghost-nav" onclick="window.location.href='login.html'">Log In</button>
+        <button class="btn-nav-solid" onclick="window.location.href='userdashboard.html'">Start Trading</button>
+        <button class="hbg" id="hbtn" onclick="toggleMM()"
+          aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="mm" id="mm">
+    <a href="market.html">Markets</a><a href="services.html">Services</a>
+    <a href="investment.html">Plans</a><a href="About.html">Company</a>
+    <div class="mm-div"></div>
+    <button class="mm-cta" onclick="window.location.href='userdashboard.html'">Start Trading</button>
+  </div>
+
+  <section class="hero">
+    <div class="hero-in">
+      <div class="eyebrow">🤝 Partner With Us</div>
+      <h1>Affiliate Program</h1>
+      <p class="hero-sub">Earn up to 40% lifetime revenue share on every trader you refer. No caps, no expiry.</p>
+    </div>
+  </section>
+
+  <div class="breadcrumb">
+    <div class="bc-inner">
+      <a href="index.html">Home</a><span class="bc-sep">›</span>
+      <span style="color:var(--blue)">Affiliate Program</span>
+    </div>
+  </div>
+
+  <section class="main-section">
+    <div class="wrap">
+      <div class="two-col">
+        <div class="sticky-side rev">
+          <div class="sidebar-label">Quick Links</div>
+          <div class="sidebar-box">
+            <a href="#how" class="slink on">How It Works</a>
+            <a href="#tiers" class="slink">Commission Tiers</a>
+            <a href="#tools" class="slink">Marketing Tools</a>
+            <a href="#payouts" class="slink">Payouts</a>
+            <a href="#apply" class="slink">Apply Now</a>
+          </div>
+          <div
+            style="margin-top:16px;background:linear-gradient(135deg,#0d1421,#1a2a4a);border-radius:var(--rl);padding:22px;color:#fff;text-align:center">
+            <div style="font-size:32px;margin-bottom:10px">💰</div>
+            <div style="font-family:var(--font);font-size:15px;font-weight:800;margin-bottom:6px">Earn up to 40%</div>
+            <p style="font-size:13px;opacity:.75;line-height:1.6;margin-bottom:16px">Per referred trader, for life.</p>
+            <button onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})"
+              style="width:100%;padding:10px;background:var(--teal);color:#fff;border:none;font-family:var(--font);font-size:13px;font-weight:700;border-radius:var(--r);cursor:pointer">Apply
+              Now</button>
+          </div>
+        </div>
+
+        <div style="min-width:0">
+          <div class="card card-pad">
+
+            <div class="sec" id="how">
+              <h2 class="sh">Turn Your Audience Into Income</h2>
+              <p class="body">The Crypto Nova Affiliate Program pays you a lifetime revenue share on every trader you
+                refer. No caps, no expiry — as long as your referral trades, you earn.</p>
+              <div class="stats-row">
+                <div class="stat-card rev d1">
+                  <div class="stat-val">40%</div>
+                  <div class="stat-lbl">Max Commission Rate</div>
+                </div>
+                <div class="stat-card rev d2">
+                  <div class="stat-val">Lifetime</div>
+                  <div class="stat-lbl">Revenue Share</div>
+                </div>
+                <div class="stat-card rev d3">
+                  <div class="stat-val">$1.2M</div>
+                  <div class="stat-lbl">Paid Out in 2024</div>
+                </div>
+                <div class="stat-card rev d4">
+                  <div class="stat-val">3,800+</div>
+                  <div class="stat-lbl">Active Partners</div>
+                </div>
+              </div>
+              <div class="feat-grid-3" style="margin-top:20px">
+                <div class="feat-card rev d1">
+                  <div class="feat-icon" style="background:#e8f0ff">🔗</div>
+                  <h4>Get Your Link</h4>
+                  <p>Unique tracking link generated instantly after approval. Sub-IDs for multi-channel tracking.</p>
+                </div>
+                <div class="feat-card rev d2">
+                  <div class="feat-icon" style="background:rgba(13,184,158,.1)">📣</div>
+                  <h4>Refer Traders</h4>
+                  <p>Share via blog, YouTube, social media, email newsletter, or any channel you choose.</p>
+                </div>
+                <div class="feat-card rev d3">
+                  <div class="feat-icon" style="background:rgba(22,163,74,.1)">💸</div>
+                  <h4>Earn for Life</h4>
+                  <p>Commissions are credited daily. Withdraw any time with no minimum threshold.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="sec" id="tiers">
+              <h2 class="sh">Commission Tiers</h2>
+              <p class="body">Your commission rate increases as your referred traders grow. Tiers are evaluated monthly
+                and upgraded automatically.</p>
+              <div class="tier-grid">
+                <div class="tier-card">
+                  <div class="tier-name">Starter</div>
+                  <div class="tier-rate">20%</div>
+                  <div class="tier-sub">Revenue share per referred trader</div>
+                  <ul class="tier-feats">
+                    <li>0–25 active referrals</li>
+                    <li>Monthly payouts</li>
+                    <li>Standard tracking dashboard</li>
+                    <li>Email support</li>
+                  </ul>
+                </div>
+                <div class="tier-card featured">
+                  <div class="tier-badge">MOST POPULAR</div>
+                  <div class="tier-name">Pro Partner</div>
+                  <div class="tier-rate">30%</div>
+                  <div class="tier-sub">Revenue share per referred trader</div>
+                  <ul class="tier-feats">
+                    <li>26–100 active referrals</li>
+                    <li>Weekly payouts</li>
+                    <li>Advanced analytics suite</li>
+                    <li>Dedicated affiliate manager</li>
+                    <li>Co-branded landing pages</li>
+                  </ul>
+                </div>
+                <div class="tier-card">
+                  <div class="tier-name">Elite</div>
+                  <div class="tier-rate">40%</div>
+                  <div class="tier-sub">Revenue share per referred trader</div>
+                  <ul class="tier-feats">
+                    <li>100+ active referrals</li>
+                    <li>Daily payouts</li>
+                    <li>Custom commission structures</li>
+                    <li>Priority support line</li>
+                    <li>Exclusive promotional access</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="sec" id="tools">
+              <h2 class="sh">Marketing Tools Included</h2>
+              <div class="feat-grid">
+                <div class="feat-card rev d1">
+                  <div class="feat-icon" style="background:#e8f0ff">🖼️</div>
+                  <h4>Banner Library</h4>
+                  <p>200+ display ad banners in all standard sizes, updated monthly with new creative.</p>
+                </div>
+                <div class="feat-card rev d2">
+                  <div class="feat-icon" style="background:rgba(13,184,158,.1)">🔗</div>
+                  <h4>Deep Linking</h4>
+                  <p>Link to any page on Crypto Nova with full attribution — landing page, specific plan, or product.
+                  </p>
+                </div>
+                <div class="feat-card rev d3">
+                  <div class="feat-icon" style="background:rgba(22,163,74,.1)">📊</div>
+                  <h4>Real-Time Reporting</h4>
+                  <p>Live dashboard showing clicks, registrations, deposits, and commissions by date and sub-ID.</p>
+                </div>
+                <div class="feat-card rev d4">
+                  <div class="feat-icon" style="background:rgba(245,158,11,.1)">🎯</div>
+                  <h4>Custom Landing Pages</h4>
+                  <p>We build custom co-branded landing pages for Pro and Elite partners at no extra cost.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="sec" id="payouts">
+              <h2 class="sh">Payout Details</h2>
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Tier</th>
+                    <th>Payout Frequency</th>
+                    <th>Min. Payout</th>
+                    <th>Methods</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Starter</td>
+                    <td>Monthly (1st of month)</td>
+                    <td>$50</td>
+                    <td>Bank transfer, USDT, BTC</td>
+                  </tr>
+                  <tr>
+                    <td>Pro Partner</td>
+                    <td>Weekly (every Monday)</td>
+                    <td>$25</td>
+                    <td>Bank transfer, USDT, BTC, ETH</td>
+                  </tr>
+                  <tr>
+                    <td>Elite</td>
+                    <td>Daily</td>
+                    <td>$10</td>
+                    <td>All methods + dedicated wire</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="box box-green"><strong>Cookie Duration:</strong> 90-day attribution window. If a user you
+                referred signs up within 90 days of clicking your link, you earn commission on all their activity —
+                forever.</div>
+            </div>
+
+            <div class="sec" id="apply">
+              <h2 class="sh">Apply to Join</h2>
+              <p class="body">Applications are reviewed within 24 hours. We welcome affiliates of all sizes — bloggers,
+                YouTubers, Telegram community owners, trading educators, and media companies.</p>
+              <div class="form-grid" style="margin-top:20px">
+                <div class="fg"><label class="fl">Full Name</label><input class="fi" type="text"
+                    placeholder="Jane Smith"></div>
+                <div class="fg"><label class="fl">Email Address</label><input class="fi" type="email"
+                    placeholder="jane@yoursite.com"></div>
+                <div class="fg"><label class="fl">Website / Channel URL</label><input class="fi" type="url"
+                    placeholder="https://yoursite.com"></div>
+                <div class="fg"><label class="fl">Monthly Audience Size</label><select class="fs">
+                    <option>Under 1,000</option>
+                    <option>1,000–10,000</option>
+                    <option>10,000–50,000</option>
+                    <option>50,000–200,000</option>
+                    <option>200,000+</option>
+                  </select></div>
+                <div class="fg full"><label class="fl">Primary Promotion Channel</label><select class="fs">
+                    <option>Blog / Website</option>
+                    <option>YouTube</option>
+                    <option>Telegram / Discord</option>
+                    <option>Twitter / X</option>
+                    <option>Email Newsletter</option>
+                    <option>Paid Advertising</option>
+                    <option>Other</option>
+                  </select></div>
+                <div class="fg full"><label class="fl">Tell us about your audience</label><textarea class="fta"
+                    placeholder="Describe your audience, content focus, and how you plan to promote Crypto Nova..."></textarea>
+                </div>
+              </div>
+              <button class="btn-sub"
+                onclick="this.textContent='Application Submitted ✓';this.style.background='#16a34a';setTimeout(()=>{this.textContent='Submit Application';this.style.background='';},3000)">Submit
+                Application</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="foot-g">
+        <div class="fb">
+          <a href="index.html" class="nav-logo">
+            <div class="logo-icon"><svg width="20" height="20" viewBox="0 0 44 44" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 3L39 12.5V31.5L22 41L5 31.5V12.5L22 3Z" stroke="white" stroke-width="3.2"
+                  stroke-linejoin="round" fill="none" />
+                <path
+                  d="M30 16C30 16 25.5 14.5 21 16C16.5 17.5 15 20.5 18.5 22.5C22 24.5 28 23 29.5 25.5C31 28 28 29.5 22 29.5"
+                  stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+              </svg></div>Crypto Nova
+          </a>
+          <p>Crypto Nova is a globally regulated financial technology company providing premium access to Forex, Crypto,
+            and Managed Investment Portfolios.</p>
+        </div>
+        <div class="fc">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="forex.html">Forex Trading</a></li>
+            <li><a href="crpto.html">Crypto Spot</a></li>
+            <li><a href="cloud.html">Cloud Mining</a></li>
+            <li><a href="investment.html">Investment Plans</a></li>
+            <li><a href="managedport.html">Managed Portfolios</a></li>
+          </ul>
+        </div>
+        <div class="fc">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="marketnews.html">Market News</a></li>
+            <li><a href="tradingGuides.html">Trading Guides</a></li>
+            <li><a href="Economicca.html">Economic Calendar</a></li>
+            <li><a href="Affiliate.html">Affiliate Program</a></li>
+            <li><a href="systems.html">System Status</a></li>
+          </ul>
+        </div>
+        <div class="fc">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="Terms.html">Terms of Service</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="Risk.html">Risk Disclosure</a></li>
+            <li><a href="Aml.html">AML Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="fbot"><span>© 2025 Crypto Nova Global. All rights reserved.</span><span>Trading involves risk. Please
+          trade responsibly.</span></div>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', function () { document.getElementById('navbar').classList.toggle('sc', scrollY > 40); }, { passive: true });
+    function toggleMM() { var b = document.getElementById('hbtn'), m = document.getElementById('mm'); var o = m.classList.toggle('open'); b.classList.toggle('open', o); document.body.style.overflow = o ? 'hidden' : ''; }
+    window.addEventListener('resize', function () { if (window.innerWidth > 768) { var m = document.getElementById('mm'), b = document.getElementById('hbtn'); if (m) { m.classList.remove('open'); document.body.style.overflow = ''; } if (b) b.classList.remove('open'); } });
+    (function () { var o = new IntersectionObserver(function (e) { e.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); o.unobserve(x.target); } }); }, { threshold: 0.1 }); document.querySelectorAll('.rev').forEach(function (el) { o.observe(el); }); })();
+
+  </script>
+</body>
+
+</html>

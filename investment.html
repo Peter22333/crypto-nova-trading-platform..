@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Nova — Investment Plans</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        :root {
+            --blue: #1a6bff;
+            --blue-d: #1254d4;
+            --blue-l: #e8f0ff;
+            --blue-s: rgba(26, 107, 255, .09);
+            --bg: #f2f4f7;
+            --white: #fff;
+            --text: #0d1421;
+            --muted: #6b7a99;
+            --dim: #9ba8c0;
+            --border: #e2e6ef;
+            --green: #16a34a;
+            --font: 'Sora', sans-serif;
+            --body: 'DM Sans', sans-serif;
+            --r: 12px;
+            --rl: 18px;
+        }
+
+        body {
+            font-family: var(--body);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--blue);
+            border-radius: 3px
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none
+        }
+
+        ul {
+            list-style: none
+        }
+
+        button {
+            cursor: pointer;
+            font-family: inherit
+        }
+
+        .wrap {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 40px
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, .96);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            backdrop-filter: blur(14px);
+            transition: box-shadow .3s
+        }
+
+        .navbar.sc {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .08)
+        }
+
+        .nav-inner {
+            max-width: 1140px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            height: 62px;
+            padding: 0 40px;
+            position: relative
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-family: var(--font);
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text);
+            flex-shrink: 0
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--blue);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 4px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%)
+        }
+
+        .nav-links a {
+            padding: 6px 15px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--muted);
+            border-radius: 8px;
+            transition: color .2s, background .2s;
+            font-family: var(--font)
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+            background: var(--bg)
+        }
+
+        .nav-links a.active {
+            color: var(--text);
+            font-weight: 700
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            flex-shrink: 0
+        }
+
+        .btn-ghost-nav {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 14px;
+            font-family: var(--font);
+            transition: color .2s
+        }
+
+        .btn-ghost-nav:hover {
+            color: var(--text)
+        }
+
+        .btn-nav-solid {
+            background: var(--blue);
+            color: #fff;
+            font-family: var(--font);
+            font-size: 14px;
+            font-weight: 700;
+            padding: 9px 22px;
+            border-radius: var(--r);
+            border: none;
+            box-shadow: 0 3px 12px rgba(26, 107, 255, .3);
+            transition: all .22s
+        }
+
+        .btn-nav-solid:hover {
+            background: var(--blue-d);
+            transform: translateY(-1px)
+        }
+
+        .hbg {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            width: 38px;
+            height: 38px;
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 7px;
+            transition: border-color .2s;
+            flex-shrink: 0
+        }
+
+        .hbg span {
+            display: block;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: transform .3s, opacity .25s
+        }
+
+        .hbg.open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg)
+        }
+
+        .hbg.open span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0)
+        }
+
+        .hbg.open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg)
+        }
+
+        .mm {
+            display: none;
+            position: fixed;
+            top: 62px;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, .98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px 24px;
+            z-index: 190;
+            flex-direction: column;
+            gap: 3px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, .1);
+            animation: mmIn .25s ease
+        }
+
+        .mm.open {
+            display: flex
+        }
+
+        @keyframes mmIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .mm a {
+            display: block;
+            padding: 11px 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--muted);
+            border-radius: 10px;
+            font-family: var(--font);
+            transition: background .2s, color .2s
+        }
+
+        .mm a:hover {
+            background: var(--bg);
+            color: var(--text)
+        }
+
+        .mm a.active {
+            color: var(--blue)
+        }
+
+        .mm-div {
+            height: 1px;
+            background: var(--border);
+            margin: 8px 0
+        }
+
+        .mm-cta {
+            display: block;
+            width: 100%;
+            padding: 13px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--blue);
+            border-radius: 10px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font);
+            box-shadow: 0 4px 14px rgba(26, 107, 255, .3);
+            margin-top: 4px
+        }
+
+        .hero {
+            padding: 72px 40px 80px;
+            text-align: center;
+            background: var(--bg);
+            position: relative;
+            overflow: hidden
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(26, 107, 255, .06), transparent 70%);
+            pointer-events: none
+        }
+
+        .hero-in {
+            position: relative;
+            z-index: 2;
+            max-width: 620px;
+            margin: 0 auto
+        }
+
+        .eyebrow {
+            display: inline-block;
+            background: #fff;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 16px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .06)
+        }
+
+        .hero h1 {
+            font-family: var(--font);
+            font-size: clamp(32px, 6vw, 62px);
+            font-weight: 900;
+            color: var(--text);
+            letter-spacing: -.04em;
+            line-height: 1.05;
+            margin-bottom: 18px
+        }
+
+        .hero-sub {
+            font-size: 16px;
+            color: var(--muted);
+            line-height: 1.75;
+            max-width: 500px;
+            margin: 0 auto
+        }
+
+        .calc-section {
+            background: var(--bg);
+            padding: 80px 0
+        }
+
+        .sec-hd {
+            text-align: center;
+            margin-bottom: 44px
+        }
+
+        .sec-title {
+            font-family: var(--font);
+            font-size: clamp(22px, 3.5vw, 34px);
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -.03em;
+            margin-bottom: 10px
+        }
+
+        .sec-sub {
+            font-size: 15px;
+            color: var(--muted);
+            max-width: 440px;
+            margin: 0 auto;
+            line-height: 1.7
+        }
+
+        .calc-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--rl);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .07);
+            padding: 36px;
+            max-width: 780px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            align-items: center
+        }
+
+        .calc-field {
+            margin-bottom: 22px
+        }
+
+        .calc-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: 8px;
+            font-family: var(--font)
+        }
+
+        .calc-select,
+        .calc-input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 15px;
+            font-family: var(--font);
+            font-weight: 600;
+            color: var(--text);
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-radius: var(--r);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            appearance: none;
+            -webkit-appearance: none
+        }
+
+        .calc-select:focus,
+        .calc-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(26, 107, 255, .1)
+        }
+
+        .select-wrap {
+            position: relative
+        }
+
+        .select-wrap::after {
+            content: '▾';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 12px;
+            pointer-events: none
+        }
+
+        .calc-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center
+        }
+
+        .calc-input-wrap span {
+            position: absolute;
+            left: 14px;
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--muted)
+        }
+
+        .calc-input {
+            padding-left: 28px
+        }
+
+        .dur-pills {
+            display: flex;
+            gap: 8px
+        }
+
+        .dur-pill {
+            flex: 1;
+            padding: 10px;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r);
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .dur-pill.active {
+            background: var(--blue-l);
+            border-color: rgba(26, 107, 255, .35);
+            color: var(--blue)
+        }
+
+        .dur-pill:hover:not(.active) {
+            border-color: var(--blue);
+            color: var(--blue)
+        }
+
+        .calc-result {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--rl);
+            padding: 28px 28px 24px
+        }
+
+        .result-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+            font-family: var(--font)
+        }
+
+        .result-profit {
+            font-family: var(--font);
+            font-size: clamp(26px, 4vw, 38px);
+            font-weight: 900;
+            color: var(--green);
+            letter-spacing: -1px;
+            margin-bottom: 24px;
+            line-height: 1
+        }
+
+        .result-divider {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 20px
+        }
+
+        .result-total-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+            font-family: var(--font)
+        }
+
+        .result-total {
+            font-family: var(--font);
+            font-size: clamp(28px, 4vw, 40px);
+            font-weight: 900;
+            color: var(--text);
+            letter-spacing: -1px;
+            margin-bottom: 28px;
+            line-height: 1
+        }
+
+        .invest-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--blue);
+            color: #fff;
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: var(--r);
+            border: none;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(26, 107, 255, .35);
+            transition: all .22s
+        }
+
+        .invest-btn:hover {
+            background: var(--blue-d);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(26, 107, 255, .4)
+        }
+
+        .plans-section {
+            background: #fff;
+            padding: 80px 0
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 52px
+        }
+
+        .plan-card {
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-radius: var(--rl);
+            padding: 32px 28px;
+            position: relative;
+            transition: all .3s
+        }
+
+        .plan-card:hover {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .1);
+            transform: translateY(-4px)
+        }
+
+        .plan-card.featured {
+            border: 2px solid var(--blue);
+            background: #fff;
+            box-shadow: 0 8px 40px rgba(26, 107, 255, .15);
+            transform: translateY(-6px)
+        }
+
+        .plan-card.featured:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 16px 52px rgba(26, 107, 255, .2)
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--blue);
+            color: #fff;
+            font-family: var(--font);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 50px;
+            letter-spacing: .08em;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(26, 107, 255, .35)
+        }
+
+        .plan-name {
+            font-family: var(--font);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 16px
+        }
+
+        .plan-min {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 24px
+        }
+
+        .plan-amount {
+            font-family: var(--font);
+            font-size: clamp(28px, 4vw, 38px);
+            font-weight: 900;
+            color: var(--text);
+            letter-spacing: -.02em;
+            line-height: 1
+        }
+
+        .plan-label {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .plan-rois {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .roi-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .roi-row:last-child {
+            border-bottom: none
+        }
+
+        .roi-label {
+            font-size: 14px;
+            color: var(--muted)
+        }
+
+        .roi-val {
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--green)
+        }
+
+        .plan-features {
+            margin-bottom: 28px
+        }
+
+        .plan-feat {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 0;
+            font-size: 14px;
+            color: var(--text)
+        }
+
+        .plan-feat::before {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background: var(--blue-l);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%231a6bff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 10px
+        }
+
+        .plan-btn {
+            display: block;
+            width: 100%;
+            padding: 13px;
+            border-radius: var(--r);
+            font-family: var(--font);
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: all .22s;
+            border: none
+        }
+
+        .plan-btn-outline {
+            background: none;
+            border: 1.5px solid var(--border);
+            color: var(--text)
+        }
+
+        .plan-btn-outline:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: var(--blue-l)
+        }
+
+        .plan-btn-solid {
+            background: var(--blue);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(26, 107, 255, .35)
+        }
+
+        .plan-btn-solid:hover {
+            background: var(--blue-d);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(26, 107, 255, .4)
+        }
+
+        .footer {
+            background: #fff;
+            border-top: 1px solid var(--border);
+            padding: 56px 0 28px
+        }
+
+        .fg {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 40px
+        }
+
+        .fb p {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 12px;
+            line-height: 1.75;
+            max-width: 240px
+        }
+
+        .fc h4 {
+            font-family: var(--font);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--text);
+            margin-bottom: 15px
+        }
+
+        .fc li {
+            margin-bottom: 10px
+        }
+
+        .fc a {
+            font-size: 13px;
+            color: var(--muted);
+            transition: color .2s
+        }
+
+        .fc a:hover {
+            color: var(--blue)
+        }
+
+        .fbot {
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--dim)
+        }
+
+        .rev {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity .6s ease, transform .6s ease
+        }
+
+        .rev.in {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .d1 {
+            transition-delay: .1s
+        }
+
+        .d2 {
+            transition-delay: .2s
+        }
+
+        .d3 {
+            transition-delay: .3s
+        }
+
+        @media(max-width:900px) {
+            .plans-grid {
+                grid-template-columns: 1fr;
+                max-width: 440px;
+                margin-left: auto;
+                margin-right: auto
+            }
+
+            .plan-card.featured {
+                transform: none
+            }
+
+            .plan-card.featured:hover {
+                transform: translateY(-4px)
+            }
+
+            .fg {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .calc-card {
+                grid-template-columns: 1fr;
+                max-width: 480px
+            }
+        }
+
+        @media(max-width:768px) {
+            .nav-links {
+                display: none !important
+            }
+
+            .btn-ghost-nav,
+            .btn-nav-solid {
+                display: none !important
+            }
+
+            .hbg {
+                display: flex !important
+            }
+
+            .wrap {
+                padding: 0 20px
+            }
+
+            .nav-inner {
+                padding: 0 20px
+            }
+
+            .hero {
+                padding: 56px 20px 64px
+            }
+
+            .hero h1 {
+                font-size: clamp(28px, 8vw, 40px)
+            }
+
+            .hero-sub {
+                font-size: 14px
+            }
+
+            .calc-section {
+                padding: 60px 0
+            }
+
+            .plans-section {
+                padding: 60px 0
+            }
+
+            .calc-card {
+                padding: 24px;
+                gap: 24px
+            }
+
+            .calc-result {
+                padding: 22px
+            }
+
+            .plans-grid {
+                max-width: 100%;
+                padding: 0 4px
+            }
+
+            .fg {
+                grid-template-columns: 1fr 1fr;
+                gap: 24px
+            }
+
+            .fbot {
+                flex-direction: column;
+                gap: 6px;
+                text-align: center
+            }
+
+            .plan-card.featured {
+                transform: none
+            }
+        }
+
+        @media(max-width:480px) {
+            .fg {
+                grid-template-columns: 1fr
+            }
+
+            .hero h1 {
+                font-size: clamp(26px, 9vw, 36px)
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-inner"><a href="index.html" class="nav-logo">
+                <div class="logo-icon" style="background:#16a34a;border-radius:9px"><svg width="16" height="16"
+                        viewBox="0 0 44 44" fill="none">
+                        <path d="M22 3L39 12.5V31.5L22 41L5 31.5V12.5L22 3Z" stroke="white" stroke-width="3.2"
+                            stroke-linejoin="round" fill="none" />
+                        <path
+                            d="M30 16C30 16 25.5 14.5 21 16C16.5 17.5 15 20.5 18.5 22.5C22 24.5 28 23 29.5 25.5C31 28 28 29.5 22 29.5"
+                            stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"
+                            fill="none" />
+                    </svg></div>Crypto Nova
+            </a>
+            <div class="nav-links"><a href="market.html">Markets</a><a href="services.html">Services</a><a
+                    href="investment.html" class="active">Investment Plans</a>
+                <div style="position:relative;display:inline-block"><a href="#"
+                        onclick="toggleDD(event,'cmenu')">Company &#9662;</a>
+                    <div id="cmenu"
+                        style="display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--border);border-radius:12px;padding:8px;min-width:180px;z-index:200;box-shadow:0 16px 48px rgba(0,0,0,.12)">
+                        <a href="about.html" class="dd-lnk">About Us</a><a href="security.html"
+                            class="dd-lnk">Security</a><a href="career.html" class="dd-lnk">Careers</a><a
+                            href="contact.html" class="dd-lnk">Contact</a>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-right"><button class="btn-ghost-nav" onclick="window.location.href='login.html'">Log
+                    In</button><button class="btn-nav-solid" onclick="window.location.href='signup.html'">Open
+                    Account</button><button class="hbg" id="hbtn" onclick="toggleMM()"
+                    aria-label="Menu"><span></span><span></span><span></span></button></div>
+        </div>
+    </nav>
+    <div class="mm" id="mm"><a href="market.html">Markets</a><a href="services.html">Services</a><a
+            href="investment.html">Investment Plans</a><a href="about.html">About Us</a><a
+            href="security.html">Security</a><a href="career.html">Careers</a><a href="contact.html">Contact</a>
+        <div class="mm-div"></div><button class="mm-cta" onclick="window.location.href='signup.html'">Open
+            Account</button>
+    </div>
+    <button class="mm-cta" onclick="window.location.href='userdashboard.html'">Go to Dashboard</button>
+    </div>
+
+    <section class="hero">
+        <div class="hero-in">
+            <div class="eyebrow">Wealth Management</div>
+            <h1>Investment Plans</h1>
+            <p class="hero-sub">Automate your returns with our managed portfolios designed for varying risk appetites.
+                Transparent pricing, no hidden fees.</p>
+        </div>
+    </section>
+
+    <section class="calc-section">
+        <div class="wrap">
+            <div class="sec-hd rev">
+                <h2 class="sec-title">Profit Calculator</h2>
+                <p class="sec-sub">Estimate your potential returns based on your selected plan and deposit amount.</p>
+            </div>
+            <div class="calc-card rev">
+                <div class="calc-inputs">
+                    <div class="calc-field">
+                        <label>Select Plan</label>
+                        <div class="select-wrap">
+                            <select class="calc-select" id="calc-plan" onchange="updateCalc()">
+                                <option value="5">Starter Plan (5% Daily)</option>
+                                <option value="8" selected>Pro Plan (8% Daily)</option>
+                                <option value="12">Premium Plan (12% Daily)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="calc-field">
+                        <label>Deposit Amount (USD)</label>
+                        <div class="calc-input-wrap">
+                            <span>$</span>
+                            <input class="calc-input" type="number" id="calc-amount" value="5000" min="100" step="100"
+                                oninput="updateCalc()">
+                        </div>
+                    </div>
+                    <div class="calc-field">
+                        <label>Duration</label>
+                        <div class="dur-pills">
+                            <button class="dur-pill active" data-mul="1" onclick="setDur(this)">Daily</button>
+                            <button class="dur-pill" data-mul="7" onclick="setDur(this)">Weekly</button>
+                            <button class="dur-pill" data-mul="30" onclick="setDur(this)">Monthly</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="calc-result">
+                    <div class="result-label">Estimated Profit</div>
+                    <div class="result-profit" id="calc-profit">+$400.00</div>
+                    <div class="result-divider"></div>
+                    <div class="result-total-label">Total Return</div>
+                    <div class="result-total" id="calc-total">$5,400.00</div>
+                    <button class="invest-btn" onclick="openInvestModalFromCalc()">Invest Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="plans-section">
+        <div class="wrap">
+            <div class="sec-hd rev">
+                <h2 class="sec-title">Choose Your Plan</h2>
+                <p class="sec-sub">Find the perfect strategy to achieve your financial goals with guaranteed daily
+                    accruals.</p>
+            </div>
+            <div class="plans-grid">
+
+                <div class="plan-card rev d1">
+                    <div class="plan-name">Starter</div>
+                    <div class="plan-min">
+                        <div class="plan-amount">$200</div>
+                        <div class="plan-label">Min. Deposit</div>
+                    </div>
+                    <div class="plan-rois">
+                        <div class="roi-row"><span class="roi-label">Daily ROI</span><span class="roi-val">10%</span>
+                        </div>
+                        <div class="roi-row"><span class="roi-label">Weekly ROI</span><span class="roi-val">35%</span>
+                        </div>
+                        <div class="roi-row"><span class="roi-label">Monthly ROI</span><span class="roi-val">150%</span>
+                        </div>
+                    </div>
+                    <div class="plan-features">
+                        <div class="plan-feat">Instant Withdrawals</div>
+                        <div class="plan-feat">7-Day Contract Duration</div>
+                        <div class="plan-feat">Standard Support</div>
+                    </div>
+                    <button class="plan-btn plan-btn-outline" onclick="openInvestModal('starter')">Select
+                        Starter</button>
+                </div>
+
+                <div class="plan-card featured rev d2">
+                    <div class="plan-badge">MOST POPULAR</div>
+                    <div class="plan-name">Pro</div>
+                    <div class="plan-min">
+                        <div class="plan-amount">$500</div>
+                        <div class="plan-label">Min. Deposit</div>
+                    </div>
+                    <div class="plan-rois">
+                        <div class="roi-row"><span class="roi-label">Daily ROI</span><span class="roi-val">10%</span>
+                        </div>
+                        <div class="roi-row"><span class="roi-label">Weekly ROI</span><span class="roi-val">56%</span>
+                        </div>
+                        <div class="roi-row"><span class="roi-label">Monthly ROI</span><span class="roi-val">240%</span>
+                        </div>
+                    </div>
+                    <div class="plan-features">
+                        <div class="plan-feat">Instant Withdrawals</div>
+                        <div class="plan-feat">14-Day Contract Duration</div>
+                        <div class="plan-feat">Priority 24/7 Support</div>
+                    </div>
+                    <button class="plan-btn plan-btn-solid" onclick="openInvestModal('pro')">Select Pro</button>
+                </div>
+
+                <div class="plan-card rev d3">
+                    <div class="plan-name">Premium</div>
+                    <div class="plan-min">
+                        <div class="plan-amount">$1,500</div>
+                        <div class="plan-label">Min. Deposit</div>
+                    </div>
+                    <div class="plan-rois">
+                        <div class="roi-row"><span class="roi-label">Daily ROI</span><span class="roi-val">15%</span>
+                        </div>
+                        <div class="roi-row"><span class="roi-label">Weekly ROI</span><span class="roi-val">104%</span>
+                        </div>
+                        <div class="roi-row"><span class="roi-label">Monthly ROI</span><span class="roi-val">360%</span>
+                        </div>
+                    </div>
+                    <div class="plan-features">
+                        <div class="plan-feat">Instant Withdrawals</div>
+                        <div class="plan-feat">30-Day Contract Duration</div>
+                        <div class="plan-feat">Dedicated Account Manager</div>
+                    </div>
+                    <button class="plan-btn plan-btn-outline" onclick="openInvestModal('premium')">Select
+                        Premium</button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="wrap">
+            <div class="fg">
+                <div class="fb"><a href="index.html" class="nav-logo">
+                        <div class="logo-icon" style="background:#16a34a;border-radius:9px"><svg width="16" height="16"
+                                viewBox="0 0 44 44" fill="none">
+                                <path d="M22 3L39 12.5V31.5L22 41L5 31.5V12.5L22 3Z" stroke="white" stroke-width="3.2"
+                                    stroke-linejoin="round" fill="none" />
+                                <path
+                                    d="M30 16C30 16 25.5 14.5 21 16C16.5 17.5 15 20.5 18.5 22.5C22 24.5 28 23 29.5 25.5C31 28 28 29.5 22 29.5"
+                                    stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"
+                                    fill="none" />
+                            </svg></div>Crypto Nova
+                    </a>
+                    <p>Crypto Nova is a globally regulated financial technology company providing premium access to
+                        Forex, Crypto, and Managed Investment Portfolios.</p>
+                </div>
+                <div class="fc">
+                    <h4>Products</h4>
+                    <ul>
+                        <li><a href="forex.html">Forex Trading</a></li>
+                        <li><a href="crpto.html">Cryptocurrency</a></li>
+                        <li><a href="cloud.html">Cloud Mining</a></li>
+                        <li><a href="investment.html">Investment Plans</a></li>
+                        <li><a href="managedport.html">Managed Portfolios</a></li>
+                    </ul>
+                </div>
+                <div class="fc">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="marketnews.html">Market News</a></li>
+                        <li><a href="tradingGuide.html">Trading Guides</a></li>
+                        <li><a href="EconomicCa.html">Economic Calendar</a></li>
+                        <li><a href="Affilate.html">Affiliate Program</a></li>
+                        <li><a href="systems.html">System Status</a></li>
+                    </ul>
+                </div>
+                <div class="fc">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="Terms.html">Terms of Service</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="Risk.html">Risk Disclosure</a></li>
+                        <li><a href="Aml.html">AML Policy</a></li>
+                        <li><a href="security.html">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="fbot"><span>&copy; 2025 Crypto Nova Trading Limited. All rights reserved.</span><span>Risk
+                    Warning: Trading involves significant risk of loss.</span></div>
+        </div>
+    </footer>
+
+    <script>
+        const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
+        const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxa3VibGV0Z2lmcWR1dHliem56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NjA5OTMsImV4cCI6MjA4ODQzNjk5M30.TkweXseKRQuA7FoT7erYdUJMuGtYWYSZ7b7l9WCPq-8';
+        const sb = {
+            _h() { return { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (sb._tok() || SUPA_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' }; },
+            _tok() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.access_token; } catch { return null; } },
+            _uid() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.user?.id; } catch { return null; } },
+            isLoggedIn() { return !!sb._tok(); },
+            requireAuth() { if (!sb.isLoggedIn()) { window.location.href = 'login.html'; return false; } return true; },
+            async get(table, filters = '') { const r = await fetch(SUPA_URL + '/rest/v1/' + table + (filters ? '?' + filters : ''), { headers: sb._h() }); return r.json(); },
+            async insert(table, body) { const r = await fetch(SUPA_URL + '/rest/v1/' + table, { method: 'POST', headers: sb._h(), body: JSON.stringify(body) }); return r.json(); },
+            async update(table, body, filters) { const r = await fetch(SUPA_URL + '/rest/v1/' + table + '?' + filters, { method: 'PATCH', headers: sb._h(), body: JSON.stringify(body) }); return r.json(); },
+            async getProfile() { const uid = sb._uid(); if (!uid) return null; const r = await sb.get('profiles', 'id=eq.' + uid + '&select=*'); return Array.isArray(r) ? r[0] : null; },
+            async updateBalance(newBal) { const uid = sb._uid(); if (!uid) return; return sb.update('profiles', { balance: newBal }, 'id=eq.' + uid); }
+        };
+        if (!sb.isLoggedIn()) { window.location.href = 'login.html'; }
+
+        async function saveInvestmentToDB(inv) {
+            const uid = sb._uid(); if (!uid) return;
+            await sb.insert('investments', {
+                id: inv.id, user_id: uid, plan: inv.plan, plan_name: inv.planName,
+                amount: inv.amount, daily_rate: inv.dailyRate, duration: inv.duration,
+                earned: 0, status: 'active', start_date: inv.startDate, end_date: inv.endDate,
+                start_ts: inv.startTs, end_ts: inv.endTs
+            });
+            await sb.insert('transactions', { user_id: uid, type: 'investment', asset: inv.planName + ' Plan', amount: '-$' + inv.amount.toFixed(2), status: 'active', ref: inv.id });
+            await sb.updateBalance(STATE.balance);
+        }
+
+        /* ── NAV ── */
+        window.addEventListener('scroll', function () { document.getElementById('navbar').classList.toggle('sc', scrollY > 40); }, { passive: true });
+        function toggleMM() {
+            var b = document.getElementById('hbtn'), m = document.getElementById('mm');
+            var o = m.classList.toggle('open'); b.classList.toggle('open', o); document.body.style.overflow = o ? 'hidden' : '';
+        }
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                var m = document.getElementById('mm'), b = document.getElementById('hbtn');
+                if (m) { m.classList.remove('open'); document.body.style.overflow = ''; }
+                if (b) b.classList.remove('open');
+            }
+        });
+
+        /* ── CALCULATOR ── */
+        var durMultiplier = 1;
+        function setDur(el) {
+            document.querySelectorAll('.dur-pill').forEach(function (p) { p.classList.remove('active'); });
+            el.classList.add('active'); durMultiplier = parseInt(el.dataset.mul); updateCalc();
+        }
+        function fmt(n) { return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+        function updateCalc() {
+            var rate = parseFloat(document.getElementById('calc-plan').value) / 100;
+            var amount = parseFloat(document.getElementById('calc-amount').value) || 0;
+            animateValue('calc-profit', amount * rate * durMultiplier, true);
+            animateValue('calc-total', amount + amount * rate * durMultiplier, false);
+        }
+        function animateValue(id, target, isProfit) {
+            var el = document.getElementById(id), startTime = null;
+            function step(ts) {
+                if (!startTime) startTime = ts;
+                var p = Math.min((ts - startTime) / 500, 1), ease = 1 - Math.pow(1 - p, 3);
+                el.textContent = (isProfit ? '+$' : '$') + fmt(target * ease);
+                if (p < 1) requestAnimationFrame(step); else el.textContent = (isProfit ? '+$' : '$') + fmt(target);
+            }
+            requestAnimationFrame(step);
+        }
+        updateCalc();
+
+        /* ── REVEAL ── */
+        (function () {
+            var o = new IntersectionObserver(function (entries) {
+                entries.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); o.unobserve(x.target); } });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.rev').forEach(function (el) { o.observe(el); });
+        })();
+
+        /* ═══════════════════════════════════════
+           SHARED STATE — balance always from Supabase
+        ═══════════════════════════════════════ */
+        var STATE = {};
+        try { STATE = JSON.parse(localStorage.getItem('at_state')) || {}; } catch (e) { }
+        if (!STATE.balance) STATE.balance = 0;
+        if (!STATE.transactions) STATE.transactions = [];
+        if (!STATE.investments) STATE.investments = [];
+        if (!STATE.miningContracts) STATE.miningContracts = [];
+
+        function saveState() {
+            try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { }
+            sb.updateBalance(STATE.balance).catch(function () { });
+        }
+
+        /* Load fresh balance + investments from Supabase on page load */
+        async function loadFromDB() {
+            try {
+                var profile = await sb.getProfile();
+                if (!profile) return;
+                /* Always use Supabase balance — never stale localStorage */
+                STATE.balance = parseFloat(profile.balance) || 0;
+                var uid = sb._uid();
+                var invs = await sb.get('investments', 'user_id=eq.' + uid + '&order=created_at.desc');
+                if (Array.isArray(invs) && invs.length) {
+                    STATE.investments = invs.map(function (i) {
+                        return {
+                            id: i.id, plan: i.plan, planName: i.plan_name,
+                            amount: parseFloat(i.amount), dailyRate: parseFloat(i.daily_rate),
+                            duration: i.duration, startDate: i.start_date, endDate: i.end_date,
+                            startTs: i.start_ts, endTs: i.end_ts,
+                            earned: parseFloat(i.earned) || 0, status: i.status
+                        };
+                    });
+                }
+                try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { }
+                /* Resume earnings for any active plans loaded from DB */
+                STATE.investments.forEach(function (inv) {
+                    if (inv.status === 'active' && Date.now() < inv.endTs) startEarnings(inv);
+                });
+            } catch (e) { console.warn('DB load error:', e); }
+        }
+        loadFromDB();
+
+        /* ── PLAN DEFINITIONS ── */
+        var PLANS = {
+            starter: { name: 'Starter', minDeposit: 200, dailyRate: 0.05, duration: 7 },
+            pro: { name: 'Pro', minDeposit: 500, dailyRate: 0.08, duration: 14 },
+            premium: { name: 'Premium', minDeposit: 1500, dailyRate: 0.12, duration: 30 }
+        };
+
+        /* ── MODAL STYLES ── */
+        (function () {
+            var s = document.createElement('style');
+            s.textContent =
+                '@keyframes atPop{from{transform:scale(.93) translateY(8px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}' +
+                '.at-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);backdrop-filter:blur(5px);z-index:2000;align-items:center;justify-content:center;padding:16px}' +
+                '.at-modal{background:#fff;border-radius:18px;padding:32px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:88vh;overflow-y:auto;animation:atPop .28s ease}' +
+                '.at-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #e2e6ef;font-size:13px}' +
+                '.at-row:last-child{border-bottom:none}';
+            document.head.appendChild(s);
+        })();
+
+        /* ── INJECT MODALS ── */
+        document.body.insertAdjacentHTML('beforeend',
+            /* Invest modal */
+            '<div id="at-ov" class="at-ov" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);backdrop-filter:blur(5px);z-index:2000;align-items:center;justify-content:center;padding:16px">' +
+            '<div class="at-modal">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">' +
+            '<div style="font-family:\'Sora\',sans-serif;font-size:19px;font-weight:800;color:#0d1421" id="at-title">Invest</div>' +
+            '<button onclick="document.getElementById(\'at-ov\').style.display=\'none\'" style="background:none;border:none;font-size:22px;color:#9ba8c0;cursor:pointer;line-height:1">&#10005;</button>' +
+            '</div>' +
+            '<div id="at-body"></div>' +
+            '</div>' +
+            '</div>' +
+            /* Success modal */
+            '<div id="at-sov" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);backdrop-filter:blur(5px);z-index:2001;align-items:center;justify-content:center;padding:16px">' +
+            '<div class="at-modal" style="text-align:center">' +
+            '<div style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#1a6bff,#0db89e);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 8px 28px rgba(26,107,255,.35)">' +
+            '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>' +
+            '</div>' +
+            '<div style="font-family:\'Sora\',sans-serif;font-size:22px;font-weight:900;margin-bottom:8px" id="at-st">Plan Activated!</div>' +
+            '<div style="font-size:14px;color:#6b7a99;line-height:1.75;margin-bottom:20px">Daily returns are being added to your balance automatically.</div>' +
+            '<div id="at-ss" style="background:#f2f4f7;border-radius:12px;padding:16px;margin-bottom:22px;text-align:left"></div>' +
+            '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
+            '<a href="userdashboard.html" style="display:inline-flex;align-items:center;gap:7px;background:#1a6bff;color:#fff;font-family:\'Sora\',sans-serif;font-size:14px;font-weight:700;padding:12px 24px;border-radius:10px;text-decoration:none;box-shadow:0 4px 14px rgba(26,107,255,.3)">View Dashboard</a>' +
+            '<button onclick="document.getElementById(\'at-sov\').style.display=\'none\'" style="font-family:\'Sora\',sans-serif;font-size:14px;font-weight:600;padding:12px 20px;border-radius:10px;border:1.5px solid #e2e6ef;background:#fff;color:#0d1421;cursor:pointer">Invest More</button>' +
+            '</div>' +
+            '</div>' +
+            '</div>'
+        );
+
+        /* ── OPEN FROM CALCULATOR ── */
+        function openInvestModalFromCalc() {
+            var rate = parseFloat(document.getElementById('calc-plan').value);
+            var amt = parseFloat(document.getElementById('calc-amount').value) || 0;
+            var key = rate === 5 ? 'starter' : rate === 8 ? 'pro' : 'premium';
+            openInvestModal(key, amt);
+        }
+
+        /* ── OPEN MODAL ── */
+        function openInvestModal(key, prefill) {
+            var plan = PLANS[key];
+            var f = function (n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+            document.getElementById('at-title').textContent = 'Invest in ' + plan.name + ' Plan';
+
+            var amt = prefill || 0;
+            var daily = amt * plan.dailyRate;
+
+            document.getElementById('at-body').innerHTML =
+                /* balance */
+                '<div style="background:#f2f4f7;border-radius:10px;padding:13px 16px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center">' +
+                '<div style="font-size:11px;color:#6b7a99;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-family:\'Sora\',sans-serif">Available Balance</div>' +
+                '<div style="font-family:\'Sora\',sans-serif;font-size:16px;font-weight:800;color:#0d1421">' + f(STATE.balance) + '</div>' +
+                '</div>' +
+                /* amount input */
+                '<div style="margin-bottom:16px">' +
+                '<div style="font-size:11px;font-weight:700;color:#6b7a99;text-transform:uppercase;letter-spacing:.09em;margin-bottom:7px;font-family:\'Sora\',sans-serif">Investment Amount (USD)</div>' +
+                '<div style="position:relative">' +
+                '<span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:\'Sora\',sans-serif;font-size:14px;font-weight:600;color:#9ba8c0">$</span>' +
+                '<input id="at-amt" type="number" placeholder="' + plan.minDeposit.toLocaleString() + '" value="' + (prefill || '') + '" min="' + plan.minDeposit + '" step="100"' +
+                ' style="width:100%;padding:13px 14px 13px 28px;background:#fff;border:2px solid #e2e6ef;border-radius:10px;font-family:\'Sora\',sans-serif;font-size:16px;font-weight:700;color:#0d1421;outline:none"' +
+                ' oninput="atPreview(\'' + key + '\')"' +
+                ' onfocus="this.style.borderColor=\'#1a6bff\';this.style.boxShadow=\'0 0 0 3px rgba(26,107,255,.1)\'"' +
+                ' onblur="this.style.borderColor=\'#e2e6ef\';this.style.boxShadow=\'none\'">' +
+                '</div>' +
+                '<div style="font-size:12px;color:#9ba8c0;margin-top:6px">Min: ' + f(plan.minDeposit) + ' · Duration: ' + plan.duration + ' days · Daily: ' + (plan.dailyRate * 100).toFixed(0) + '%</div>' +
+                '</div>' +
+                /* preview */
+                '<div style="background:linear-gradient(135deg,#1254d4,#1a6bff);border-radius:12px;padding:18px;color:#fff;margin-bottom:16px">' +
+                '<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.7;margin-bottom:10px;font-family:\'Sora\',sans-serif">Projected Returns</div>' +
+                '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">' +
+                '<div><div style="font-size:10px;opacity:.65;margin-bottom:3px">Daily</div><div style="font-family:\'Sora\',sans-serif;font-size:14px;font-weight:800" id="at-d">' + f(daily) + '</div></div>' +
+                '<div><div style="font-size:10px;opacity:.65;margin-bottom:3px">Weekly</div><div style="font-family:\'Sora\',sans-serif;font-size:14px;font-weight:800" id="at-w">' + f(daily * 7) + '</div></div>' +
+                '<div><div style="font-size:10px;opacity:.65;margin-bottom:3px">At Maturity</div><div style="font-family:\'Sora\',sans-serif;font-size:18px;font-weight:900" id="at-t">' + f(daily * plan.duration) + '</div></div>' +
+                '</div>' +
+                '</div>' +
+                /* error */
+                '<div id="at-err" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;margin-bottom:14px"></div>' +
+                /* info */
+                '<div style="background:rgba(26,107,255,.06);border:1px solid rgba(26,107,255,.15);border-radius:8px;padding:11px 14px;font-size:13px;color:#1254d4;margin-bottom:18px;line-height:1.6">' +
+                '💡 Funds are deducted from your balance. Daily returns added automatically for ' + plan.duration + ' days.' +
+                '</div>' +
+                /* button */
+                '<button id="at-btn" onclick="doInvest(\'' + key + '\')" style="width:100%;padding:14px;background:#1a6bff;color:#fff;font-family:\'Sora\',sans-serif;font-size:15px;font-weight:800;border-radius:10px;border:none;box-shadow:0 4px 14px rgba(26,107,255,.35);cursor:pointer">Activate ' + plan.name + ' Plan</button>';
+
+            document.getElementById('at-ov').style.display = 'flex';
+            if (prefill) atPreview(key);
+        }
+
+        function atPreview(key) {
+            var plan = PLANS[key], amt = parseFloat(document.getElementById('at-amt').value) || 0;
+            var f = function (n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+            document.getElementById('at-d').textContent = f(amt * plan.dailyRate);
+            document.getElementById('at-w').textContent = f(amt * plan.dailyRate * 7);
+            document.getElementById('at-t').textContent = f(amt * plan.dailyRate * plan.duration);
+        }
+
+        function doInvest(key) {
+            var plan = PLANS[key];
+            var amt = parseFloat(document.getElementById('at-amt').value) || 0;
+            var err = document.getElementById('at-err');
+            var btn = document.getElementById('at-btn');
+            err.style.display = 'none';
+
+            if (STATE.balance <= 0) {
+                err.style.display = 'block';
+                err.textContent = 'No balance available. Please deposit funds first.';
+                return;
+            }
+            if (amt < plan.minDeposit) {
+                err.style.display = 'block';
+                err.textContent = 'Minimum for ' + plan.name + ' plan is $' + plan.minDeposit.toLocaleString() + '.';
+                return;
+            }
+            if (amt > STATE.balance) {
+                err.style.display = 'block';
+                err.textContent = 'Insufficient balance ($' + STATE.balance.toFixed(2) + '). Deposit more funds first.';
+                return;
+            }
+
+            btn.disabled = true; btn.textContent = 'Activating…';
+
+            setTimeout(function () {
+                STATE.balance -= amt;
+                var now = new Date(), end = new Date(now.getTime() + plan.duration * 86400000);
+                var inv = {
+                    id: 'INV' + Date.now(), plan: key, planName: plan.name, amount: amt,
+                    dailyRate: plan.dailyRate, duration: plan.duration,
+                    startDate: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    endDate: end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    startTs: now.getTime(), endTs: end.getTime(), earned: 0, status: 'active'
+                };
+                STATE.investments.push(inv);
+                saveInvestmentToDB(inv).catch(() => { });
+                STATE.transactions.unshift({ id: inv.id, type: 'investment', asset: plan.name + ' Plan', amount: '-$' + amt.toFixed(2), date: inv.startDate, hash: inv.id, status: 'active' });
+                saveState();
+                document.getElementById('at-ov').style.display = 'none';
+
+                var f = function (n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+                document.getElementById('at-st').textContent = plan.name + ' Plan Activated! 🚀';
+                document.getElementById('at-ss').innerHTML =
+                    atRow('Plan', plan.name) + atRow('Invested', f(amt)) +
+                    atRow('Daily Return', '+' + f(amt * plan.dailyRate) + ' / day', '#16a34a') +
+                    atRow('Duration', plan.duration + ' days') +
+                    atRow('Total at Maturity', f(amt * plan.dailyRate * plan.duration), '#1a6bff') +
+                    atRow('Ends On', inv.endDate);
+                document.getElementById('at-sov').style.display = 'flex';
+                startEarnings(inv);
+            }, 700);
+        }
+
+        function atRow(k, v, col) {
+            return '<div class="at-row"><span style="color:#6b7a99">' + k + '</span><span style="font-weight:700;font-family:\'Sora\',sans-serif' + (col ? ';color:' + col : '') + '">' + v + '</span></div>';
+        }
+
+        /* ── EARNINGS TICKER — 30s = 1/2880 of daily ── */
+        function startEarnings(inv) {
+            var tick = (inv.amount * inv.dailyRate) / 2880;
+            var tid = setInterval(function () {
+                try { STATE = JSON.parse(localStorage.getItem('at_state') || '{}'); } catch (e) { }
+                if (!STATE.investments) { clearInterval(tid); return; }
+                var idx = STATE.investments.findIndex(function (i) { return i.id === inv.id; });
+                if (idx === -1 || STATE.investments[idx].status !== 'active') { clearInterval(tid); return; }
+                if (Date.now() >= STATE.investments[idx].endTs) {
+                    STATE.investments[idx].status = 'completed';
+                    saveState(); // syncs to Supabase
+                    // Update earned in DB
+                    sb.update('investments', { status: 'completed' }, 'id=eq.' + inv.id).catch(function () { });
+                    clearInterval(tid); return;
+                }
+                STATE.balance += tick;
+                STATE.investments[idx].earned = (STATE.investments[idx].earned || 0) + tick;
+                saveState(); // saves localStorage + syncs balance to Supabase
+                // Periodically update earned field in DB (every 10 ticks = ~5 min)
+                if (Math.random() < 0.1) {
+                    sb.update('investments', { earned: STATE.investments[idx].earned }, 'id=eq.' + inv.id).catch(function () { });
+                }
+            }, 30000);
+        }
+
+        /* Resume handled inside loadFromDB() above */
+    </script>
+</body>
+
+</html>

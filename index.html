@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Nova — Trade Crypto & Forex with Institutional Precision</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- TICKER -->
+    <div class="ticker">
+        <div class="ttrack" id="tt"></div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="nav" id="nav">
+        <div class="ni">
+            <a href="index.html" class="nlogo">
+                <div class="nicon">
+                    <svg width="20" height="20" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 3L39 12.5V31.5L22 41L5 31.5V12.5L22 3Z" stroke="white" stroke-width="3.2"
+                            stroke-linejoin="round" fill="none" />
+                        <path
+                            d="M30 16C30 16 25.5 14.5 21 16C16.5 17.5 15 20.5 18.5 22.5C22 24.5 28 23 29.5 25.5C31 28 28 29.5 22 29.5"
+                            stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"
+                            fill="none" />
+                    </svg>
+                </div>
+                Crypto Nova
+            </a>
+            <div class="nlinks">
+                <a href="market.html">Markets</a>
+                <a href="services.html">Services</a>
+                <div style="position:relative;display:inline-block" id="plans-dd">
+                    <a href="investment.html">Investment Plans</a>
+                </div>
+                <div style="position:relative;display:inline-block" id="company-dd">
+                    <a href="#" onclick="toggleDD(event,'company-menu')">Company ▾</a>
+                    <div id="company-menu"
+                        style="display:none;position:absolute;top:100%;left:0;background:#0b1e2d;border:1px solid rgba(0,229,195,.15);border-radius:12px;padding:8px;min-width:180px;z-index:200;box-shadow:0 16px 48px rgba(0,0,0,.4)">
+                        <a href="About.html"
+                            style="display:block;padding:9px 14px;color:#8ba8a0;font-size:14px;font-weight:600;border-radius:8px;text-decoration:none;transition:all .2s"
+                            onmouseover="this.style.color='#e8f4f0';this.style.background='rgba(255,255,255,.06)'"
+                            onmouseout="this.style.color='#8ba8a0';this.style.background='transparent'">About Us</a>
+                        <a href="security.html"
+                            style="display:block;padding:9px 14px;color:#8ba8a0;font-size:14px;font-weight:600;border-radius:8px;text-decoration:none;transition:all .2s"
+                            onmouseover="this.style.color='#e8f4f0';this.style.background='rgba(255,255,255,.06)'"
+                            onmouseout="this.style.color='#8ba8a0';this.style.background='transparent'">Security</a>
+                        <a href="career.html"
+                            style="display:block;padding:9px 14px;color:#8ba8a0;font-size:14px;font-weight:600;border-radius:8px;text-decoration:none;transition:all .2s"
+                            onmouseover="this.style.color='#e8f4f0';this.style.background='rgba(255,255,255,.06)'"
+                            onmouseout="this.style.color='#8ba8a0';this.style.background='transparent'">Careers</a>
+                        <a href="contact.html"
+                            style="display:block;padding:9px 14px;color:#8ba8a0;font-size:14px;font-weight:600;border-radius:8px;text-decoration:none;transition:all .2s"
+                            onmouseover="this.style.color='#e8f4f0';this.style.background='rgba(255,255,255,.06)'"
+                            onmouseout="this.style.color='#8ba8a0';this.style.background='transparent'">Contact</a>
+                    </div>
+                </div>
+            </div>
+            <div class="nr">
+                <a href="login.html"><button class="ng">Sign In</button></a>
+                <a href="signup.html" class="btn bp" style="padding:10px 20px;font-size:14px;">Open Account</a>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span class="hbar"></span><span class="hbar"></span><span class="hbar"></span>
+            </button>
+        </div>
+        <div class="mobile-menu" id="mobile-menu">
+            <div class="mobile-links">
+                <a href="market.html">Markets</a>
+                <a href="services.html">Services</a>
+                <a href="investment.html">Investment Plans</a>
+                <a href="about.html">About Us</a>
+                <a href="security.html">Security</a>
+                <a href="career.html">Careers</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="mobile-actions">
+                <a href="login.html"><button class="ng mobile-signin"
+                        style="width:100%;padding:13px;text-align:center">Sign In</button></a>
+                <a href="signup.html" class="btn bp"
+                    style="width:100%;justify-content:center;padding:13px 20px;font-size:15px;">Open Account</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hc">
+            <div class="hbadge rev">🔥 New: Crypto Staking Live</div>
+            <h1 class="rev">Trade Crypto &amp; Forex<br>with <span class="glow">Institutional</span><br>Precision</h1>
+            <p class="hsub rev">Experience lightning-fast execution, bank-grade security, and zero hidden fees. Access
+                global markets from one unified platform built for serious investors.</p>
+            <div class="hcta rev">
+                <a href="signup.html" class="btn bp" style="font-size:16px;padding:15px 34px;">
+                    Start Trading Now
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </a>
+                <a href="market.html" class="btn bo" style="font-size:16px;padding:15px 34px;">Explore Markets</a>
+            </div>
+            <div class="hpills rev">
+                <span class="hpill"><span class="pdot"></span>$0 Commission</span>
+                <span class="hpill"><span class="pdot"></span>24/7 Support</span>
+                <span class="hpill"><span class="pdot"></span>Instant Withdrawals</span>
+            </div>
+        </div>
+        <div class="chart-wrap rev">
+            <div class="chart-card">
+                <div class="ctop">
+                    <div class="ccoin">
+                        <div class="cicon">₿</div>
+                        <div>
+                            <div class="cname">BTC / USD</div>
+                            <div class="csub">Bitcoin · Binance · Live</div>
+                        </div>
+                    </div>
+                    <div class="cprice">
+                        <div id="lp">$84,230</div>
+                        <div id="lc" class="cu">▲ +2.45% today</div>
+                    </div>
+                    <div class="cohlc">
+                        <div class="oitem">
+                            <div class="olbl">Open</div>
+                            <div class="oval">$82,110</div>
+                        </div>
+                        <div class="oitem">
+                            <div class="olbl">High</div>
+                            <div class="oval" style="color:var(--teal)">$86,450</div>
+                        </div>
+                        <div class="oitem">
+                            <div class="olbl">Low</div>
+                            <div class="oval" style="color:var(--red)">$81,200</div>
+                        </div>
+                        <div class="oitem">
+                            <div class="olbl">Volume 24h</div>
+                            <div class="oval">$4.2B</div>
+                        </div>
+                    </div>
+                    <div class="ctabs">
+                        <button class="ctab" onclick="ST(this,'1H')">1H</button>
+                        <button class="ctab ac" onclick="ST(this,'1D')">1D</button>
+                        <button class="ctab" onclick="ST(this,'1W')">1W</button>
+                        <button class="ctab" onclick="ST(this,'1M')">1M</button>
+                        <button class="ctab" onclick="ST(this,'1Y')">1Y</button>
+                    </div>
+                </div>
+                <div class="cbody" id="cbody">
+                    <div class="cyaxis" id="ya"></div>
+                    <canvas id="cc"></canvas>
+                    <div class="cxaxis" id="xa"></div>
+                    <div id="ctt"></div>
+                </div>
+                <div class="cbot">
+                    <div class="cstats">
+                        <div class="cs2">
+                            <div class="csl">Mkt Cap</div>
+                            <div class="csv">$1.64T</div>
+                        </div>
+                        <div class="cs2">
+                            <div class="csl">Circulating</div>
+                            <div class="csv">19.7M BTC</div>
+                        </div>
+                        <div class="cs2">
+                            <div class="csl">All-Time High</div>
+                            <div class="csv">$108,786</div>
+                        </div>
+                        <div class="cs2">
+                            <div class="csl">Dominance</div>
+                            <div class="csv">53.4%</div>
+                        </div>
+                        <div class="cs2">
+                            <div class="csl">Fear &amp; Greed</div>
+                            <div class="csv" style="color:var(--teal)">72 — Greed</div>
+                        </div>
+                    </div>
+                    <div class="livebadge">
+                        <div class="ldot"></div>LIVE FEED
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SOLUTIONS -->
+    <section class="sol-sec">
+        <div class="container">
+            <div class="text-center rev">
+                <span class="ey">What We Offer</span>
+                <h2 class="st">Comprehensive Investment Solutions</h2>
+                <p class="ss">Diversify your portfolio with our multi-asset platform. Choose from self-directed trading
+                    or fully managed investment plans.</p>
+            </div>
+            <div class="sg">
+                <a href="forex.html" class="sc3 rev" style="text-decoration:none;color:inherit">
+                    <div class="sico">📈</div>
+                    <h3 class="stit">Forex Trading</h3>
+                    <p class="sdesc">Trade 60+ major, minor and exotic currency pairs with ultra-low spreads and 1:500
+                        leverage.</p>
+                </a>
+                <a href="crpto.html" class="sc3 rev" style="text-decoration:none;color:inherit">
+                    <div class="sico">₿</div>
+                    <h3 class="stit">Cryptocurrency</h3>
+                    <p class="sdesc">Buy, sell, and store top digital assets. Benefit from deep liquidity and secure
+                        cold storage.</p>
+                </a>
+                <a href="cloud.html" class="sc3 rev" style="text-decoration:none;color:inherit">
+                    <div class="sico">⛏️</div>
+                    <h3 class="stit">Cloud Mining</h3>
+                    <p class="sdesc">Earn daily crypto rewards without hardware maintenance. Rent hash power securely.
+                    </p>
+                </a>
+                <a href="managedport.html" class="sc3 rev" style="text-decoration:none;color:inherit">
+                    <div class="sico">🏦</div>
+                    <h3 class="stit">Wealth Management</h3>
+                    <p class="sdesc">Let our expert algorithms and fund managers grow your capital with targeted ROI
+                        strategies.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- PERFORMANCE -->
+    <section>
+        <div class="container">
+            <div class="pg">
+                <div class="rev">
+                    <span class="ey">Infrastructure</span>
+                    <h2 class="st" style="text-align:left;max-width:400px;">Built for Performance &amp; Reliability</h2>
+                    <p style="font-size:15px;color:var(--tm);line-height:1.75;margin-bottom:32px;">Our proprietary
+                        matching engine handles millions of transactions per second, ensuring your orders are executed
+                        instantly at the best available market prices.</p>
+                    <div class="pfs">
+                        <div class="pf">
+                            <h4>Sub-millisecond Execution</h4>
+                            <p>Never miss a market move. Our servers are co-located in major global financial hubs.</p>
+                        </div>
+                        <div class="pf">
+                            <h4>Institutional-Grade Security</h4>
+                            <p>Client funds are held in segregated top-tier bank accounts and multi-sig cold wallets.
+                            </p>
+                        </div>
+                        <div class="pf">
+                            <h4>Advanced Analytics</h4>
+                            <p>Access premium charting tools, technical indicators, and real-time market sentiment.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="pvis rev"><canvas id="nc"></canvas></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PLANS -->
+    <section class="pric-sec">
+        <div class="container">
+            <div class="text-center rev">
+                <span class="ey">Investment Plans</span>
+                <h2 class="st">Managed Investment Plans</h2>
+                <p class="ss">Choose a strategy that fits your financial goals. Our systems generate consistent yields
+                    through arbitrage and algorithmic trading.</p>
+            </div>
+            <div class="pgrid">
+                <div class="planc rev">
+                    <div class="pt">Starter</div>
+                    <div class="psub">Perfect for testing the platform</div>
+                    <div class="pp"><sup>$</sup>500</div>
+                    <div class="pn">Minimum investment</div>
+                    <a href="signup.html"><button class="pbtn pbo">Select Plan</button></a>
+                    <hr class="phr">
+                    <div class="pfl">
+                        <div class="pfi"><span class="fdot"></span>5% Daily ROI · 7 Days</div>
+                        <div class="pfi"><span class="fdot"></span>Dedicated Support</div>
+                        <div class="pfi"><span class="fdot"></span>Weekly Reports</div>
+                        <div class="pfi"><span class="fdot"></span>Auto-compounding</div>
+                    </div>
+                </div>
+                <div class="planc feat rev">
+                    <div class="ppop">Most Popular</div>
+                    <div class="pt" style="color:var(--teal)">Professional</div>
+                    <div class="psub">For serious investors</div>
+                    <div class="pp"
+                        style="background:linear-gradient(135deg,var(--teal),#6efde0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
+                        <sup>$</sup>5,000
+                    </div>
+                    <div class="pn">Minimum investment</div>
+                    <a href="signup.html"><button class="pbtn pbf">Select Plan</button></a>
+                    <hr class="phr">
+                    <div class="pfl">
+                        <div class="pfi"><span class="fdot"></span>8% Daily ROI · 14 Days</div>
+                        <div class="pfi"><span class="fdot"></span>Priority 24/7 Support</div>
+                        <div class="pfi"><span class="fdot"></span>Daily Market Analysis</div>
+                        <div class="pfi"><span class="fdot"></span>Advanced Trading Signals</div>
+                    </div>
+                </div>
+                <div class="planc rev">
+                    <div class="pt">Institutional</div>
+                    <div class="psub">Tailored for high net-worth</div>
+                    <div class="pp"><sup>$</sup>25,000</div>
+                    <div class="pn">Minimum investment</div>
+                    <a href="signup.html"><button class="pbtn pbg">Select Plan</button></a>
+                    <hr class="phr">
+                    <div class="pfl">
+                        <div class="pfi"><span class="fdot"></span>12% Daily ROI · 30 Days</div>
+                        <div class="pfi"><span class="fdot"></span>Dedicated Wealth Manager</div>
+                        <div class="pfi"><span class="fdot"></span>Direct API Access</div>
+                        <div class="pfi"><span class="fdot"></span>VIP Networking Events</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHY -->
+    <section style="padding:96px 0">
+        <div class="container">
+            <div class="text-center rev">
+                <span class="ey">Why Us</span>
+                <h2 class="st">Why Choose Crypto Nova</h2>
+                <p class="ss">Join over 250,000 users globally who trust us with their trading and investment journey.
+                </p>
+            </div>
+            <div class="wg rev">
+                <div class="ws">
+                    <div class="sv">$<span class="cnt" data-t="5" data-s="B+">0</span></div>
+                    <div class="sl">Quarterly Volume</div>
+                </div>
+                <div class="ws">
+                    <div class="sv"><span class="cnt" data-t="250" data-s="k+">0</span></div>
+                    <div class="sl">Active Traders</div>
+                </div>
+                <div class="ws">
+                    <div class="sv">&lt;<span class="cnt" data-t="0.1" data-s="ms" data-d="1">0</span></div>
+                    <div class="sl">Execution Speed</div>
+                </div>
+                <div class="ws">
+                    <div class="sv"><span class="cnt" data-t="150" data-s="+">0</span></div>
+                    <div class="sl">Countries Supported</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="t-sec">
+        <div class="container">
+            <div class="th rev">
+                <div><span class="ey">Testimonials</span>
+                    <h2 class="st" style="text-align:left;margin-bottom:0;">What Our Traders Say</h2>
+                </div>
+                <div class="tarr"><button class="ta" id="tp">&#8592;</button><button class="ta" id="tn">&#8594;</button>
+                </div>
+            </div>
+            <div id="tg"></div>
+        </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section class="sec-bg">
+        <div class="container">
+            <div class="text-center rev">
+                <span class="ey">Trust &amp; Safety</span>
+                <h2 class="st">Uncompromising Security &amp; Compliance</h2>
+                <p class="ss">Your assets are protected by industry-leading security protocols and rigorous regulatory
+                    compliance.</p>
+            </div>
+            <div class="secg">
+                <div class="secc rev">
+                    <div class="seci">🔐</div>
+                    <div class="sect">AES-256 Encryption</div>
+                    <div class="secd">Military-grade encryption protects all data in transit and at rest.</div>
+                </div>
+                <div class="secc rev">
+                    <div class="seci">🧊</div>
+                    <div class="sect">98% Cold Storage</div>
+                    <div class="secd">Almost all digital assets held offline in geographically distributed vaults.</div>
+                </div>
+                <div class="secc rev">
+                    <div class="seci">⚖️</div>
+                    <div class="sect">Fully Regulated</div>
+                    <div class="secd">Licensed and regulated by top-tier financial authorities globally.</div>
+                </div>
+                <div class="secc rev">
+                    <div class="seci">🛡️</div>
+                    <div class="sect">Biometric &amp; 2FA</div>
+                    <div class="secd">Multi-factor authentication and biometric verification for every login.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="fg">
+                <div class="fb">
+                    <a href="index.html" class="nlogo" style="text-decoration:none">
+                        <div class="nicon">
+                            <svg width="20" height="20" viewBox="0 0 44 44" fill="none">
+                                <path d="M22 3L39 12.5V31.5L22 41L5 31.5V12.5L22 3Z" stroke="white" stroke-width="3.2"
+                                    stroke-linejoin="round" fill="none" />
+                                <path
+                                    d="M30 16C30 16 25.5 14.5 21 16C16.5 17.5 15 20.5 18.5 22.5C22 24.5 28 23 29.5 25.5C31 28 28 29.5 22 29.5"
+                                    stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"
+                                    fill="none" />
+                            </svg>
+                        </div>
+                        <span style="color:var(--text);font-size:17px;font-weight:900">Crypto Nova</span>
+                    </a>
+                    <p>The unified platform for Crypto, Forex, and Managed Wealth. Trade with confidence, backed by
+                        bank-grade security.</p>
+                </div>
+                <div class="fc">
+                    <h4>Products</h4>
+                    <ul>
+                        <li><a href="forex.html">Forex Trading</a></li>
+                        <li><a href="crpto.html">Cryptocurrency</a></li>
+                        <li><a href="cloud.html">Cloud Mining</a></li>
+                        <li><a href="investment.html">Investment Plans</a></li>
+                        <li><a href="managedport.html">Managed Portfolios</a></li>
+                    </ul>
+                </div>
+                <div class="fc">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="marketnews.html">Market News</a></li>
+                        <li><a href="tradingGuide.html">Trading Guides</a></li>
+                        <li><a href="EconomicCa.html">Economic Calendar</a></li>
+                        <li><a href="Affilate.html">Affiliate Program</a></li>
+                        <li><a href="systems.html">System Status</a></li>
+                    </ul>
+                </div>
+                <div class="fc">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="Terms.html">Terms of Service</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="Risk.html">Risk Disclosure</a></li>
+                        <li><a href="Aml.html">AML Policy</a></li>
+                        <li><a href="security.html">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="fbot">
+                <span>© 2025 Crypto Nova Trading Limited. All rights reserved.</span>
+                <span>Risk Warning: Trading involves significant risk of loss.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="chatbot.js"></script>
+</body>
+
+</html>

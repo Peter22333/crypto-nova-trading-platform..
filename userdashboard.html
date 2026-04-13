@@ -1,0 +1,4049 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Nova — Dashboard</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      height: 100%
+    }
+
+    :root {
+      --teal: #0db89e;
+      --teal-d: #0a9a84;
+      --teal-l: #e6f9f6;
+      --teal-s: rgba(13, 184, 158, .1);
+      --blue: #1a6bff;
+      --blue-l: #e8f0ff;
+      --bg: #f0f4f8;
+      --white: #fff;
+      --text: #0d1421;
+      --muted: #6b7a99;
+      --dim: #9ba8c0;
+      --border: #e2e8f0;
+      --green: #16a34a;
+      --green-l: rgba(22, 163, 74, .1);
+      --red: #dc2626;
+      --red-l: rgba(220, 38, 38, .1);
+      --orange: #f59e0b;
+      --sidebar: 240px;
+      --header: 64px;
+      --font: 'Sora', sans-serif;
+      --body: 'DM Sans', sans-serif;
+      --r: 10px;
+      --rl: 14px;
+      --sh: 0 2px 12px rgba(0, 0, 0, .06);
+      --shm: 0 8px 32px rgba(0, 0, 0, .1);
+    }
+
+    body {
+      font-family: var(--body);
+      background: var(--bg);
+      color: var(--text);
+      height: 100%;
+      overflow: hidden
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none
+    }
+
+    ul {
+      list-style: none
+    }
+
+    button {
+      cursor: pointer;
+      font-family: inherit
+    }
+
+    input,
+    select,
+    textarea {
+      font-family: inherit
+    }
+
+    /* ═══════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════ */
+    .app {
+      display: flex;
+      height: 100vh;
+      overflow: hidden
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar);
+      background: #fff;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+      transition: transform .3s ease
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 20px 24px;
+      font-family: var(--font);
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0
+    }
+
+    .logo-box {
+      width: 34px;
+      height: 34px;
+      background: #16a34a;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto
+    }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      padding: 10px 10px 6px;
+      font-family: var(--font)
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 12px;
+      border-radius: var(--r);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .18s;
+      margin-bottom: 2px;
+      font-family: var(--font)
+    }
+
+    .nav-item:hover {
+      background: var(--bg);
+      color: var(--text)
+    }
+
+    .nav-item.active {
+      background: var(--teal-l);
+      color: var(--teal);
+      font-weight: 700
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      opacity: .7
+    }
+
+    .nav-item.active svg {
+      opacity: 1
+    }
+
+    .sidebar-user {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0
+    }
+
+    .user-av {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal), var(--blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .user-name {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2
+    }
+
+    .user-tier {
+      font-size: 11px;
+      color: var(--muted)
+    }
+
+    .user-logout {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--dim);
+      padding: 6px;
+      border-radius: 6px;
+      transition: color .2s;
+      flex-shrink: 0
+    }
+
+    .user-logout:hover {
+      color: var(--red)
+    }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      height: var(--header);
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+      flex-shrink: 0
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+      flex-shrink: 0
+    }
+
+    .balance-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--teal-l);
+      border: 1.5px solid rgba(13, 184, 158, .2);
+      border-radius: 50px;
+      padding: 7px 16px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--teal);
+      white-space: nowrap
+    }
+
+    .balance-chip svg {
+      flex-shrink: 0
+    }
+
+    .notif-btn {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .2s;
+      flex-shrink: 0
+    }
+
+    .notif-btn:hover {
+      background: #fff;
+      border-color: var(--teal);
+      color: var(--teal)
+    }
+
+    .notif-dot {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--red);
+      border: 1.5px solid #fff
+    }
+
+    .user-av.sm {
+      width: 36px;
+      height: 36px;
+      font-size: 12px;
+      flex-shrink: 0;
+      border: 2px solid var(--border);
+      transition: border-color .2s
+    }
+
+    .user-av.sm:hover {
+      border-color: var(--teal)
+    }
+
+    .page-title {
+      font-family: var(--font);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      white-space: nowrap
+    }
+
+    .topbar-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 8px 16px;
+      flex: 1;
+      max-width: 360px;
+      margin-left: auto
+    }
+
+    .topbar-search svg {
+      color: var(--dim);
+      flex-shrink: 0
+    }
+
+    .topbar-search input {
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 13px;
+      color: var(--text);
+      width: 100%
+    }
+
+    .topbar-search input::placeholder {
+      color: var(--dim)
+    }
+
+    .topbar-bell {
+      position: relative;
+      background: none;
+      border: none;
+      color: var(--muted);
+      padding: 8px;
+      border-radius: 8px;
+      transition: color .2s
+    }
+
+    .topbar-bell:hover {
+      color: var(--text)
+    }
+
+    .bell-dot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--red);
+      border: 1.5px solid #fff
+    }
+
+    .ham-btn {
+      display: none;
+      background: none;
+      border: none;
+      padding: 6px;
+      color: var(--text);
+      border-radius: 6px
+    }
+
+    .ham-btn svg {
+      width: 20px;
+      height: 20px
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px
+    }
+
+    /* ── VIEWS ── */
+    .view {
+      display: none;
+      animation: fadeIn .25s ease
+    }
+
+    .view.active {
+      display: block
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* ═══════════════════════════════════════
+   OVERVIEW VIEW
+═══════════════════════════════════════ */
+    .ov-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px
+    }
+
+    .ov-left {
+      display: flex;
+      flex-direction: column;
+      gap: 20px
+    }
+
+    /* Balance card */
+    .balance-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      padding: 28px 28px 24px;
+      box-shadow: var(--sh)
+    }
+
+    .bal-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 14px;
+      font-family: var(--font)
+    }
+
+    .bal-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+      flex-wrap: wrap
+    }
+
+    .bal-amount {
+      font-family: var(--font);
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -1.5px;
+      line-height: 1
+    }
+
+    .bal-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--teal-l);
+      color: var(--teal);
+      border: 1px solid rgba(13, 184, 158, .2);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 50px
+    }
+
+    .bal-btc {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 26px
+    }
+
+    .bal-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    .btn-deposit {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--teal);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 11px 22px;
+      border-radius: var(--r);
+      border: none;
+      box-shadow: 0 3px 12px rgba(13, 184, 158, .3);
+      transition: all .22s
+    }
+
+    .btn-deposit:hover {
+      background: var(--teal-d);
+      transform: translateY(-1px)
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 11px 20px;
+      border-radius: var(--r);
+      border: 1.5px solid var(--border);
+      transition: all .22s
+    }
+
+    .btn-action:hover {
+      border-color: var(--teal);
+      color: var(--teal)
+    }
+
+    /* Live Markets mini table */
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      box-shadow: var(--sh);
+      overflow: hidden
+    }
+
+    .card-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .card-title {
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .card-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--teal);
+      cursor: pointer;
+      transition: opacity .2s;
+      display: flex;
+      align-items: center;
+      gap: 4px
+    }
+
+    .card-link:hover {
+      opacity: .75
+    }
+
+    .mkt-head {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1fr 1fr 80px;
+      padding: 10px 22px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .mkt-hd {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--dim)
+    }
+
+    .mkt-row {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1fr 1fr 80px;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      transition: background .18s;
+      cursor: pointer
+    }
+
+    .mkt-row:last-child {
+      border-bottom: none
+    }
+
+    .mkt-row:hover {
+      background: #f8fafd
+    }
+
+    .ac {
+      display: flex;
+      align-items: center;
+      gap: 11px
+    }
+
+    .coin-av {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0
+    }
+
+    .coin-name {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700
+    }
+
+    .coin-sym {
+      font-size: 11px;
+      color: var(--dim);
+      margin-top: 1px
+    }
+
+    .price {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600
+    }
+
+    .chg {
+      font-size: 13px;
+      font-weight: 600
+    }
+
+    .up {
+      color: var(--green)
+    }
+
+    .dn {
+      color: var(--red)
+    }
+
+    .cap {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .trade-btn {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      transition: all .2s
+    }
+
+    .trade-btn:hover {
+      background: var(--teal);
+      color: #fff;
+      border-color: var(--teal)
+    }
+
+    @keyframes fup {
+
+      0%,
+      100% {
+        color: var(--text)
+      }
+
+      40% {
+        color: var(--green)
+      }
+    }
+
+    @keyframes fdn {
+
+      0%,
+      100% {
+        color: var(--text)
+      }
+
+      40% {
+        color: var(--red)
+      }
+    }
+
+    .fup {
+      animation: fup .5s ease
+    }
+
+    .fdn {
+      animation: fdn .5s ease
+    }
+
+    /* Right column */
+    .ov-right {
+      display: flex;
+      flex-direction: column;
+      gap: 20px
+    }
+
+    /* Quick deposit */
+    .qd-field {
+      margin-bottom: 14px
+    }
+
+    .qd-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 7px;
+      font-family: var(--font)
+    }
+
+    .qd-select {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      outline: none;
+      appearance: none;
+      transition: border-color .2s;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239ba8c0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center
+    }
+
+    .qd-select:focus {
+      border-color: var(--teal)
+    }
+
+    .qd-addr-wrap {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start
+    }
+
+    .qr-box {
+      width: 72px;
+      height: 72px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid var(--border)
+    }
+
+    .qr-box canvas {
+      display: block
+    }
+
+    .addr-info {}
+
+    .addr-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 5px;
+      font-family: var(--font);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .07em
+    }
+
+    .addr-val {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--text);
+      word-break: break-all;
+      line-height: 1.5;
+      margin-bottom: 8px
+    }
+
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--teal);
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: opacity .2s
+    }
+
+    .copy-btn:hover {
+      opacity: .7
+    }
+
+    /* Portfolio allocation bar */
+    .alloc-bar {
+      height: 10px;
+      border-radius: 50px;
+      display: flex;
+      overflow: hidden;
+      margin-bottom: 18px
+    }
+
+    .alloc-seg {
+      height: 100%;
+      transition: width .4s ease
+    }
+
+    .alloc-items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .alloc-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .alloc-dot-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text)
+    }
+
+    .alloc-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .alloc-pct {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    /* ═══════════════════════════════════════
+   LIVE MARKETS VIEW
+═══════════════════════════════════════ */
+    .mkt-full-head {
+      display: grid;
+      grid-template-columns: 2fr 1.3fr 1fr 1.1fr 1fr 90px;
+      padding: 11px 22px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .mkt-full-row {
+      display: grid;
+      grid-template-columns: 2fr 1.3fr 1fr 1.1fr 1fr 90px;
+      padding: 15px 22px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      transition: background .18s;
+      cursor: pointer
+    }
+
+    .mkt-full-row:last-child {
+      border-bottom: none
+    }
+
+    .mkt-full-row:hover {
+      background: #f8fafd
+    }
+
+    /* Filter tabs */
+    .filter-tabs {
+      display: flex;
+      gap: 5px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 4px;
+      margin-bottom: 18px
+    }
+
+    .ftab {
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      background: none;
+      border: none;
+      color: var(--muted);
+      transition: all .2s
+    }
+
+    .ftab.active {
+      background: var(--teal);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(13, 184, 158, .3)
+    }
+
+    .ftab:hover:not(.active) {
+      color: var(--text);
+      background: var(--bg)
+    }
+
+    /* ═══════════════════════════════════════
+   PORTFOLIO VIEW
+═══════════════════════════════════════ */
+    .port-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px
+    }
+
+    .port-stat {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      padding: 20px 22px;
+      box-shadow: var(--sh);
+      position: relative;
+      overflow: hidden
+    }
+
+    .ps-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px
+    }
+
+    .ps-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-family: var(--font)
+    }
+
+    .ps-val {
+      font-family: var(--font);
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -.5px;
+      line-height: 1.1
+    }
+
+    .ps-sub {
+      font-size: 12px;
+      margin-top: 4px
+    }
+
+    .port-pos-head {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr 1fr 1fr 1fr 1fr 80px;
+      padding: 10px 20px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .port-pos-row {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr 1fr 1fr 1fr 1fr 80px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      font-size: 13px;
+      transition: background .18s
+    }
+
+    .port-pos-row:last-child {
+      border-bottom: none
+    }
+
+    .port-pos-row:hover {
+      background: #f8fafd
+    }
+
+    .port-closed-head {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr 1fr 1fr 1fr 1fr;
+      padding: 10px 20px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .port-closed-row {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr 1fr 1fr 1fr 1fr;
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      font-size: 13px
+    }
+
+    .port-closed-row:last-child {
+      border-bottom: none
+    }
+
+    .dir-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700
+    }
+
+    .dir-buy {
+      background: rgba(22, 163, 74, .1);
+      color: var(--green)
+    }
+
+    .dir-sell {
+      background: rgba(220, 38, 38, .1);
+      color: var(--red)
+    }
+
+    .pnl-bar-wrap {
+      background: var(--bg);
+      border-radius: 4px;
+      height: 5px;
+      overflow: hidden;
+      margin-top: 4px
+    }
+
+    .pnl-bar {
+      height: 100%;
+      border-radius: 4px;
+      transition: width .4s
+    }
+
+    .port-stat {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      padding: 20px 22px;
+      box-shadow: var(--sh)
+    }
+
+    .ps-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 8px;
+      font-family: var(--font)
+    }
+
+    .ps-val {
+      font-family: var(--font);
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -.5px
+    }
+
+    .ps-sub {
+      font-size: 12px;
+      margin-top: 4px
+    }
+
+    .port-assets-head {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr;
+      padding: 11px 22px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .port-assets-row {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--border);
+      align-items: center
+    }
+
+    .port-assets-row:last-child {
+      border-bottom: none
+    }
+
+    /* ═══════════════════════════════════════
+   TRADE VIEW
+═══════════════════════════════════════ */
+    .trade-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px
+    }
+
+    .trade-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      padding: 24px;
+      box-shadow: var(--sh)
+    }
+
+    .trade-tabs {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      margin-bottom: 22px
+    }
+
+    .ttab {
+      flex: 1;
+      padding: 10px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      background: #fff;
+      color: var(--muted);
+      transition: all .2s
+    }
+
+    .ttab.buy.active {
+      background: var(--green);
+      color: #fff
+    }
+
+    .ttab.sell.active {
+      background: var(--red);
+      color: #fff
+    }
+
+    .ttab:hover:not(.active) {
+      background: var(--bg)
+    }
+
+    .trade-field {
+      margin-bottom: 16px
+    }
+
+    .trade-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 7px;
+      font-family: var(--font)
+    }
+
+    .trade-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center
+    }
+
+    .trade-input {
+      width: 100%;
+      padding: 12px 70px 12px 16px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s
+    }
+
+    .trade-input:focus {
+      border-color: var(--teal);
+      background: #fff
+    }
+
+    .trade-suffix {
+      position: absolute;
+      right: 14px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted)
+    }
+
+    .trade-pcts {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px
+    }
+
+    .pct-btn {
+      flex: 1;
+      padding: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      transition: all .2s
+    }
+
+    .pct-btn:hover {
+      background: var(--teal-l);
+      border-color: var(--teal);
+      color: var(--teal)
+    }
+
+    .trade-summary {
+      background: var(--bg);
+      border-radius: var(--r);
+      padding: 14px;
+      margin-bottom: 18px
+    }
+
+    .ts-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 13px
+    }
+
+    .ts-key {
+      color: var(--muted)
+    }
+
+    .ts-val {
+      font-weight: 600;
+      font-family: var(--font)
+    }
+
+    .btn-buy {
+      width: 100%;
+      padding: 14px;
+      background: var(--green);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 800;
+      border-radius: var(--r);
+      border: none;
+      box-shadow: 0 4px 14px rgba(22, 163, 74, .3);
+      transition: all .22s
+    }
+
+    .btn-buy:hover {
+      opacity: .9;
+      transform: translateY(-1px)
+    }
+
+    .btn-sell {
+      width: 100%;
+      padding: 14px;
+      background: var(--red);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 800;
+      border-radius: var(--r);
+      border: none;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, .3);
+      transition: all .22s
+    }
+
+    .btn-sell:hover {
+      opacity: .9;
+      transform: translateY(-1px)
+    }
+
+    /* chart area */
+    .chart-area {
+      width: 100%;
+      height: 280px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      background: var(--bg)
+    }
+
+    .chart-area canvas {
+      position: absolute;
+      inset: 0
+    }
+
+    /* ═══════════════════════════════════════
+   DEPOSIT VIEW
+═══════════════════════════════════════ */
+    .dep-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px
+    }
+
+    .form-field {
+      margin-bottom: 18px
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 8px;
+      font-family: var(--font)
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      font-family: var(--body);
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      appearance: none
+    }
+
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239ba8c0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px var(--teal-s)
+    }
+
+    .btn-submit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      background: var(--teal);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: var(--r);
+      border: none;
+      box-shadow: 0 4px 14px rgba(13, 184, 158, .3);
+      transition: all .22s;
+      margin-top: 6px
+    }
+
+    .btn-submit:hover {
+      background: var(--teal-d);
+      transform: translateY(-1px)
+    }
+
+    .dep-info-card {
+      background: linear-gradient(135deg, var(--teal), var(--teal-d));
+      border-radius: var(--rl);
+      padding: 24px;
+      color: #fff
+    }
+
+    .dep-info-card h3 {
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 14px
+    }
+
+    .dep-info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, .88)
+    }
+
+    .dep-info-row svg {
+      flex-shrink: 0;
+      margin-top: 2px
+    }
+
+    .addr-display {
+      background: rgba(0, 0, 0, .18);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px
+    }
+
+    .addr-display .label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: rgba(255, 255, 255, .6);
+      margin-bottom: 5px;
+      font-family: var(--font);
+      font-weight: 700
+    }
+
+    .addr-display .val {
+      font-family: monospace;
+      font-size: 11px;
+      color: #fff;
+      word-break: break-all;
+      line-height: 1.5
+    }
+
+    .qr-center {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px
+    }
+
+    .qr-center canvas {
+      border-radius: 8px;
+      background: #fff;
+      padding: 6px
+    }
+
+    /* ═══════════════════════════════════════
+   WITHDRAW VIEW
+═══════════════════════════════════════ */
+    .withdraw-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px
+    }
+
+    .bal-info {
+      background: var(--bg);
+      border-radius: var(--r);
+      padding: 14px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .bi-label {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .bi-val {
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .warning-box {
+      background: rgba(245, 158, 11, .08);
+      border: 1px solid rgba(245, 158, 11, .2);
+      border-radius: var(--r);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #b45309;
+      margin-bottom: 18px;
+      display: flex;
+      gap: 8px;
+      line-height: 1.5
+    }
+
+    /* ═══════════════════════════════════════
+   TRANSACTIONS VIEW
+═══════════════════════════════════════ */
+    .tx-filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .tx-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 8px 16px;
+      flex: 1;
+      min-width: 200px
+    }
+
+    .tx-search input {
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 13px;
+      color: var(--text);
+      width: 100%
+    }
+
+    .tx-search input::placeholder {
+      color: var(--dim)
+    }
+
+    .tx-head {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1.2fr 1fr 1fr 100px;
+      padding: 11px 22px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .tx-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1.2fr 1fr 1fr 100px;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      transition: background .18s
+    }
+
+    .tx-row:last-child {
+      border-bottom: none
+    }
+
+    .tx-row:hover {
+      background: #f8fafd
+    }
+
+    .tx-type-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .tx-type-label {
+      display: flex;
+      align-items: center;
+      gap: 9px
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 50px
+    }
+
+    .badge-green {
+      background: var(--green-l);
+      color: var(--green)
+    }
+
+    .badge-yellow {
+      background: rgba(245, 158, 11, .1);
+      color: #b45309
+    }
+
+    .badge-red {
+      background: var(--red-l);
+      color: var(--red)
+    }
+
+    .badge-blue {
+      background: var(--blue-l);
+      color: var(--blue)
+    }
+
+    /* ═══════════════════════════════════════
+   SETTINGS VIEW
+═══════════════════════════════════════ */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 20px
+    }
+
+    .settings-nav {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      padding: 12px;
+      box-shadow: var(--sh);
+      height: fit-content
+    }
+
+    .s-nav-item {
+      padding: 10px 14px;
+      border-radius: var(--r);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .18s;
+      margin-bottom: 2px;
+      font-family: var(--font)
+    }
+
+    .s-nav-item:hover {
+      background: var(--bg);
+      color: var(--text)
+    }
+
+    .s-nav-item.active {
+      background: var(--teal-l);
+      color: var(--teal);
+      font-weight: 700
+    }
+
+    .settings-panel {
+      display: none
+    }
+
+    .settings-panel.active {
+      display: block
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 28px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .profile-av-big {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal), var(--blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font);
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff
+    }
+
+    .profile-info h3 {
+      font-family: var(--font);
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .profile-info p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .toggle-row:last-child {
+      border-bottom: none
+    }
+
+    .toggle-info h4 {
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px
+    }
+
+    .toggle-info p {
+      font-size: 12px;
+      color: var(--muted);
+      max-width: 320px
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute
+    }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 50px;
+      transition: .3s;
+      cursor: pointer
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .3s;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .2)
+    }
+
+    input:checked+.toggle-slider {
+      background: var(--teal)
+    }
+
+    input:checked+.toggle-slider::before {
+      transform: translateX(20px)
+    }
+
+    /* ═══════════════════════════════════════
+   SECURITY VIEW
+═══════════════════════════════════════ */
+    .sec-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px
+    }
+
+    .sec-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 20px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      box-shadow: var(--sh)
+    }
+
+    .sec-item-info h4 {
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 5px
+    }
+
+    .sec-item-info p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 260px
+    }
+
+    .sec-status {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px
+    }
+
+    .sec-badge {
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 50px
+    }
+
+    .sec-enabled {
+      background: var(--green-l);
+      color: var(--green)
+    }
+
+    .sec-disabled {
+      background: var(--red-l);
+      color: var(--red)
+    }
+
+    .btn-sec {
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      transition: all .2s
+    }
+
+    .btn-sec:hover {
+      border-color: var(--teal);
+      color: var(--teal)
+    }
+
+    /* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 9999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all .3s ease;
+      pointer-events: none;
+      max-width: 320px
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1
+    }
+
+    .toast-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .toast-success .toast-icon {
+      background: var(--green-l);
+      color: var(--green)
+    }
+
+    .toast-error .toast-icon {
+      background: var(--red-l);
+      color: var(--red)
+    }
+
+    .toast-info .toast-icon {
+      background: var(--teal-l);
+      color: var(--teal)
+    }
+
+    /* ═══════════════════════════════════════
+   MODAL
+═══════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal-overlay.active {
+      display: flex
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px;
+      width: 90%;
+      max-width: 460px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .18);
+      transform: scale(.95) translateY(10px);
+      transition: all .25s;
+      max-height: 90vh;
+      overflow-y: auto
+    }
+
+    .modal-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px
+    }
+
+    .modal-title {
+      font-family: var(--font);
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      padding: 4px;
+      border-radius: 6px;
+      transition: color .2s;
+      font-size: 20px;
+      line-height: 1
+    }
+
+    .modal-close:hover {
+      color: var(--text)
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--green-l);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px
+    }
+
+    .success-icon svg {
+      color: var(--green)
+    }
+
+    /* ═══════════════════════════════════════
+   SIDEBAR OVERLAY (mobile)
+═══════════════════════════════════════ */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .4);
+      z-index: 299
+    }
+
+    /* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+    @media(max-width:1100px) {
+      .ov-grid {
+        grid-template-columns: 1fr
+      }
+
+      .ov-right {
+        flex-direction: row;
+        flex-wrap: wrap
+      }
+
+      .ov-right .card {
+        flex: 1;
+        min-width: 280px
+      }
+
+      .mkt-full-head,
+      .mkt-full-row {
+        grid-template-columns: 2fr 1.3fr 1fr 90px
+      }
+
+      .mkt-hd:nth-child(4),
+      .mkt-hd:nth-child(5),
+      .mkt-row>:nth-child(4),
+      .mkt-row>:nth-child(5) {
+        display: none
+      }
+    }
+
+    @media(max-width:900px) {
+      :root {
+        --sidebar: 240px
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 300;
+        transform: translateX(-100%)
+      }
+
+      .sidebar.open {
+        transform: translateX(0)
+      }
+
+      .sidebar-overlay {
+        display: block
+      }
+
+      .ham-btn {
+        display: flex
+      }
+
+      .trade-grid,
+      .dep-grid,
+      .withdraw-grid,
+      .sec-grid,
+      .settings-grid {
+        grid-template-columns: 1fr
+      }
+
+      .port-grid {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr
+      }
+
+      .content {
+        padding: 18px
+      }
+
+      .topbar {
+        padding: 0 18px
+      }
+
+      .tx-head,
+      .tx-row {
+        grid-template-columns: 1.4fr 1.2fr 1fr 90px
+      }
+
+      .tx-hd:nth-child(4),
+      .tx-hd:nth-child(5),
+      .tx-row>:nth-child(4),
+      .tx-row>:nth-child(5) {
+        display: none
+      }
+
+      .mkt-full-head,
+      .mkt-full-row {
+        grid-template-columns: 2fr 1.3fr 90px
+      }
+
+      .mkt-hd:nth-child(3) {
+        display: none
+      }
+    }
+
+    @media(max-width:600px) {
+      .bal-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px
+      }
+
+      .bal-actions {
+        flex-direction: column
+      }
+
+      .btn-deposit,
+      .btn-action {
+        width: 100%;
+        justify-content: center
+      }
+
+      .port-grid {
+        grid-template-columns: 1fr
+      }
+
+      .mkt-head,
+      .mkt-row {
+        grid-template-columns: 2fr 1fr 70px
+      }
+
+      .mkt-hd:nth-child(3),
+      .mkt-row>:nth-child(3) {
+        display: none
+      }
+
+      .tx-head,
+      .tx-row {
+        grid-template-columns: 1fr 1fr 80px
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <body>
+    <div class="app" id="app">
+
+      <!-- ══ SIDEBAR ══ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div
+            style="width:32px;height:32px;background:#16a34a;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 44 44" fill="none">
+              <path d="M22 3L39 12.5V31.5L22 41L5 31.5V12.5L22 3Z" stroke="white" stroke-width="3.2"
+                stroke-linejoin="round" />
+              <path
+                d="M30 16C30 16 25.5 14.5 21 16C16.5 17.5 15 20.5 18.5 22.5C22 24.5 28 23 29.5 25.5C31 28 28 29.5 22 29.5"
+                stroke="white" stroke-width="3.2" stroke-linecap="round" />
+            </svg>
+          </div>
+          Crypto Nova
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Main Menu</div>
+          <div class="nav-item active" onclick="navigate('overview',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>Overview
+          </div>
+          <div class="nav-item" onclick="navigate('markets',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+              <polyline points="16 7 22 7 22 13" />
+            </svg>Markets
+          </div>
+          <div class="nav-item" onclick="navigate('trade',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>Trade
+          </div>
+          <div class="nav-item" onclick="navigate('portfolio',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+            </svg>Portfolio
+          </div>
+          <div class="nav-section-label">Finance</div>
+          <div class="nav-item" onclick="navigate('deposit',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 19V5M5 12l7 7 7-7" />
+            </svg>Deposit
+          </div>
+          <div class="nav-item" onclick="navigate('withdraw',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M19 12l-7-7-7 7" />
+            </svg>Withdraw
+          </div>
+          <div class="nav-item" onclick="navigate('transactions',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>Transactions
+          </div>
+          <div class="nav-section-label">Account</div>
+          <div class="nav-item" onclick="navigate('settings',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>Settings
+          </div>
+          <div class="nav-item" onclick="navigate('security',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>Security
+          </div>
+        </nav>
+        <div class="sidebar-user">
+          <div class="user-av" id="user-av">CN</div>
+          <div class="user-meta">
+            <div class="user-name" id="user-display-name">Loading...</div>
+            <div class="user-tier" id="user-tier-badge">Standard</div>
+          </div>
+          <button class="user-logout" onclick="logout()" title="Log out">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
+        </div>
+      </aside>
+      <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+      <!-- ══ MAIN ══ -->
+      <div class="main">
+        <!-- TOPBAR -->
+        <div class="topbar">
+          <button class="ham-btn" id="ham-btn" onclick="openSidebar()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <div class="page-title" id="page-title">Dashboard Overview</div>
+          <div class="topbar-right">
+            <div class="balance-chip" onclick="navigate('overview',null)" style="cursor:pointer" title="Your balance">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+              <span id="bal-display">$0.00</span>
+            </div>
+            <button class="notif-btn" onclick="showToast('No new notifications','info')" title="Notifications">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+            </button>
+            <div class="user-av sm" id="topbar-av" onclick="navigate('settings',null)" style="cursor:pointer"
+              title="Account settings">CN</div>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+
+          <!-- ══ OVERVIEW ══ -->
+          <div class="view active" id="view-overview">
+            <div class="ov-grid">
+              <div class="ov-left">
+                <!-- Balance Card -->
+                <div class="card bal-card" style="padding:28px;margin-bottom:20px">
+                  <div class="bal-row">
+                    <div>
+                      <div
+                        style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px">
+                        Total Portfolio Balance</div>
+                      <div
+                        style="font-family:var(--font);font-size:34px;font-weight:900;color:var(--text);letter-spacing:-.02em"
+                        id="ov-balance">$0.00</div>
+                      <div class="up" style="font-size:13px;font-weight:600;margin-top:4px" id="ov-pnl-badge">↗
+                        Loading...</div>
+                    </div>
+                    <div class="bal-actions">
+                      <button class="btn-deposit" onclick="navigate('deposit',null)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2.5">
+                          <path d="M12 19V5M5 12l7 7 7-7" />
+                        </svg>Deposit
+                      </button>
+                      <button class="btn-action" onclick="navigate('withdraw',null)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2.5">
+                          <path d="M12 5v14M19 12l-7-7-7 7" />
+                        </svg>Withdraw
+                      </button>
+                      <button class="btn-action" onclick="navigate('trade',null)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2.5">
+                          <line x1="18" y1="20" x2="18" y2="10" />
+                          <line x1="12" y1="20" x2="12" y2="4" />
+                          <line x1="6" y1="20" x2="6" y2="14" />
+                        </svg>Trade
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- Stats Row -->
+                <div class="stats-row"
+                  style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
+                  <div class="card mini-stat" style="padding:18px 20px">
+                    <div
+                      style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:8px">
+                      Open Trades</div>
+                    <div style="font-family:var(--font);font-size:22px;font-weight:800;color:var(--text)"
+                      id="stat-open-trades">0</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:2px">Active positions</div>
+                  </div>
+                  <div class="card mini-stat" style="padding:18px 20px">
+                    <div
+                      style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:8px">
+                      Investments</div>
+                    <div style="font-family:var(--font);font-size:22px;font-weight:800;color:var(--teal)"
+                      id="stat-investments">0</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:2px">Active plans</div>
+                  </div>
+                  <div class="card mini-stat" style="padding:18px 20px">
+                    <div
+                      style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:8px">
+                      Total Earned</div>
+                    <div style="font-family:var(--font);font-size:22px;font-weight:800;color:var(--green)"
+                      id="stat-earned">$0.00</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:2px">From investments</div>
+                  </div>
+                </div>
+                <!-- Recent Transactions -->
+                <div class="card">
+                  <div class="card-hdr">
+                    <div class="card-title">Recent Transactions</div>
+                    <div class="card-link" onclick="navigate('transactions',null)">View All <svg width="13" height="13"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                      </svg></div>
+                  </div>
+                  <div id="ov-tx-list"></div>
+                </div>
+              </div>
+              <div class="ov-right">
+                <!-- Market Snapshot -->
+                <div class="card" style="margin-bottom:16px">
+                  <div class="card-hdr">
+                    <div class="card-title">Market Snapshot</div>
+                    <div class="card-link" onclick="navigate('markets',null)">All Markets →</div>
+                  </div>
+                  <div id="ov-market-list"></div>
+                </div>
+                <!-- Quick Actions -->
+                <div class="card">
+                  <div class="card-hdr">
+                    <div class="card-title">Quick Actions</div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 0">
+                    <button onclick="navigate('trade',null)"
+                      style="padding:14px 10px;background:var(--teal-l);border:1.5px solid rgba(13,184,158,.15);border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;color:var(--teal);cursor:pointer;transition:all .2s;text-align:center"
+                      onmouseover="this.style.background='var(--teal)';this.style.color='#fff'"
+                      onmouseout="this.style.background='var(--teal-l)';this.style.color='var(--teal)'">📈 Trade
+                      Now</button>
+                    <button onclick="navigate('deposit',null)"
+                      style="padding:14px 10px;background:rgba(22,163,74,.08);border:1.5px solid rgba(22,163,74,.15);border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;color:var(--green);cursor:pointer;transition:all .2s;text-align:center"
+                      onmouseover="this.style.background='var(--green)';this.style.color='#fff'"
+                      onmouseout="this.style.background='rgba(22,163,74,.08)';this.style.color='var(--green)'">💰
+                      Deposit</button>
+                    <button onclick="navigate('portfolio',null)"
+                      style="padding:14px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:all .2s;text-align:center"
+                      onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'"
+                      onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">📊
+                      Portfolio</button>
+                    <button onclick="navigate('transactions',null)"
+                      style="padding:14px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:all .2s;text-align:center"
+                      onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'"
+                      onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">📋
+                      History</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══ MARKETS ══ -->
+          <div class="view" id="view-markets">
+            <div class="filter-tabs" style="margin-bottom:16px">
+              <button class="ftab active" onclick="filterMarkets(this,'all')">All</button>
+              <button class="ftab" onclick="filterMarkets(this,'crypto')">Crypto</button>
+              <button class="ftab" onclick="filterMarkets(this,'forex')">Forex</button>
+            </div>
+            <div class="card">
+              <div class="mkt-full-head mkt-hd-row">
+                <div class="mkt-hd">Asset</div>
+                <div class="mkt-hd">Price</div>
+                <div class="mkt-hd">24h Change</div>
+                <div class="mkt-hd">Market Cap</div>
+                <div class="mkt-hd">Volume</div>
+                <div class="mkt-hd">Action</div>
+              </div>
+              <div id="markets-full-table"></div>
+            </div>
+          </div>
+
+          <!-- ══ TRADE ══ -->
+          <div class="view" id="view-trade">
+            <div class="trade-grid">
+              <div>
+                <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px">
+                  <div
+                    style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+                    <div>
+                      <div style="font-family:var(--font);font-size:18px;font-weight:800" id="trade-pair-display">BTC /
+                        USD</div>
+                      <div
+                        style="font-size:22px;font-weight:800;color:var(--text);font-family:var(--font);margin-top:2px"
+                        id="trade-price-display">$0.00</div>
+                      <div class="up" style="font-size:13px;font-weight:700;margin-top:2px" id="trade-chg-display">
+                        +0.00%</div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                      <button class="trade-btn" onclick="setTradePair('BTC')">BTC</button>
+                      <button class="trade-btn" onclick="setTradePair('ETH')">ETH</button>
+                      <button class="trade-btn" onclick="setTradePair('SOL')">SOL</button>
+                      <button class="trade-btn" onclick="setTradePair('BNB')">BNB</button>
+                      <button class="trade-btn" onclick="setTradePair('XRP')">XRP</button>
+                    </div>
+                  </div>
+                  <div class="chart-area" id="trade-chart" style="height:260px;padding:10px 16px;position:relative">
+                    <canvas id="trade-canvas" style="width:100%;height:100%"></canvas>
+                  </div>
+                  <div style="padding:0 22px 14px" id="recent-trades"></div>
+                </div>
+                <!-- Open Positions -->
+                <div class="card">
+                  <div class="card-hdr">
+                    <div class="card-title">Open Positions</div>
+                    <div id="open-pos-count" style="font-size:12px;color:var(--muted)">0 positions</div>
+                  </div>
+                  <div id="open-positions-table"></div>
+                </div>
+              </div>
+              <div>
+                <div class="card" style="padding:24px">
+                  <select class="form-select" id="trade-pair-sel" onchange="updateTradePair()"
+                    style="margin-bottom:18px">
+                    <option value="BTC">BTC/USD — Bitcoin</option>
+                    <option value="ETH">ETH/USD — Ethereum</option>
+                    <option value="SOL">SOL/USD — Solana</option>
+                    <option value="BNB">BNB/USD — BNB</option>
+                    <option value="XRP">XRP/USD — Ripple</option>
+                    <option value="EURUSD">EUR/USD — Euro</option>
+                    <option value="GBPUSD">GBP/USD — Pound</option>
+                  </select>
+                  <div class="trade-tabs">
+                    <button class="trade-tab active" id="tab-buy" onclick="setTradeType('buy',this)">Buy / Long</button>
+                    <button class="trade-tab" id="tab-sell" onclick="setTradeType('sell',this)">Sell / Short</button>
+                  </div>
+                  <div class="trade-field">
+                    <div class="trade-label"><span>Amount (USD)</span><span id="trade-avail"
+                        style="color:var(--teal)">Avail: $0.00</span></div>
+                    <div class="trade-input-wrap">
+                      <input class="trade-input" type="number" id="trade-amount" placeholder="0.00"
+                        oninput="updateTradeSummary()">
+                      <span class="trade-suffix">USD</span>
+                    </div>
+                    <div class="trade-pcts">
+                      <button class="pct-btn" onclick="setPct(25)">25%</button>
+                      <button class="pct-btn" onclick="setPct(50)">50%</button>
+                      <button class="pct-btn" onclick="setPct(75)">75%</button>
+                      <button class="pct-btn" onclick="setPct(100)">Max</button>
+                    </div>
+                  </div>
+                  <div class="trade-field">
+                    <div class="trade-label"><span>Leverage</span></div>
+                    <select class="form-select" id="trade-leverage" onchange="updateTradeSummary()">
+                      <option value="1">1x — No Leverage</option>
+                      <option value="2">2x</option>
+                      <option value="5">5x</option>
+                      <option value="10">10x</option>
+                      <option value="20">20x</option>
+                    </select>
+                  </div>
+                  <div class="trade-field">
+                    <div class="trade-label"><span>Market Price</span></div>
+                    <div class="trade-input-wrap">
+                      <input class="trade-input" type="text" id="trade-price-in" readonly
+                        style="background:var(--bg);color:var(--muted)">
+                      <span class="trade-suffix">USD</span>
+                    </div>
+                  </div>
+                  <div class="trade-summary" id="trade-summary">
+                    <div class="ts-row"><span class="ts-key">Position Size</span><span class="ts-val"
+                        id="ts-size">—</span></div>
+                    <div class="ts-row"><span class="ts-key">Margin Required</span><span class="ts-val"
+                        id="ts-margin">—</span></div>
+                    <div class="ts-row"><span class="ts-key">Est. Fee (0.1%)</span><span class="ts-val"
+                        id="ts-fee">—</span></div>
+                    <div class="ts-row" style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px"><span
+                        class="ts-key" style="font-weight:700">Total Cost</span><span class="ts-val"
+                        style="font-weight:800;color:var(--text)" id="ts-total">—</span></div>
+                  </div>
+                  <div id="trade-error"
+                    style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;margin-bottom:14px">
+                  </div>
+                  <button class="btn-submit" id="trade-submit-btn" onclick="executeTrade()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                      <polyline points="16 7 22 7 22 13" />
+                    </svg>
+                    <span id="trade-btn-label">Place Buy Order</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══ PORTFOLIO ══ -->
+          <div class="view" id="view-portfolio">
+
+            <!-- Stat Cards -->
+            <div class="port-grid">
+              <div class="port-stat">
+                <div class="ps-icon" style="background:var(--teal-l)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2.2">
+                    <line x1="12" y1="1" x2="12" y2="23" />
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  </svg>
+                </div>
+                <div class="ps-label">Account Balance</div>
+                <div class="ps-val" id="port-balance">$0.00</div>
+                <div class="ps-sub" style="color:var(--muted)">Available to trade</div>
+              </div>
+              <div class="port-stat">
+                <div class="ps-icon" style="background:rgba(22,163,74,.1)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.2">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                    <polyline points="16 7 22 7 22 13" />
+                  </svg>
+                </div>
+                <div class="ps-label">Open Positions Value</div>
+                <div class="ps-val" id="port-open-val">$0.00</div>
+                <div class="ps-sub" id="port-open-sub" style="color:var(--muted)">0 positions</div>
+              </div>
+              <div class="port-stat">
+                <div class="ps-icon" style="background:rgba(124,58,237,.1)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.2">
+                    <path
+                      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                  </svg>
+                </div>
+                <div class="ps-label">Active Investments</div>
+                <div class="ps-val" id="port-inv-val">$0.00</div>
+                <div class="ps-sub" id="port-inv-sub" style="color:var(--muted)">0 plans</div>
+              </div>
+              <div class="port-stat">
+                <div class="ps-icon" style="background:rgba(245,158,11,.1)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                </div>
+                <div class="ps-label">Total Earned</div>
+                <div class="ps-val" id="port-earned" style="color:var(--teal)">$0.00</div>
+                <div class="ps-sub" style="color:var(--muted)">Investments + mining</div>
+              </div>
+            </div>
+
+            <!-- Two-column layout -->
+            <div style="display:grid;grid-template-columns:1fr 340px;gap:20px" id="port-layout">
+
+              <!-- LEFT COLUMN -->
+              <div style="display:flex;flex-direction:column;gap:20px">
+
+                <!-- Open Positions -->
+                <div class="card">
+                  <div class="card-hdr">
+                    <div class="card-title">Open Positions</div>
+                    <button onclick="navigate('trade',null)"
+                      style="font-size:12px;font-weight:700;color:var(--teal);background:none;border:none;cursor:pointer">+
+                      New Trade</button>
+                  </div>
+                  <div class="port-pos-head">
+                    <div class="mkt-hd">Pair</div>
+                    <div class="mkt-hd">Direction</div>
+                    <div class="mkt-hd">Size</div>
+                    <div class="mkt-hd">Entry</div>
+                    <div class="mkt-hd">Current</div>
+                    <div class="mkt-hd">P&amp;L</div>
+                    <div class="mkt-hd"></div>
+                  </div>
+                  <div id="port-positions"></div>
+                </div>
+
+                <!-- Closed Trades History -->
+                <div class="card">
+                  <div class="card-hdr">
+                    <div class="card-title">Closed Trades</div>
+                    <div id="port-closed-count" style="font-size:12px;color:var(--muted)"></div>
+                  </div>
+                  <div id="port-closed-trades"></div>
+                </div>
+
+              </div>
+
+              <!-- RIGHT COLUMN -->
+              <div style="display:flex;flex-direction:column;gap:20px">
+
+                <!-- P&L Summary -->
+                <div class="card" style="padding:22px">
+                  <div class="card-title" style="margin-bottom:16px">P&amp;L Summary</div>
+                  <div id="port-pnl-summary"></div>
+                </div>
+
+                <!-- Active Investment Plans -->
+                <div class="card">
+                  <div class="card-hdr">
+                    <div class="card-title">Investment Plans</div>
+                    <a href="investment.html" style="font-size:12px;font-weight:700;color:var(--teal)">Browse →</a>
+                  </div>
+                  <div id="portfolio-investments"></div>
+                </div>
+
+                <!-- Mining Contracts -->
+                <div class="card">
+                  <div class="card-hdr">
+                    <div class="card-title">Mining Contracts</div>
+                    <a href="cloud.html" style="font-size:12px;font-weight:700;color:var(--teal)">Browse →</a>
+                  </div>
+                  <div id="portfolio-mining"></div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- ══ DEPOSIT ══ -->
+          <div class="view" id="view-deposit">
+            <div style="max-width:600px;margin:0 auto;padding:20px 0">
+              <div class="card" style="padding:36px;text-align:center">
+                <div
+                  style="width:72px;height:72px;background:var(--teal-l);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2.2">
+                    <path d="M12 19V5M5 12l7 7 7-7" />
+                  </svg>
+                </div>
+                <div
+                  style="font-family:var(--font);font-size:22px;font-weight:900;color:var(--text);margin-bottom:10px">
+                  Deposit Funds</div>
+                <div
+                  style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:28px;max-width:380px;margin-left:auto;margin-right:auto">
+                  Send crypto to your Crypto Nova wallet. Deposits are reviewed and credited by our team within 1–24
+                  hours after network confirmation.
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px;text-align:left">
+                  <div style="background:var(--bg);border-radius:10px;padding:14px 16px">
+                    <div style="font-size:22px;margin-bottom:6px">₿</div>
+                    <div style="font-family:var(--font);font-size:13px;font-weight:700">Bitcoin</div>
+                    <div style="font-size:11px;color:var(--muted)">BTC Network</div>
+                  </div>
+                  <div style="background:var(--bg);border-radius:10px;padding:14px 16px">
+                    <div style="font-size:22px;margin-bottom:6px">Ξ</div>
+                    <div style="font-family:var(--font);font-size:13px;font-weight:700">Ethereum</div>
+                    <div style="font-size:11px;color:var(--muted)">ERC-20</div>
+                  </div>
+                  <div style="background:var(--bg);border-radius:10px;padding:14px 16px">
+                    <div style="font-size:22px;margin-bottom:6px">₮</div>
+                    <div style="font-family:var(--font);font-size:13px;font-weight:700">USDT</div>
+                    <div style="font-size:11px;color:var(--muted)">TRC-20 / ERC-20</div>
+                  </div>
+                </div>
+                <button class="btn-deposit" onclick="window.location.href='deposit-page.html'"
+                  style="font-size:15px;padding:14px 36px;border-radius:var(--r)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 19V5M5 12l7 7 7-7" />
+                  </svg>
+                  Go to Deposit Page
+                </button>
+                <div style="margin-top:16px;font-size:12px;color:var(--muted)">You'll be taken to our secure deposit
+                  page</div>
+              </div>
+              <!-- Recent deposits pulled from state -->
+              <div class="card" style="margin-top:16px">
+                <div class="card-hdr">
+                  <div class="card-title">Recent Deposits</div>
+                </div>
+                <div id="recent-deposits"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══ WITHDRAW ══ -->
+          <div class="view" id="view-withdraw">
+            <div class="withdraw-grid">
+              <div class="card" style="padding:28px">
+                <div class="card-title" style="margin-bottom:20px">Withdraw Funds</div>
+                <div class="bal-info">
+                  <div>
+                    <div class="bi-label">Available Balance</div>
+                    <div class="bi-val" id="wd-avail">$0.00</div>
+                  </div>
+                  <div>
+                    <div class="bi-label">Min Withdrawal</div>
+                    <div class="bi-val">$20.00</div>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Asset</label>
+                  <select class="form-select" id="wd-coin" onchange="updateWdFee()">
+                    <option value="BTC">₿ Bitcoin (BTC)</option>
+                    <option value="ETH">Ξ Ethereum (ETH)</option>
+                    <option value="USDT">₮ Tether (USDT)</option>
+                    <option value="SOL">◎ Solana (SOL)</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Network</label>
+                  <select class="form-select" id="wd-network">
+                    <option>Bitcoin Network (BTC)</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Destination Address</label>
+                  <input class="form-input" id="wd-address" type="text" placeholder="Enter your wallet address">
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Amount (USD)</label>
+                  <div style="position:relative;display:flex;align-items:center">
+                    <span
+                      style="position:absolute;left:14px;font-family:var(--font);font-size:14px;font-weight:600;color:var(--muted)">$</span>
+                    <input class="form-input" id="wd-amount" type="number" placeholder="0.00" style="padding-left:28px"
+                      oninput="updateWdFee()">
+                    <button
+                      style="position:absolute;right:12px;font-family:var(--font);font-size:11px;font-weight:700;color:var(--teal);background:none;border:none;cursor:pointer"
+                      onclick="setWdMax()">MAX</button>
+                  </div>
+                </div>
+                <div class="warning-box">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    style="flex-shrink:0;margin-top:1px">
+                    <path
+                      d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                  Double-check the destination address. Crypto withdrawals are irreversible.
+                </div>
+                <div style="background:var(--bg);border-radius:var(--r);padding:14px;margin-bottom:18px">
+                  <div class="ts-row"><span class="ts-key">Network Fee</span><span class="ts-val"
+                      id="wd-fee">$2.50</span></div>
+                  <div class="ts-row"><span class="ts-key">You'll receive</span><span class="ts-val"
+                      id="wd-receive">$0.00</span></div>
+                </div>
+                <div id="wd-error"
+                  style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;margin-bottom:14px">
+                </div>
+                <button class="btn-submit" onclick="submitWithdraw()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 19V5M5 12l7 7 7-7" />
+                  </svg>
+                  Submit Withdrawal Request
+                </button>
+              </div>
+              <div class="card">
+                <div class="card-hdr">
+                  <div class="card-title">Withdrawal History</div>
+                </div>
+                <div id="withdraw-history"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══ TRANSACTIONS ══ -->
+          <div class="view" id="view-transactions">
+            <div class="tx-filters">
+              <div class="filter-tabs" style="margin-bottom:0">
+                <button class="ftab active" onclick="filterTx(this,'all')">All</button>
+                <button class="ftab" onclick="filterTx(this,'deposit')">Deposits</button>
+                <button class="ftab" onclick="filterTx(this,'withdraw')">Withdrawals</button>
+                <button class="ftab" onclick="filterTx(this,'trade')">Trades</button>
+                <button class="ftab" onclick="filterTx(this,'investment')">Investments</button>
+              </div>
+              <div class="tx-search">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+                <input type="text" placeholder="Search transactions..." oninput="searchTx(this.value)">
+              </div>
+            </div>
+            <div class="card">
+              <div class="tx-head">
+                <div class="mkt-hd">Type</div>
+                <div class="mkt-hd">Asset</div>
+                <div class="mkt-hd">Amount</div>
+                <div class="mkt-hd">Date</div>
+                <div class="mkt-hd">Ref / ID</div>
+                <div class="mkt-hd">Status</div>
+              </div>
+              <div id="tx-table"></div>
+            </div>
+          </div>
+
+          <!-- ══ SETTINGS ══ -->
+          <div class="view" id="view-settings">
+            <div class="settings-grid">
+              <div class="settings-nav">
+                <div class="s-nav-item active" onclick="switchSettingsPanel('profile',this)">👤 Profile</div>
+                <div class="s-nav-item" onclick="switchSettingsPanel('notifications',this)">🔔 Notifications</div>
+                <div class="s-nav-item" onclick="switchSettingsPanel('preferences',this)">⚙️ Preferences</div>
+              </div>
+              <div>
+                <!-- Profile -->
+                <div class="card" style="padding:28px" id="sp-profile">
+                  <div class="profile-header">
+                    <div class="profile-av-big" id="settings-av">CN</div>
+                    <div class="profile-info">
+                      <h3 id="settings-name">Loading...</h3>
+                      <p id="settings-email" style="font-size:13px;color:var(--muted);margin-top:2px">Loading...</p>
+                    </div>
+                  </div>
+                  <div class="form-grid">
+                    <div class="form-field"><label class="form-label">First Name</label><input class="form-input"
+                        id="set-fname" placeholder="First name"></div>
+                    <div class="form-field"><label class="form-label">Last Name</label><input class="form-input"
+                        id="set-lname" placeholder="Last name"></div>
+                    <div class="form-field"><label class="form-label">Email</label><input class="form-input"
+                        id="set-email" placeholder="Email" readonly style="background:var(--bg);color:var(--muted)">
+                    </div>
+                    <div class="form-field"><label class="form-label">Phone</label><input class="form-input"
+                        id="set-phone" placeholder="+1 555 000 0000"></div>
+                    <div class="form-field"><label class="form-label">Country</label>
+                      <select class="form-select" id="set-country">
+                        <option>United States</option>
+                        <option>United Kingdom</option>
+                        <option>Canada</option>
+                        <option>Nigeria</option>
+                        <option>Australia</option>
+                        <option>Germany</option>
+                        <option>France</option>
+                        <option>Singapore</option>
+                      </select>
+                    </div>
+                    <div class="form-field"><label class="form-label">Currency</label>
+                      <select class="form-select" id="set-currency">
+                        <option>USD — US Dollar</option>
+                        <option>EUR — Euro</option>
+                        <option>GBP — British Pound</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button class="btn-submit" onclick="saveProfile()">Save Changes</button>
+                </div>
+                <!-- Notifications -->
+                <div class="card" style="padding:28px;display:none" id="sp-notifications">
+                  <h3 style="font-family:var(--font);font-weight:800;margin-bottom:20px">Notification Preferences</h3>
+                  <div class="toggle-row">
+                    <div class="toggle-info">
+                      <h4>Price Alerts</h4>
+                      <p>Get notified when assets hit your target price</p>
+                    </div><label class="toggle-switch"><input type="checkbox" checked><span
+                        class="toggle-slider"></span></label>
+                  </div>
+                  <div class="toggle-row">
+                    <div class="toggle-info">
+                      <h4>Deposit Confirmations</h4>
+                      <p>Receive alerts when deposits are credited</p>
+                    </div><label class="toggle-switch"><input type="checkbox" checked><span
+                        class="toggle-slider"></span></label>
+                  </div>
+                  <div class="toggle-row">
+                    <div class="toggle-info">
+                      <h4>Withdrawal Updates</h4>
+                      <p>Email alerts on withdrawal status changes</p>
+                    </div><label class="toggle-switch"><input type="checkbox" checked><span
+                        class="toggle-slider"></span></label>
+                  </div>
+                  <div class="toggle-row">
+                    <div class="toggle-info">
+                      <h4>Trade Confirmations</h4>
+                      <p>Confirmation email after every trade</p>
+                    </div><label class="toggle-switch"><input type="checkbox" checked><span
+                        class="toggle-slider"></span></label>
+                  </div>
+                  <div class="toggle-row">
+                    <div class="toggle-info">
+                      <h4>Marketing Emails</h4>
+                      <p>News, promotions, and platform updates</p>
+                    </div><label class="toggle-switch"><input type="checkbox"><span
+                        class="toggle-slider"></span></label>
+                  </div>
+                  <button class="btn-submit" style="margin-top:20px"
+                    onclick="showToast('Notification settings saved','success')">Save Preferences</button>
+                </div>
+                <!-- Preferences -->
+                <div class="card" style="padding:28px;display:none" id="sp-preferences">
+                  <h3 style="font-family:var(--font);font-weight:800;margin-bottom:20px">Display & Trading Preferences
+                  </h3>
+                  <div class="form-grid">
+                    <div class="form-field"><label class="form-label">Default Trade Pair</label><select
+                        class="form-select">
+                        <option>BTC/USD</option>
+                        <option>ETH/USD</option>
+                        <option>SOL/USD</option>
+                      </select></div>
+                    <div class="form-field"><label class="form-label">Language</label><select class="form-select">
+                        <option>English</option>
+                        <option>French</option>
+                        <option>Spanish</option>
+                        <option>Arabic</option>
+                      </select></div>
+                    <div class="form-field"><label class="form-label">Timezone</label><select class="form-select">
+                        <option>UTC-5 (EST)</option>
+                        <option>UTC+0 (GMT)</option>
+                        <option>UTC+1 (WAT)</option>
+                        <option>UTC+8 (SGT)</option>
+                      </select></div>
+                  </div>
+                  <button class="btn-submit" onclick="showToast('Preferences saved','success')">Save
+                    Preferences</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══ SECURITY ══ -->
+          <div class="view" id="view-security">
+            <div class="sec-grid">
+              <div class="sec-item">
+                <div class="sec-item-info">
+                  <h4>Two-Factor Authentication</h4>
+                  <p>Add an extra layer of security using an authenticator app or SMS on every login.</p>
+                </div>
+                <div class="sec-status"><span class="sec-badge sec-disabled">Disabled</span><button class="btn-sec"
+                    onclick="showToast('2FA setup coming soon','info')">Enable 2FA</button></div>
+              </div>
+              <div class="sec-item">
+                <div class="sec-item-info">
+                  <h4>Password</h4>
+                  <p>Use a strong password with uppercase, numbers, and symbols.</p>
+                </div>
+                <div class="sec-status"><span class="sec-badge sec-enabled">Active</span><button class="btn-sec"
+                    onclick="openModal('change-pw-modal')">Change Password</button></div>
+              </div>
+              <div class="sec-item">
+                <div class="sec-item-info">
+                  <h4>Email Verification</h4>
+                  <p>Your email address is verified and linked to this account.</p>
+                </div>
+                <div class="sec-status"><span class="sec-badge sec-enabled">Verified</span><button class="btn-sec"
+                    onclick="showToast('Email already verified','success')">Verified</button></div>
+              </div>
+              <div class="sec-item">
+                <div class="sec-item-info">
+                  <h4>KYC Verification</h4>
+                  <p>Complete identity verification to unlock higher limits and premium features.</p>
+                </div>
+                <div class="sec-status"><span class="sec-badge sec-disabled">Pending</span><button class="btn-sec"
+                    onclick="showToast('KYC flow coming soon','info')">Start KYC</button></div>
+              </div>
+              <div class="sec-item">
+                <div class="sec-item-info">
+                  <h4>Active Sessions</h4>
+                  <p id="session-info">You have 1 active session on this device.</p>
+                </div>
+                <div class="sec-status"><span class="sec-badge sec-enabled">1 Active</span><button class="btn-sec"
+                    onclick="revokeOtherSessions()">Revoke Others</button></div>
+              </div>
+              <div class="sec-item" style="border-bottom:none">
+                <div class="sec-item-info">
+                  <h4 style="color:var(--red)">Delete Account</h4>
+                  <p>Permanently delete your account and all associated data. This cannot be undone.</p>
+                </div>
+                <div class="sec-status"><span class="sec-badge"
+                    style="background:#fef2f2;color:var(--red)">Danger</span><button class="btn-sec"
+                    style="color:var(--red);border-color:rgba(239,68,68,.3)"
+                    onclick="showToast('Please contact support to delete your account','info')">Request
+                    Deletion</button></div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /content -->
+      </div><!-- /main -->
+    </div><!-- /app -->
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+      <div class="toast-icon" id="toast-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12" />
+        </svg></div><span id="toast-msg">Success</span>
+    </div>
+
+    <!-- CHANGE PASSWORD MODAL -->
+    <div class="modal-overlay" id="change-pw-modal">
+      <div class="modal">
+        <div class="modal-hdr">
+          <div class="modal-title">Change Password</div><button class="modal-close"
+            onclick="closeModal('change-pw-modal')">✕</button>
+        </div>
+        <div class="form-field"><label class="form-label">Current Password</label><input class="form-input"
+            type="password" id="cur-pw" placeholder="••••••••"></div>
+        <div class="form-field"><label class="form-label">New Password</label><input class="form-input" type="password"
+            id="new-pw" placeholder="••••••••"></div>
+        <div class="form-field"><label class="form-label">Confirm New Password</label><input class="form-input"
+            type="password" id="conf-pw" placeholder="••••••••"></div>
+        <div id="pw-error"
+          style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;margin-bottom:14px">
+        </div>
+        <button class="btn-submit" onclick="changePassword()">Update Password</button>
+      </div>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div class="modal-overlay" id="success-modal">
+      <div class="modal" style="text-align:center;padding:36px 28px">
+        <div class="success-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12" />
+          </svg></div>
+        <div style="font-family:var(--font);font-size:20px;font-weight:800;margin-bottom:8px" id="success-title">Done!
+        </div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:24px" id="success-msg">Your request
+          was submitted successfully.</div>
+        <button class="btn-submit" onclick="closeModal('success-modal')">Close</button>
+      </div>
+    </div>
+
+    <!-- CLOSE TRADE MODAL -->
+    <div class="modal-overlay" id="close-trade-modal">
+      <div class="modal">
+        <div class="modal-hdr">
+          <div class="modal-title">Close Position</div><button class="modal-close"
+            onclick="closeModal('close-trade-modal')">✕</button>
+        </div>
+        <div id="close-trade-details"
+          style="background:var(--bg);border-radius:var(--r);padding:16px;margin-bottom:18px;font-size:14px"></div>
+        <button class="btn-submit" id="confirm-close-btn" onclick="confirmCloseTrade()"
+          style="background:var(--red);transition:opacity .2s">Confirm Close Position</button>
+      </div>
+    </div>
+
+    <script>
+      /* ═══════════════════════════════════════════════
+         SUPABASE CLIENT
+      ═══════════════════════════════════════════════ */
+      const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
+      const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxa3VibGV0Z2lmcWR1dHliem56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NjA5OTMsImV4cCI6MjA4ODQzNjk5M30.TkweXseKRQuA7FoT7erYdUJMuGtYWYSZ7b7l9WCPq-8';
+      const sb = {
+        _h() { return { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (sb._tok() || SUPA_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' }; },
+        _tok() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.access_token; } catch { return null; } },
+        _uid() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.user?.id; } catch { return null; } },
+        isLoggedIn() { return !!sb._tok(); },
+        async get(t, f = '') { const r = await fetch(SUPA_URL + '/rest/v1/' + t + (f ? '?' + f : ''), { headers: sb._h() }); return r.json(); },
+        async insert(t, b) { const r = await fetch(SUPA_URL + '/rest/v1/' + t, { method: 'POST', headers: sb._h(), body: JSON.stringify(b) }); return r.json(); },
+        async update(t, b, f) { const r = await fetch(SUPA_URL + '/rest/v1/' + t + '?' + f, { method: 'PATCH', headers: sb._h(), body: JSON.stringify(b) }); return r.json(); },
+        async getProfile() { const uid = sb._uid(); if (!uid) return null; const r = await sb.get('profiles', 'id=eq.' + uid + '&select=*'); return Array.isArray(r) ? r[0] : null; },
+        async updateBalance(nb) { const uid = sb._uid(); if (!uid) return; return sb.update('profiles', { balance: nb }, 'id=eq.' + uid); }
+      };
+
+      /* ═══════════════════════════════════════════════
+         AUTO-LOGOUT: clear session on tab/window close
+      ═══════════════════════════════════════════════ */
+      window.addEventListener('beforeunload', function () {
+        // Mark that we're leaving — on next load, check if session is stale
+        sessionStorage.setItem('cn_tab_alive', '1');
+      });
+      // If sessionStorage doesn't have the flag, the tab was closed and reopened = fresh start
+      // We use sessionStorage (cleared on close) vs localStorage (persists)
+      // On load: if no sessionStorage flag but localStorage has session → user closed & reopened = logout
+      (function checkSessionOnLoad() {
+        const tabAlive = sessionStorage.getItem('cn_tab_alive');
+        const hasSession = !!sb._tok();
+        if (!tabAlive && hasSession) {
+          // Tab was freshly opened (not just navigated) — for security, we keep session
+          // but set the alive flag going forward
+          sessionStorage.setItem('cn_tab_alive', '1');
+        }
+      })();
+
+      /* ═══════════════════════════════════════════════
+         AUTH GUARD
+      ═══════════════════════════════════════════════ */
+      if (!sb.isLoggedIn()) { window.location.href = 'login.html'; }
+
+      /* ═══════════════════════════════════════════════
+         STATE
+      ═══════════════════════════════════════════════ */
+      var STATE = (function () {
+        try { var s = JSON.parse(localStorage.getItem('at_state')); if (s) return s; } catch (e) { }
+        return { user: { name: '', email: '', initials: '', tier: 'Standard' }, balance: 0, trades: [], transactions: [], investments: [], miningContracts: [] };
+      })();
+      function saveState() { try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { } sb.updateBalance(STATE.balance).catch(() => { }); }
+
+      /* ═══════════════════════════════════════════════
+         DEPOSIT ADDRESSES
+      ═══════════════════════════════════════════════ */
+      const ADDRS = {
+        BTC: { addr: 'bc1q705yyxfpnkrr3nzu556nnnl4egv9kkr7xma4wc', nets: ['Bitcoin Network (BTC)', 'Lightning Network'] },
+        ETH: { addr: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F', nets: ['Ethereum (ERC-20)', 'Arbitrum', 'Optimism'] },
+        USDT: { addr: 'bc1q705yyxfpnkrr3nzu556nnnl4egv9kkr7xma4wc', nets: ['TRC-20 (Tron)', 'ERC-20 (Ethereum)', 'BEP-20 (BSC)'] },
+        SOL: { addr: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU', nets: ['Solana Network'] },
+        BNB: { addr: 'bnb1grpf0955h0ykzq3ar5nmum7y6gdfl6lxfn46h2', nets: ['BEP-20 (BSC)', 'BEP-2'] }
+      };
+
+      /* ═══════════════════════════════════════════════
+         LIVE MARKET DATA
+      ═══════════════════════════════════════════════ */
+      var liveCoins = [
+        { sym: 'BTC', name: 'Bitcoin', price: 84230, chg: +2.45, cap: '$1.64T', vol: '$42.3B', type: 'crypto' },
+        { sym: 'ETH', name: 'Ethereum', price: 3180, chg: +1.82, cap: '$382B', vol: '$18.7B', type: 'crypto' },
+        { sym: 'SOL', name: 'Solana', price: 142, chg: +4.21, cap: '$64B', vol: '$5.2B', type: 'crypto' },
+        { sym: 'BNB', name: 'BNB', price: 412, chg: -0.35, cap: '$61B', vol: '$2.1B', type: 'crypto' },
+        { sym: 'XRP', name: 'Ripple', price: 0.624, chg: +1.12, cap: '$35B', vol: '$1.8B', type: 'crypto' },
+        { sym: 'EURUSD', name: 'EUR/USD', price: 1.0842, chg: +0.08, cap: '—', vol: '$90B', type: 'forex' },
+        { sym: 'GBPUSD', name: 'GBP/USD', price: 1.2710, chg: -0.14, cap: '—', vol: '$62B', type: 'forex' },
+        { sym: 'USDJPY', name: 'USD/JPY', price: 149.82, chg: +0.22, cap: '—', vol: '$71B', type: 'forex' }
+      ];
+      function updateOpenPositionsPnL() {
+        var trades = (STATE.trades || []).filter(function (t) { return t.status === 'open'; });
+        trades.forEach(function (t) {
+          var coin = liveCoins.find(function (c) { return c.sym === t.sym; });
+          if (!coin) return;
+          var curPrice = coin.price;
+          var pnlPct = ((curPrice - t.entryPrice) / t.entryPrice) * (t.type === 'buy' ? 1 : -1) * (t.leverage || 1) * 100;
+          var pnl = +(t.amount * pnlPct / 100).toFixed(2);
+          var up = pnl >= 0;
+          var fmt = function (n) { return '$' + parseFloat(n || 0).toFixed(2); };
+          // Update in trade view
+          var pnlEl = document.getElementById('pnl-' + t.id);
+          if (pnlEl) {
+            pnlEl.style.color = up ? 'var(--green)' : 'var(--red)';
+            pnlEl.innerHTML = (up ? '+' : '') + fmt(pnl) + '<span style="font-size:11px;font-weight:600;margin-left:4px">' + (up ? '(+' : '(') + pnlPct.toFixed(2) + '%)</span>';
+          }
+          var curEl = document.getElementById('cur-' + t.id);
+          if (curEl) curEl.textContent = '$' + curPrice.toLocaleString();
+          // Update in portfolio view
+          var portPnlEl = document.getElementById('port-pnl-' + t.id);
+          if (portPnlEl) {
+            portPnlEl.style.color = up ? 'var(--green)' : 'var(--red)';
+            portPnlEl.textContent = (up ? '+' : '') + fmt(pnl) + ' (' + (up ? '+' : '') + pnlPct.toFixed(2) + '%)';
+          }
+        });
+      }
+
+      function tickMarket() {
+        liveCoins.forEach(function (c) {
+          var d = (Math.random() - .5) * (c.price * 0.001);
+          c.price = Math.max(0.001, +(c.price + d).toFixed(c.price < 10 ? 4 : 2));
+          c.chg = +(c.chg + (Math.random() - .5) * 0.05).toFixed(2);
+        });
+        renderMarketsTable(currentFilter);
+        renderOvMarkets();
+        updateTradePrice();
+        updateOpenPositionsPnL();
+      }
+      setInterval(tickMarket, 3000);
+      var currentFilter = 'all';
+
+      /* ═══════════════════════════════════════════════
+         LOAD PROFILE FROM SUPABASE
+      ═══════════════════════════════════════════════ */
+      async function loadProfile() {
+        try {
+          const p = await sb.getProfile();
+          if (!p) return;
+          STATE.balance = parseFloat(p.balance) || 0;
+          STATE.user = {
+            name: p.full_name || 'Trader',
+            email: p.email || sb._tok() ? JSON.parse(localStorage.getItem('sb_session')).user.email : '',
+            initials: p.initials || (p.full_name ? (p.full_name.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase().slice(0, 2)) : 'CN'),
+            tier: p.tier || 'Standard'
+          };
+          const uid = sb._uid();
+          const [txns, invs, mines] = await Promise.all([
+            sb.get('transactions', 'user_id=eq.' + uid + '&order=created_at.desc&limit=100'),
+            sb.get('investments', 'user_id=eq.' + uid + '&order=created_at.desc'),
+            sb.get('mining_contracts', 'user_id=eq.' + uid + '&order=created_at.desc')
+          ]);
+          if (Array.isArray(txns)) STATE.transactions = txns.map(function (t) { return { id: t.ref || t.id, type: t.type, asset: t.asset, amount: t.amount, date: new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), hash: t.ref || t.id, status: t.status }; });
+          if (Array.isArray(invs)) STATE.investments = invs.map(function (i) { return { id: i.id, plan: i.plan, planName: i.plan_name, amount: parseFloat(i.amount), dailyRate: parseFloat(i.daily_rate), duration: i.duration, startDate: i.start_date, endDate: i.end_date, startTs: i.start_ts, endTs: i.end_ts, earned: parseFloat(i.earned) || 0, status: i.status }; });
+          if (Array.isArray(mines)) STATE.miningContracts = mines.map(function (m) { return { id: m.id, type: m.type, name: m.name, price: parseFloat(m.price), hashrate: m.hashrate, dailyRoi: parseFloat(m.daily_roi), duration: m.duration, startDate: m.start_date, endDate: m.end_date, startTs: m.start_ts, endTs: m.end_ts, earned: parseFloat(m.earned) || 0, status: m.status }; });
+          saveState();
+          refreshAllUI();
+          // Resume tickers for active investments/mining
+          STATE.investments.filter(function (i) { return i.status === 'active' && Date.now() < i.endTs; }).forEach(startEarningsTicker);
+          STATE.miningContracts.filter(function (m) { return m.status === 'active' && Date.now() < m.endTs; }).forEach(startMiningTicker);
+        } catch (e) { console.warn('Profile load error:', e); }
+      }
+
+      /* ═══════════════════════════════════════════════
+         REFRESH ALL UI
+      ═══════════════════════════════════════════════ */
+      function refreshAllUI() {
+        var u = STATE.user;
+        var initials = u.initials || (u.name ? (u.name.split(' ').map(function (w) { return w[0] || ''; }).join('').toUpperCase().slice(0, 2) || 'CN') : 'CN');
+        // Sidebar user
+        document.getElementById('user-display-name').textContent = u.name || 'Trader';
+        document.getElementById('user-av').textContent = initials;
+        document.getElementById('user-tier-badge').textContent = u.tier || 'Standard';
+        document.getElementById('topbar-av').textContent = initials;
+        // Settings
+        if (document.getElementById('settings-av')) document.getElementById('settings-av').textContent = initials;
+        if (document.getElementById('settings-name')) document.getElementById('settings-name').textContent = u.name;
+        if (document.getElementById('settings-email')) document.getElementById('settings-email').textContent = u.email;
+        var parts = u.name.split(' ');
+        if (document.getElementById('set-fname')) document.getElementById('set-fname').value = parts[0] || '';
+        if (document.getElementById('set-lname')) document.getElementById('set-lname').value = parts.slice(1).join(' ') || '';
+        if (document.getElementById('set-email')) document.getElementById('set-email').value = u.email || '';
+        // Balance
+        var fmt = function (n) { return '$' + parseFloat(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+        document.getElementById('bal-display').textContent = fmt(STATE.balance);
+        document.getElementById('ov-balance').textContent = fmt(STATE.balance);
+        document.getElementById('wd-avail').textContent = fmt(STATE.balance);
+        document.getElementById('trade-avail').textContent = 'Avail: ' + fmt(STATE.balance);
+        // Overview extras
+        var activeInvs = STATE.investments.filter(function (i) { return i.status === 'active'; }).length;
+        var totalEarned = STATE.investments.reduce(function (a, i) { return a + i.earned; }, 0) + STATE.miningContracts.reduce(function (a, m) { return a + m.earned; }, 0);
+        var openTrades = (STATE.trades || []).filter(function (t) { return t.status === 'open'; }).length;
+        if (document.getElementById('stat-open-trades')) document.getElementById('stat-open-trades').textContent = openTrades;
+        if (document.getElementById('stat-investments')) document.getElementById('stat-investments').textContent = activeInvs;
+        if (document.getElementById('stat-earned')) document.getElementById('stat-earned').textContent = fmt(totalEarned);
+        document.getElementById('ov-pnl-badge').textContent = totalEarned > 0 ? ('↗ +' + fmt(totalEarned) + ' earned') : '↗ Start investing to earn';
+        // Render tables
+        buildOvTx();
+        renderOvMarkets();
+        buildTxTable('all', '');
+        buildPortfolio();
+        buildWithdrawHistory();
+        buildDepositHistory();
+        buildOpenPositions();
+        updateDepositView();
+      }
+
+      /* ═══════════════════════════════════════════════
+         OVERVIEW TX LIST
+      ═══════════════════════════════════════════════ */
+      function buildOvTx() {
+        var el = document.getElementById('ov-tx-list');
+        if (!el) return;
+        var txs = STATE.transactions.slice(0, 5);
+        if (!txs.length) { el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:14px">No transactions yet. Make a deposit to get started.</div>'; return; }
+        el.innerHTML = txs.map(function (t) {
+          var icon = t.type === 'deposit' ? '↓' : t.type === 'withdraw' ? '↑' : t.type === 'trade' ? '⇄' : '★';
+          var col = t.status === 'completed' || t.status === 'active' ? 'var(--teal)' : t.status === 'pending' ? 'var(--orange)' : 'var(--muted)';
+          return '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">'
+            + '<div style="width:36px;height:36px;border-radius:50%;background:var(--teal-l);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">' + icon + '</div>'
+            + '<div style="flex:1"><div style="font-family:var(--font);font-size:13px;font-weight:700;text-transform:capitalize">' + t.type + '</div><div style="font-size:12px;color:var(--muted)">' + t.date + '</div></div>'
+            + '<div style="text-align:right"><div style="font-family:var(--font);font-size:13px;font-weight:700">' + t.amount + '</div><div style="font-size:11px;color:' + col + ';text-transform:capitalize">' + t.status + '</div></div>'
+            + '</div>';
+        }).join('');
+      }
+
+      /* ═══════════════════════════════════════════════
+         MARKETS TABLE
+      ═══════════════════════════════════════════════ */
+      function renderOvMarkets() {
+        var el = document.getElementById('ov-market-list');
+        if (!el) return;
+        el.innerHTML = liveCoins.slice(0, 5).map(function (c) {
+          var up = c.chg >= 0;
+          return '<div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)" class="mkt-row-hover">'
+            + '<div style="width:32px;height:32px;background:var(--teal-l);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:10px;font-weight:800;color:var(--teal);flex-shrink:0">' + c.sym.slice(0, 3) + '</div>'
+            + '<div style="flex:1"><div style="font-family:var(--font);font-size:13px;font-weight:700">' + c.sym + '</div><div style="font-size:11px;color:var(--muted)">' + c.name + '</div></div>'
+            + '<div style="text-align:right"><div style="font-family:var(--font);font-size:13px;font-weight:700">$' + c.price.toLocaleString() + '</div>'
+            + '<div style="font-size:12px;font-weight:700;color:' + (up ? 'var(--green)' : 'var(--red)') + '">' + (up ? '+' : '') + c.chg + '%</div></div>'
+            + '</div>';
+        }).join('');
+      }
+      function renderMarketsTable(filter) {
+        var el = document.getElementById('markets-full-table');
+        if (!el) return;
+        var coins = filter === 'all' ? liveCoins : liveCoins.filter(function (c) { return c.type === filter; });
+        el.innerHTML = coins.map(function (c) {
+          var up = c.chg >= 0;
+          return '<div class="mkt-full-row">'
+            + '<div class="pc"><div class="pbadge" style="background:var(--teal-l);color:var(--teal)">' + c.sym.slice(0, 3) + '</div><div><div class="pname">' + c.sym + '</div><div style="font-size:11px;color:var(--muted)">' + c.name + '</div></div></div>'
+            + '<div style="font-family:var(--font);font-size:14px;font-weight:700">$' + c.price.toLocaleString() + '</div>'
+            + '<div style="font-weight:700;color:' + (up ? 'var(--green)' : 'var(--red)') + '">' + (up ? '+' : '') + c.chg + '%</div>'
+            + '<div style="font-size:13px;color:var(--muted)">' + c.cap + '</div>'
+            + '<div style="font-size:13px;color:var(--muted)">' + c.vol + '</div>'
+            + '<div><button onclick="setTradePairAndNavigate(\'' + c.sym + '\')" style="padding:6px 14px;background:var(--teal);color:#fff;border:none;border-radius:7px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer">Trade</button></div>'
+            + '</div>';
+        }).join('');
+      }
+      function filterMarkets(el, f) {
+        document.querySelectorAll('#view-markets .ftab').forEach(function (t) { t.classList.remove('active'); });
+        el.classList.add('active');
+        currentFilter = f;
+        renderMarketsTable(f);
+      }
+      function setTradePairAndNavigate(sym) { navigate('trade', null); setTimeout(function () { setTradePair(sym); }, 100); }
+
+      /* ═══════════════════════════════════════════════
+         TRADE ENGINE
+      ═══════════════════════════════════════════════ */
+      var currentTradeType = 'buy';
+      var currentTradeSym = 'BTC';
+      var tradeChart = null;
+
+      function setTradeType(type, btn) {
+        currentTradeType = type;
+        document.querySelectorAll('.trade-tab').forEach(function (t) { t.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('trade-btn-label').textContent = type === 'buy' ? 'Place Buy Order' : 'Place Sell Order';
+        document.getElementById('trade-submit-btn').style.background = type === 'buy' ? 'var(--green)' : 'var(--red)';
+        updateTradeSummary();
+      }
+      function setTradePair(sym) {
+        currentTradeSym = sym;
+        var coin = liveCoins.find(function (c) { return c.sym === sym; });
+        if (!coin) return;
+        document.getElementById('trade-pair-display').textContent = sym + ' / USD';
+        document.getElementById('trade-price-display').textContent = '$' + coin.price.toLocaleString();
+        document.getElementById('trade-chg-display').textContent = (coin.chg >= 0 ? '+' : '') + coin.chg + '%';
+        document.getElementById('trade-chg-display').className = coin.chg >= 0 ? 'up' : 'dn';
+        document.getElementById('trade-price-in').value = coin.price.toFixed(2);
+        drawTradeChart(sym);
+        updateTradeSummary();
+      }
+      function updateTradePair() {
+        var sym = document.getElementById('trade-pair-sel').value;
+        setTradePair(sym);
+      }
+      function updateTradePrice() {
+        var coin = liveCoins.find(function (c) { return c.sym === currentTradeSym; });
+        if (!coin) return;
+        document.getElementById('trade-price-display').textContent = '$' + coin.price.toLocaleString();
+        document.getElementById('trade-price-in').value = coin.price.toFixed(2);
+        document.getElementById('trade-chg-display').textContent = (coin.chg >= 0 ? '+' : '') + coin.chg + '%';
+      }
+      function updateTradeSummary() {
+        var amt = parseFloat(document.getElementById('trade-amount').value) || 0;
+        var lev = parseInt(document.getElementById('trade-leverage').value) || 1;
+        var coin = liveCoins.find(function (c) { return c.sym === currentTradeSym; });
+        var price = coin ? coin.price : 1;
+        var posSize = amt * lev;
+        var fee = amt * 0.001;
+        var total = amt + fee;
+        var fmt = function (n) { return n > 0 ? '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'; };
+        document.getElementById('ts-size').textContent = posSize > 0 ? fmt(posSize) : '—';
+        document.getElementById('ts-margin').textContent = amt > 0 ? fmt(amt) : '—';
+        document.getElementById('ts-fee').textContent = amt > 0 ? fmt(fee) : '—';
+        document.getElementById('ts-total').textContent = amt > 0 ? fmt(total) : '—';
+      }
+      function setPct(pct) {
+        var bal = STATE.balance;
+        document.getElementById('trade-amount').value = (bal * (pct / 100)).toFixed(2);
+        updateTradeSummary();
+      }
+      function executeTrade() {
+        var errEl = document.getElementById('trade-error');
+        errEl.style.display = 'none';
+        var amt = parseFloat(document.getElementById('trade-amount').value) || 0;
+        var lev = parseInt(document.getElementById('trade-leverage').value) || 1;
+        if (amt <= 0) { errEl.textContent = 'Please enter a valid amount.'; errEl.style.display = 'block'; return; }
+        if (amt > STATE.balance) { errEl.textContent = 'Insufficient balance. Available: $' + STATE.balance.toFixed(2); errEl.style.display = 'block'; return; }
+        if (amt < 5) { errEl.textContent = 'Minimum trade amount is $5.'; errEl.style.display = 'block'; return; }
+        var btn = document.getElementById('trade-submit-btn');
+        btn.disabled = true; btn.textContent = 'Placing order...';
+        setTimeout(function () {
+          var coin = liveCoins.find(function (c) { return c.sym === currentTradeSym; });
+          var price = coin ? coin.price : 1;
+          var fee = amt * 0.001;
+          STATE.balance -= (amt + fee);
+          var trade = {
+            id: 'TRD' + Date.now(), sym: currentTradeSym, type: currentTradeType,
+            amount: amt, leverage: lev, entryPrice: price,
+            positionSize: amt * lev, fee: fee,
+            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            status: 'open', pnl: 0
+          };
+          if (!STATE.trades) STATE.trades = [];
+          STATE.trades.unshift(trade);
+          STATE.transactions.unshift({
+            id: trade.id, type: 'trade', asset: currentTradeSym + '/USD',
+            amount: (currentTradeType === 'buy' ? '+' : '-') + '$' + amt.toFixed(2),
+            date: trade.date, hash: trade.id, status: 'active'
+          });
+          saveState();
+          refreshAllUI();
+          btn.disabled = false;
+          btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> <span id="trade-btn-label">' + (currentTradeType === 'buy' ? 'Place Buy Order' : 'Place Sell Order') + '</span>';
+          document.getElementById('trade-amount').value = '';
+          showToast(currentTradeSym + ' ' + currentTradeType.toUpperCase() + ' order placed!', 'success');
+          sb.insert('transactions', { user_id: sb._uid(), type: 'trade', asset: currentTradeSym + '/USD', amount: (currentTradeType === 'buy' ? '+' : '-') + '$' + amt.toFixed(2), status: 'active', ref: trade.id }).catch(() => { });
+        }, 800);
+      }
+
+      /* ═══════════════════════════════════════════════
+         OPEN POSITIONS
+      ═══════════════════════════════════════════════ */
+      var tradeToClose = null;
+      function buildOpenPositions() {
+        var el = document.getElementById('open-positions-table');
+        if (!el) return;
+        var trades = (STATE.trades || []).filter(function (t) { return t.status === 'open'; });
+        var cntEl = document.getElementById('open-pos-count');
+        if (cntEl) cntEl.textContent = trades.length + ' position' + (trades.length !== 1 ? 's' : '');
+        if (!trades.length) {
+          el.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:14px">No open positions. <span style="color:var(--teal);cursor:pointer;font-weight:700" onclick="navigate(\'trade\',null)">Start trading →</span></div>';
+          return;
+        }
+        var fmt = function (n) { return '$' + parseFloat(n || 0).toFixed(2); };
+        var header = '<div style="display:grid;grid-template-columns:1.2fr 80px 1fr 1fr 1fr 1.5fr 110px;padding:9px 18px;background:var(--bg);border-bottom:1px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">'
+          + '<div>Pair</div><div>Side</div><div>Size</div><div>Entry</div><div>Current</div><div>Live P&L</div><div></div></div>';
+        var rowsHTML = trades.map(function (t) {
+          var coin = liveCoins.find(function (c) { return c.sym === t.sym; });
+          var curPrice = coin ? coin.price : t.entryPrice;
+          var lev = t.leverage || 1;
+          var pnlPct = ((curPrice - t.entryPrice) / t.entryPrice) * (t.type === 'buy' ? 1 : -1) * lev * 100;
+          var pnl = +(t.amount * pnlPct / 100).toFixed(2);
+          var up = pnl >= 0;
+          // Use data-id attribute — zero escaping issues
+          return '<div style="display:grid;grid-template-columns:1.2fr 80px 1fr 1fr 1fr 1.5fr 110px;padding:13px 18px;border-bottom:1px solid var(--border);align-items:center;font-size:13px">'
+            + '<div style="font-family:var(--font);font-weight:800">' + t.sym + '/USD'
+            + (lev > 1 ? ' <span style="font-size:10px;color:var(--muted)">' + lev + 'x</span>' : '')
+            + '</div>'
+            + '<div><span style="padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;background:'
+            + (t.type === 'buy' ? 'rgba(22,163,74,.12)' : 'rgba(239,68,68,.12)')
+            + ';color:' + (t.type === 'buy' ? 'var(--green)' : 'var(--red)') + '">' + t.type.toUpperCase() + '</span></div>'
+            + '<div style="font-family:monospace">' + fmt(t.positionSize || t.amount) + '</div>'
+            + '<div style="font-family:monospace;color:var(--muted)">$' + parseFloat(t.entryPrice || 0).toLocaleString() + '</div>'
+            + '<div style="font-family:monospace" id="cur-' + t.id + '">$' + curPrice.toLocaleString() + '</div>'
+            + '<div style="font-family:monospace;font-weight:700;color:' + (up ? 'var(--green)' : 'var(--red)') + '" id="pnl-' + t.id + '">'
+            + (up ? '+' : '') + fmt(pnl)
+            + ' <span style="font-size:11px;">' + (up ? '(+' : '(') + pnlPct.toFixed(2) + '%)</span>'
+            + '</div>'
+            + '<div><button class="cn-close-btn" data-id="' + t.id + '" '
+            + 'style="padding:7px 16px;background:var(--red);color:#fff;border:none;border-radius:8px;'
+            + 'font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer">✕ Close</button></div>'
+            + '</div>';
+        }).join('');
+        el.innerHTML = header + rowsHTML;
+        // Attach click handlers via data-id — no escaping needed at all
+        el.querySelectorAll('.cn-close-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            openCloseTrade(this.getAttribute('data-id'));
+          });
+        });
+      }
+      function openCloseTrade(id) {
+        var t = (STATE.trades || []).find(function (x) { return x.id === id; });
+        if (!t) { showToast('Trade not found', 'error'); return; }
+        tradeToClose = t;
+        var coin = liveCoins.find(function (c) { return c.sym === t.sym; });
+        var curPrice = coin ? coin.price : t.entryPrice;
+        var lev = t.leverage || 1;
+        var pnlPct = ((curPrice - t.entryPrice) / t.entryPrice) * (t.type === 'buy' ? 1 : -1) * lev * 100;
+        var pnl = +(t.amount * pnlPct / 100).toFixed(2);
+        var returns = +(t.amount + pnl).toFixed(2);
+        var fmt = function (n) { return '$' + parseFloat(n || 0).toFixed(2); };
+        var up = pnl >= 0;
+        function row(k, v, col) {
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">'
+            + '<span style="font-size:13px;color:var(--muted)">' + k + '</span>'
+            + '<strong style="font-size:13px;font-family:var(--font)' + (col ? ';color:' + col : '') + '">' + v + '</strong></div>';
+        }
+        document.getElementById('close-trade-details').innerHTML =
+          row('Asset', t.sym + '/USD')
+          + row('Direction', t.type.toUpperCase(), t.type === 'buy' ? 'var(--green)' : 'var(--red)')
+          + row('Trade Amount', fmt(t.amount))
+          + row('Leverage', lev + '×')
+          + row('Entry Price', '$' + parseFloat(t.entryPrice || 0).toLocaleString())
+          + row('Current Price', '$' + curPrice.toLocaleString())
+          + row('Unrealised P&L', (up ? '+' : '') + fmt(pnl) + ' (' + (up ? '+' : '') + pnlPct.toFixed(2) + '%)', up ? 'var(--green)' : 'var(--red)')
+          + '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">'
+          + '<span style="font-size:13px;color:var(--muted)">You receive back</span>'
+          + '<strong style="font-size:17px;font-family:var(--font);color:' + (returns >= 0 ? 'var(--teal)' : 'var(--red)') + '">' + fmt(Math.max(0, returns)) + '</strong>'
+          + '</div>';
+        var btn = document.getElementById('confirm-close-btn');
+        if (btn) {
+          btn.style.background = up ? 'var(--teal)' : 'var(--red)';
+          btn.textContent = up ? 'Close & Take Profit (' + fmt(pnl) + ')' : 'Close & Accept Loss (' + fmt(pnl) + ')';
+          btn.disabled = false;
+        }
+        openModal('close-trade-modal');
+      }
+
+      function confirmCloseTrade() {
+        if (!tradeToClose) return;
+        var t = tradeToClose;
+        var btn = document.getElementById('confirm-close-btn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Closing...'; }
+        var coin = liveCoins.find(function (c) { return c.sym === t.sym; });
+        var curPrice = coin ? coin.price : t.entryPrice;
+        var pnlPct = ((curPrice - t.entryPrice) / t.entryPrice) * (t.type === 'buy' ? 1 : -1) * (t.leverage || 1) * 100;
+        var pnl = +(t.amount * pnlPct / 100).toFixed(2);
+        var returns = +(t.amount + pnl).toFixed(2);
+        // Update trade record
+        t.status = 'closed';
+        t.pnl = pnl;
+        t.closePrice = curPrice;
+        t.closeDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        // Return funds + pnl to balance
+        STATE.balance = +(STATE.balance + returns).toFixed(2);
+        // Add to transaction history
+        STATE.transactions.unshift({
+          id: 'TRD' + Date.now(), type: 'trade', asset: t.sym + '/USD',
+          amount: (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2) + ' P&L',
+          date: t.closeDate, hash: t.id, status: 'completed'
+        });
+        saveState(); // syncs balance to Supabase
+        // Also write to Supabase transactions
+        sb.insert('transactions', {
+          user_id: sb._uid(), type: 'trade', asset: t.sym + '/USD closed',
+          amount: (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2) + ' P&L',
+          status: 'completed', ref: t.id + '_close'
+        }).catch(function () { });
+        closeModal('close-trade-modal');
+        tradeToClose = null;
+        if (btn) { btn.disabled = false; btn.textContent = 'Confirm Close Position'; }
+        refreshAllUI();
+        showToast('Position closed. P&L: ' + (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(2), pnl >= 0 ? 'success' : 'error');
+      }
+
+      /* ═══════════════════════════════════════════════
+         CHART (simple canvas)
+      ═══════════════════════════════════════════════ */
+      function drawTradeChart(sym) {
+        var canvas = document.getElementById('trade-canvas');
+        if (!canvas) return;
+        var coin = liveCoins.find(function (c) { return c.sym === sym; }) || liveCoins[0];
+        var ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth || 600; canvas.height = canvas.offsetHeight || 240;
+        var W = canvas.width, H = canvas.height;
+        var pts = 40; var arr = []; var p = coin.price * 0.97;
+        for (var i = 0; i < pts; i++) { p = p * (1 + (Math.random() - .48) * 0.012); arr.push(p); }
+        arr.push(coin.price);
+        var mn = Math.min.apply(null, arr) * 0.999, mx = Math.max.apply(null, arr) * 1.001;
+        var x = function (i) { return i * (W / (arr.length - 1)); };
+        var y = function (v) { return H - ((v - mn) / (mx - mn)) * (H * 0.85) - H * 0.05; };
+        ctx.clearRect(0, 0, W, H);
+        var up = arr[arr.length - 1] >= arr[0];
+        var grd = ctx.createLinearGradient(0, 0, 0, H);
+        grd.addColorStop(0, up ? 'rgba(13,184,158,.18)' : 'rgba(239,68,68,.18)');
+        grd.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.moveTo(x(0), y(arr[0]));
+        for (var i = 1; i < arr.length; i++)ctx.lineTo(x(i), y(arr[i]));
+        ctx.lineTo(x(arr.length - 1), H); ctx.lineTo(0, H); ctx.closePath();
+        ctx.fillStyle = grd; ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x(0), y(arr[0]));
+        for (var i = 1; i < arr.length; i++)ctx.lineTo(x(i), y(arr[i]));
+        ctx.strokeStyle = up ? '#0db89e' : '#ef4444'; ctx.lineWidth = 2; ctx.stroke();
+      }
+
+      /* ═══════════════════════════════════════════════
+         PORTFOLIO
+      ═══════════════════════════════════════════════ */
+      function buildPortfolio() {
+        var fmt = function (n) { return '$' + parseFloat(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+        var trades = STATE.trades || [];
+        var openTrades = trades.filter(function (t) { return t.status === 'open'; });
+        var closedTrades = trades.filter(function (t) { return t.status === 'closed'; });
+
+        // ── STAT CARDS ──
+        var openVal = 0, totalPnlOpen = 0;
+        openTrades.forEach(function (t) {
+          var coin = liveCoins.find(function (c) { return c.sym === t.sym; }) || { price: t.entryPrice };
+          var pct = ((coin.price - t.entryPrice) / t.entryPrice) * (t.type === 'buy' ? 1 : -1) * t.leverage;
+          var pnl = t.amount * pct;
+          openVal += t.positionSize || t.amount;
+          totalPnlOpen += pnl;
+        });
+        var totalInvested = STATE.investments.reduce(function (a, i) { return a + (i.status === 'active' ? i.amount : 0); }, 0);
+        var totalEarned = (STATE.investments.reduce(function (a, i) { return a + i.earned; }, 0)) + (STATE.miningContracts.reduce(function (a, m) { return a + m.earned; }, 0));
+        var activeInvs = STATE.investments.filter(function (i) { return i.status === 'active'; });
+        var activeMines = STATE.miningContracts.filter(function (m) { return m.status === 'active'; });
+
+        if (document.getElementById('port-balance')) document.getElementById('port-balance').textContent = fmt(STATE.balance);
+        if (document.getElementById('port-open-val')) document.getElementById('port-open-val').textContent = fmt(openVal);
+        if (document.getElementById('port-open-sub')) document.getElementById('port-open-sub').textContent = openTrades.length + ' position' + (openTrades.length !== 1 ? 's' : '');
+        if (document.getElementById('port-inv-val')) document.getElementById('port-inv-val').textContent = fmt(totalInvested);
+        if (document.getElementById('port-inv-sub')) document.getElementById('port-inv-sub').textContent = activeInvs.length + ' active plan' + (activeInvs.length !== 1 ? 's' : '');
+        if (document.getElementById('port-earned')) document.getElementById('port-earned').textContent = fmt(totalEarned);
+
+        // ── OPEN POSITIONS ──
+        var posEl = document.getElementById('port-positions');
+        if (posEl) {
+          if (!openTrades.length) {
+            posEl.innerHTML = '<div style="padding:28px;text-align:center;color:var(--muted);font-size:14px">No open positions. <span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="navigate(\'trade\',null)">Start trading →</span></div>';
+          } else {
+            posEl.innerHTML = '<div class="port-pos-head"><div class="mkt-hd">Pair</div><div class="mkt-hd">Dir.</div><div class="mkt-hd">Size</div><div class="mkt-hd">Entry</div><div class="mkt-hd">Current</div><div class="mkt-hd">P&L</div><div class="mkt-hd"></div></div>'
+              + openTrades.map(function (t) {
+                var coin = liveCoins.find(function (c) { return c.sym === t.sym; }) || { price: t.entryPrice };
+                var pct = ((coin.price - t.entryPrice) / t.entryPrice) * (t.type === 'buy' ? 1 : -1) * t.leverage;
+                var pnl = t.amount * pct;
+                var pnlStr = (pnl >= 0 ? '+' : '') + fmt(pnl) + ' (' + (pnl >= 0 ? '+' : '') + (pct * 100).toFixed(2) + '%)';
+                return '<div class="port-pos-row">'
+                  + '<div style="font-family:var(--font);font-weight:800">' + t.sym + '/USD' + (t.leverage > 1 ? ' <span style="font-size:10px;color:var(--muted)">' + t.leverage + 'x</span>' : '') + '</div>'
+                  + '<div><span class="dir-badge dir-' + t.type + '">' + t.type.toUpperCase() + '</span></div>'
+                  + '<div style="font-weight:600">' + fmt(t.positionSize || t.amount) + '</div>'
+                  + '<div style="color:var(--muted)">$' + t.entryPrice.toLocaleString() + '</div>'
+                  + '<div style="font-weight:600">$' + coin.price.toLocaleString() + '</div>'
+                  + '<div style="font-weight:700;color:' + (pnl >= 0 ? 'var(--green)' : 'var(--red)') + '">' + pnlStr + '</div>'
+                  + '<div><button class="cn-port-close" data-id="' + t.id + '" style="padding:5px 12px;background:rgba(220,38,38,.08);color:var(--red);border:1px solid rgba(220,38,38,.2);border-radius:7px;font-family:var(--font);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">✕ Close</button></div>'
+                  + '</div>';
+              }).join('');
+          }
+        }
+
+        // ── P&L SUMMARY ──
+        var pnlEl = document.getElementById('port-pnl-summary');
+        if (pnlEl) {
+          var totalClosedPnl = closedTrades.reduce(function (a, t) { return a + (t.pnl || 0); }, 0);
+          var winTrades = closedTrades.filter(function (t) { return (t.pnl || 0) > 0; });
+          var lossTrades = closedTrades.filter(function (t) { return (t.pnl || 0) <= 0; });
+          var winRate = closedTrades.length ? Math.round(winTrades.length / closedTrades.length * 100) : 0;
+          var rows = [
+            ['Open P&L', (totalPnlOpen >= 0 ? '+' : '') + fmt(totalPnlOpen), totalPnlOpen >= 0 ? 'var(--green)' : 'var(--red)'],
+            ['Realised P&L', (totalClosedPnl >= 0 ? '+' : '') + fmt(totalClosedPnl), totalClosedPnl >= 0 ? 'var(--green)' : 'var(--red)'],
+            ['Total Trades', closedTrades.length.toString(), 'var(--text)'],
+            ['Win Rate', winRate + '%', winRate >= 50 ? 'var(--green)' : 'var(--red)'],
+            ['Investment Returns', '+' + fmt(totalEarned), 'var(--teal)'],
+          ];
+          pnlEl.innerHTML = rows.map(function (r) {
+            return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">'
+              + '<span style="font-size:13px;color:var(--muted)">' + r[0] + '</span>'
+              + '<span style="font-family:var(--font);font-size:14px;font-weight:800;color:' + r[2] + '">' + r[1] + '</span>'
+              + '</div>';
+          }).join('') + '<div style="margin-top:14px;background:var(--teal-l);border-radius:8px;padding:14px;text-align:center">'
+            + '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:4px">Net Portfolio Value</div>'
+            + '<div style="font-family:var(--font);font-size:22px;font-weight:900;color:var(--teal)">' + fmt(STATE.balance + openVal + totalEarned) + '</div>'
+            + '</div>';
+        }
+
+        // ── CLOSED TRADES ──
+        var closedEl = document.getElementById('port-closed-trades');
+        if (document.getElementById('port-closed-count')) document.getElementById('port-closed-count').textContent = closedTrades.length + ' trade' + (closedTrades.length !== 1 ? 's' : '');
+        if (closedEl) {
+          if (!closedTrades.length) {
+            closedEl.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:14px">No closed trades yet.</div>';
+          } else {
+            closedEl.innerHTML = '<div class="port-closed-head"><div class="mkt-hd">Pair</div><div class="mkt-hd">Dir.</div><div class="mkt-hd">Amount</div><div class="mkt-hd">Entry</div><div class="mkt-hd">Close</div><div class="mkt-hd">P&L</div></div>'
+              + closedTrades.slice(0, 10).map(function (t) {
+                var pnl = t.pnl || 0;
+                return '<div class="port-closed-row">'
+                  + '<div style="font-family:var(--font);font-weight:700">' + t.sym + '/USD</div>'
+                  + '<div><span class="dir-badge dir-' + t.type + '">' + t.type.toUpperCase() + '</span></div>'
+                  + '<div>' + fmt(t.amount) + '</div>'
+                  + '<div style="color:var(--muted)">$' + t.entryPrice.toLocaleString() + '</div>'
+                  + '<div style="color:var(--muted)">$' + (t.closePrice || t.entryPrice).toLocaleString() + '</div>'
+                  + '<div style="font-weight:700;color:' + (pnl >= 0 ? 'var(--green)' : 'var(--red)') + '">' + (pnl >= 0 ? '+' : '') + fmt(pnl) + '</div>'
+                  + '</div>';
+              }).join('');
+          }
+        }
+
+        // ── INVESTMENT PLANS ──
+        var invEl = document.getElementById('portfolio-investments');
+        if (invEl) {
+          if (!activeInvs.length) {
+            invEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No active plans. <a href="investment.html" style="color:var(--teal);font-weight:600">Browse plans →</a></div>';
+          } else {
+            invEl.innerHTML = activeInvs.map(function (i) {
+              var prog = Math.min(100, Math.max(0, ((Date.now() - i.startTs) / (i.endTs - i.startTs) * 100) || 0));
+              var totalReturn = i.amount * i.dailyRate * i.duration;
+              return '<div style="padding:16px 20px;border-bottom:1px solid var(--border)">'
+                + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">'
+                + '<div><div style="font-family:var(--font);font-size:13px;font-weight:800">' + i.planName + '</div>'
+                + '<div style="font-size:11px;color:var(--muted);margin-top:2px">' + fmt(i.amount) + ' · ' + (i.dailyRate * 100).toFixed(1) + '%/day · ' + i.duration + 'd</div></div>'
+                + '<div style="text-align:right"><div style="font-size:13px;font-weight:800;color:var(--teal)">+' + fmt(i.earned) + '</div>'
+                + '<div style="font-size:10px;color:var(--muted)">of ' + fmt(totalReturn) + '</div></div></div>'
+                + '<div style="background:var(--border);border-radius:4px;height:5px;overflow:hidden">'
+                + '<div style="background:var(--teal);height:100%;width:' + prog.toFixed(1) + '%;border-radius:4px"></div></div>'
+                + '<div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--dim)">'
+                + '<span>' + prog.toFixed(0) + '% complete</span><span>Ends ' + i.endDate + '</span></div>'
+                + '</div>';
+            }).join('')
+              + (STATE.investments.filter(function (i) { return i.status === 'completed'; }).length ?
+                '<div style="padding:10px 20px;font-size:12px;color:var(--muted);text-align:center">' + STATE.investments.filter(function (i) { return i.status === 'completed'; }).length + ' completed plan(s)</div>' : '');
+          }
+        }
+
+        // ── MINING CONTRACTS ──
+        var mineEl = document.getElementById('portfolio-mining');
+        if (mineEl) {
+          if (!activeMines.length) {
+            mineEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No active contracts. <a href="cloud.html" style="color:var(--teal);font-weight:600">Start mining →</a></div>';
+          } else {
+            mineEl.innerHTML = activeMines.map(function (m) {
+              var prog = Math.min(100, Math.max(0, ((Date.now() - m.startTs) / (m.endTs - m.startTs) * 100) || 0));
+              return '<div style="padding:16px 20px;border-bottom:1px solid var(--border)">'
+                + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">'
+                + '<div><div style="font-family:var(--font);font-size:13px;font-weight:800">' + m.name + '</div>'
+                + '<div style="font-size:11px;color:var(--muted);margin-top:2px">' + m.hashrate + ' · ' + (m.dailyRoi * 100).toFixed(1) + '% daily</div></div>'
+                + '<div style="text-align:right"><div style="font-size:13px;font-weight:800;color:var(--teal)">+' + fmt(m.earned) + '</div>'
+                + '<div style="font-size:10px;color:var(--muted)">' + m.duration + 'd contract</div></div></div>'
+                + '<div style="background:var(--border);border-radius:4px;height:5px;overflow:hidden">'
+                + '<div style="background:#d97706;height:100%;width:' + prog.toFixed(1) + '%;border-radius:4px"></div></div>'
+                + '<div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--dim)">'
+                + '<span>' + prog.toFixed(0) + '% complete</span><span>Ends ' + m.endDate + '</span></div>'
+                + '</div>';
+            }).join('');
+          }
+        }
+        // Attach portfolio close handlers
+        setTimeout(function () {
+          document.querySelectorAll('.cn-port-close').forEach(function (btn) {
+            btn.addEventListener('click', function () { openCloseTrade(this.getAttribute('data-id')); });
+          });
+        }, 0);
+      }
+      /* ═══════════════════════════════════════════════
+         DEPOSIT
+      ═══════════════════════════════════════════════ */
+      function updateDepositView() {
+        var coin = document.getElementById('dep-coin') ? document.getElementById('dep-coin').value : 'BTC';
+        var info = ADDRS[coin] || ADDRS.BTC;
+        if (document.getElementById('dep-addr-field')) document.getElementById('dep-addr-field').value = info.addr;
+        if (document.getElementById('dep-network')) {
+          var sel = document.getElementById('dep-network');
+          sel.innerHTML = info.nets.map(function (n) { return '<option>' + n + '</option>'; }).join('');
+        }
+        if (document.getElementById('dep-warning-text'))
+          document.getElementById('dep-warning-text').textContent = 'Only send ' + coin + ' to this address on the selected network. Sending other assets may result in permanent loss.';
+        drawQR('dep-qr-canvas', info.addr, 120);
+      }
+      function copyAddr() {
+        var val = document.getElementById('dep-addr-field').value;
+        navigator.clipboard.writeText(val).then(function () { showToast('Address copied!', 'success'); }).catch(function () { showToast('Copy failed – select manually', 'info'); });
+      }
+      function confirmDepositSetup() {
+        var coin = document.getElementById('dep-coin').value;
+        var network = document.getElementById('dep-network').value;
+        var ref = 'DEP' + Date.now();
+        sb.insert('deposits', {
+          user_id: sb._uid(), method: 'crypto', asset: coin, amount: 0,
+          fee: 0, credited: false, ref: ref, status: 'pending'
+        }).catch(() => { });
+        STATE.transactions.unshift({
+          id: ref, type: 'deposit', asset: coin + ' (' + network + ')',
+          amount: 'Pending', date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          hash: ref, status: 'pending'
+        });
+        saveState();
+        buildDepositHistory(); buildOvTx(); buildTxTable('all', '');
+        document.getElementById('success-title').textContent = 'Deposit Request Submitted!';
+        document.getElementById('success-msg').textContent = 'Your deposit is being reviewed. Funds will be credited to your account within 1–24 hours after confirmation.';
+        openModal('success-modal');
+      }
+      function buildDepositHistory() {
+        var el = document.getElementById('recent-deposits');
+        if (!el) return;
+        var deps = STATE.transactions.filter(function (t) { return t.type === 'deposit'; }).slice(0, 5);
+        if (!deps.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No deposits yet.</div>'; return; }
+        el.innerHTML = deps.map(function (d) {
+          var col = d.status === 'completed' ? 'var(--green)' : d.status === 'pending' ? '#d97706' : 'var(--muted)';
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)">'
+            + '<div><div style="font-family:var(--font);font-size:13px;font-weight:700">' + d.asset + '</div><div style="font-size:12px;color:var(--muted)">' + d.date + '</div></div>'
+            + '<div style="text-align:right"><div style="font-size:13px;font-weight:700">' + d.amount + '</div><span style="font-size:11px;color:' + col + ';text-transform:capitalize">' + d.status + '</span></div>'
+            + '</div>';
+        }).join('');
+      }
+
+      /* ═══════════════════════════════════════════════
+         WITHDRAW
+      ═══════════════════════════════════════════════ */
+      var WD_FEES = { BTC: 2.5, ETH: 3.0, USDT: 1.0, SOL: 0.5 };
+      function updateWdFee() {
+        var coin = document.getElementById('wd-coin') ? document.getElementById('wd-coin').value : 'BTC';
+        var nets = { BTC: ['Bitcoin Network (BTC)', 'Lightning Network'], ETH: ['Ethereum (ERC-20)'], USDT: ['TRC-20 (Tron)', 'ERC-20', 'BEP-20'], SOL: ['Solana Network'] };
+        var netSel = document.getElementById('wd-network');
+        if (netSel) { netSel.innerHTML = (nets[coin] || ['Bitcoin Network']).map(function (n) { return '<option>' + n + '</option>'; }).join(''); }
+        var fee = WD_FEES[coin] || 2.5;
+        var amt = parseFloat(document.getElementById('wd-amount') ? document.getElementById('wd-amount').value : 0) || 0;
+        var receive = Math.max(0, amt - fee);
+        if (document.getElementById('wd-fee')) document.getElementById('wd-fee').textContent = '$' + fee.toFixed(2);
+        if (document.getElementById('wd-receive')) document.getElementById('wd-receive').textContent = '$' + receive.toFixed(2);
+      }
+      function setWdMax() {
+        var coin = document.getElementById('wd-coin').value;
+        var fee = WD_FEES[coin] || 2.5;
+        var max = Math.max(0, STATE.balance - fee);
+        document.getElementById('wd-amount').value = max.toFixed(2);
+        updateWdFee();
+      }
+      function submitWithdraw() {
+        var errEl = document.getElementById('wd-error');
+        errEl.style.display = 'none';
+        var addr = document.getElementById('wd-address').value.trim();
+        var amt = parseFloat(document.getElementById('wd-amount').value) || 0;
+        var coin = document.getElementById('wd-coin').value;
+        var fee = WD_FEES[coin] || 2.5;
+        var total = amt; // full amount deducted including fee
+        if (!addr) { errEl.textContent = 'Please enter a valid destination address.'; errEl.style.display = 'block'; return; }
+        if (amt < 20) { errEl.textContent = 'Minimum withdrawal is $20.00.'; errEl.style.display = 'block'; return; }
+        if (total > STATE.balance) { errEl.textContent = 'Insufficient balance. Available: $' + STATE.balance.toFixed(2) + '. Note: fee of $' + fee.toFixed(2) + ' is included.'; errEl.style.display = 'block'; return; }
+        var btn = document.querySelector('#view-withdraw .btn-submit');
+        if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
+        // Deduct full amount from balance immediately
+        STATE.balance -= total;
+        var ref = 'WD' + Date.now();
+        var dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        STATE.transactions.unshift({
+          id: ref, type: 'withdraw', asset: coin,
+          amount: '-$' + amt.toFixed(2),
+          date: dateStr, hash: ref, status: 'pending'
+        });
+        saveState(); // also syncs balance to Supabase
+        sb.insert('withdrawals', {
+          user_id: sb._uid(), amount: amt, asset: coin, address: addr,
+          network: document.getElementById('wd-network').value, ref: ref, status: 'pending'
+        }).catch(() => { });
+        sb.insert('transactions', {
+          user_id: sb._uid(), type: 'withdraw', asset: coin,
+          amount: '-$' + amt.toFixed(2), status: 'pending', ref: ref
+        }).catch(() => { });
+        setTimeout(function () {
+          if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7 7 7-7"/></svg> Submit Withdrawal Request'; }
+        }, 1000);
+        buildWithdrawHistory(); buildOvTx(); buildTxTable('all', ''); refreshAllUI();
+        document.getElementById('wd-address').value = '';
+        document.getElementById('wd-amount').value = '';
+        updateWdFee();
+        document.getElementById('success-title').textContent = 'Withdrawal Submitted!';
+        document.getElementById('success-msg').textContent = 'Your withdrawal of $' + amt.toFixed(2) + ' ' + coin + ' is now pending review. $' + total.toFixed(2) + ' has been deducted from your balance. Processing takes 1–24 hours.';
+        openModal('success-modal');
+      }
+      function buildWithdrawHistory() {
+        var el = document.getElementById('withdraw-history');
+        if (!el) return;
+        var wds = STATE.transactions.filter(function (t) { return t.type === 'withdraw'; }).slice(0, 10);
+        if (!wds.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No withdrawals yet.</div>'; return; }
+        el.innerHTML = wds.map(function (w) {
+          var col = w.status === 'completed' ? 'var(--green)' : w.status === 'pending' ? '#d97706' : 'var(--red)';
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--border)">'
+            + '<div><div style="font-family:var(--font);font-size:13px;font-weight:700">' + w.asset + '</div><div style="font-size:12px;color:var(--muted)">' + w.date + '</div></div>'
+            + '<div style="text-align:right"><div style="font-size:13px;font-weight:700">' + w.amount + '</div><span style="font-size:11px;color:' + col + ';text-transform:capitalize">' + w.status + '</span></div>'
+            + '</div>';
+        }).join('');
+      }
+
+      /* ═══════════════════════════════════════════════
+         TRANSACTIONS TABLE
+      ═══════════════════════════════════════════════ */
+      var txFilter = 'all', txSearch = '';
+      function buildTxTable(filter, search) {
+        var el = document.getElementById('tx-table');
+        if (!el) return;
+        var txs = STATE.transactions || [];
+        if (filter && filter !== 'all') txs = txs.filter(function (t) { return t.type === filter; });
+        if (search) txs = txs.filter(function (t) { return JSON.stringify(t).toLowerCase().includes(search.toLowerCase()); });
+        if (!txs.length) { el.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted)">No transactions found.</div>'; return; }
+        var icons = { deposit: '↓', withdraw: '↑', trade: '⇄', investment: '★', mining: '⛏' };
+        var cols = { deposit: 'var(--green)', withdraw: 'var(--red)', trade: 'var(--teal)', investment: '#7c3aed', mining: '#ea580c' };
+        el.innerHTML = txs.map(function (t) {
+          var sc = t.status === 'completed' || t.status === 'active' ? 'sec-enabled' : t.status === 'pending' ? '' : t.status === 'failed' ? 'sec-disabled' : '';
+          var sbg = t.status === 'pending' ? 'background:#fef3c7;color:#92400e' : '';
+          return '<div class="tx-row">'
+            + '<div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;border-radius:50%;background:' + (cols[t.type] || 'var(--muted)') + ';opacity:.12;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:' + (cols[t.type] || 'var(--muted)') + '">' + (icons[t.type] || '•') + '</div><div style="font-family:var(--font);font-size:13px;font-weight:700;text-transform:capitalize">' + t.type + '</div></div>'
+            + '<div style="font-size:13px">' + t.asset + '</div>'
+            + '<div style="font-family:var(--font);font-size:13px;font-weight:700">' + t.amount + '</div>'
+            + '<div style="font-size:12px;color:var(--muted)">' + t.date + '</div>'
+            + '<div style="font-family:monospace;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px" title="' + t.hash + '">' + t.hash + '</div>'
+            + '<div><span class="sec-badge ' + sc + '" style="' + sbg + ';text-transform:capitalize">' + t.status + '</span></div>'
+            + '</div>';
+        }).join('');
+      }
+      function filterTx(el, f) {
+        document.querySelectorAll('#view-transactions .ftab').forEach(function (t) { t.classList.remove('active'); });
+        el.classList.add('active');
+        txFilter = f;
+        buildTxTable(f, txSearch);
+      }
+      function searchTx(v) { txSearch = v; buildTxTable(txFilter, v); }
+
+      /* ═══════════════════════════════════════════════
+         SETTINGS — SAVE PROFILE
+      ═══════════════════════════════════════════════ */
+      function saveProfile() {
+        var fn = document.getElementById('set-fname').value.trim();
+        var ln = document.getElementById('set-lname').value.trim();
+        var fullName = (fn + ' ' + ln).trim() || STATE.user.name;
+        var initials = ((fn[0] || '') + (ln[0] || '')).toUpperCase() || 'CN';
+        STATE.user.name = fullName;
+        STATE.user.initials = initials;
+        saveState();
+        // Update Supabase profiles
+        sb.update('profiles', { full_name: fullName, initials: initials }, 'id=eq.' + sb._uid()).catch(() => { });
+        refreshAllUI();
+        showToast('Profile updated successfully', 'success');
+      }
+
+      /* ═══════════════════════════════════════════════
+         SECURITY
+      ═══════════════════════════════════════════════ */
+      async function changePassword() {
+        var errEl = document.getElementById('pw-error');
+        errEl.style.display = 'none';
+        var np = document.getElementById('new-pw').value;
+        var cp = document.getElementById('conf-pw').value;
+        if (!np || np.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
+        if (np !== cp) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
+        try {
+          const tok = sb._tok();
+          const r = await fetch(SUPA_URL + '/auth/v1/user', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + tok }, body: JSON.stringify({ password: np }) });
+          const d = await r.json();
+          if (d.error) { errEl.textContent = d.error.message || 'Failed to update password.'; errEl.style.display = 'block'; }
+          else { closeModal('change-pw-modal'); showToast('Password updated successfully', 'success'); }
+        } catch (e) { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; }
+      }
+      function revokeOtherSessions() {
+        showToast('All other sessions have been revoked', 'success');
+      }
+
+      /* ═══════════════════════════════════════════════
+         INVESTMENT / MINING EARNINGS TICKERS
+      ═══════════════════════════════════════════════ */
+      function startEarningsTicker(inv) {
+        var tick = inv.amount * inv.dailyRate / 2880;
+        var tid = setInterval(function () {
+          var i = STATE.investments.find(function (x) { return x.id === inv.id; });
+          if (!i || i.status !== 'active') { clearInterval(tid); return; }
+          if (Date.now() >= i.endTs) { i.status = 'completed'; saveState(); clearInterval(tid); return; }
+          i.earned = (i.earned || 0) + tick; STATE.balance += tick;
+          saveState();
+          document.getElementById('bal-display').textContent = '$' + STATE.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          document.getElementById('ov-balance').textContent = '$' + STATE.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }, 30000);
+      }
+      function startMiningTicker(contract) {
+        var tick = contract.price * contract.dailyRoi / 2880;
+        var tid = setInterval(function () {
+          var m = STATE.miningContracts.find(function (x) { return x.id === contract.id; });
+          if (!m || m.status !== 'active') { clearInterval(tid); return; }
+          if (Date.now() >= m.endTs) { m.status = 'completed'; saveState(); clearInterval(tid); return; }
+          m.earned = (m.earned || 0) + tick; STATE.balance += tick;
+          saveState();
+          document.getElementById('bal-display').textContent = '$' + STATE.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }, 30000);
+      }
+
+      /* ═══════════════════════════════════════════════
+         QR CODE (canvas draw)
+      ═══════════════════════════════════════════════ */
+      function drawQR(id, addr, size) {
+        var c = document.getElementById(id);
+        if (!c) return;
+        var ctx = c.getContext('2d');
+        c.width = size; c.height = size;
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, size, size);
+        var s = Math.floor(size / 21);
+        var hash = 0; for (var i = 0; i < addr.length; i++)hash = (hash * 31 + addr.charCodeAt(i)) & 0xffffffff;
+        for (var r = 0; r < 21; r++)for (var cc = 0; cc < 21; cc++) {
+          var v = (hash ^ (r * 73856093) ^ (cc * 19349663)) % 7;
+          if (v < 3 || (r < 7 && cc < 7) || (r < 7 && cc > 13) || (r > 13 && cc < 7)) { ctx.fillStyle = '#000'; ctx.fillRect(cc * s, r * s, s, s); }
+        }
+      }
+
+      /* ═══════════════════════════════════════════════
+         NAV / UI HELPERS
+      ═══════════════════════════════════════════════ */
+      var TITLES = { overview: 'Dashboard Overview', markets: 'Live Markets', trade: 'Trade', portfolio: 'Portfolio', deposit: 'Deposit Funds', withdraw: 'Withdraw Funds', transactions: 'Transaction History', settings: 'Account Settings', security: 'Security' };
+      function navigate(view, el) {
+        document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+        document.querySelectorAll('.nav-item').forEach(function (n) { n.classList.remove('active'); });
+        var vEl = document.getElementById('view-' + view);
+        if (vEl) vEl.classList.add('active');
+        if (el) el.classList.add('active');
+        else {
+          document.querySelectorAll('.nav-item').forEach(function (n) {
+            if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + view + "'")) n.classList.add('active');
+          });
+        }
+        document.getElementById('page-title').textContent = TITLES[view] || view;
+        closeSidebar();
+        if (view === 'trade') { setTimeout(function () { drawTradeChart(currentTradeSym); }, 50); }
+        if (view === 'portfolio') { buildPortfolio(); }
+        if (view === 'transactions') { buildTxTable(txFilter, txSearch); }
+      }
+      function switchSettingsPanel(id, el) {
+        document.querySelectorAll('.s-nav-item').forEach(function (n) { n.classList.remove('active'); });
+        el.classList.add('active');
+        ['sp-profile', 'sp-notifications', 'sp-preferences'].forEach(function (p) {
+          var pEl = document.getElementById(p);
+          if (pEl) pEl.style.display = p === 'sp-' + id ? 'block' : 'none';
+        });
+      }
+      function openModal(id) { var el = document.getElementById(id); if (el) { el.style.display = 'flex'; el.classList.add('active'); } }
+      function closeModal(id) { var el = document.getElementById(id); if (el) { el.style.display = 'none'; el.classList.remove('active'); } }
+      function showToast(msg, type) {
+        var t = document.getElementById('toast');
+        var ic = document.getElementById('toast-icon');
+        var m = document.getElementById('toast-msg');
+        t.className = 'toast ' + (type || 'success');
+        m.textContent = msg;
+        if (type === 'info') ic.style.background = 'rgba(13,184,158,.15)';
+        else if (type === 'error') ic.style.background = 'rgba(239,68,68,.15)';
+        else ic.style.background = 'rgba(22,163,74,.15)';
+        t.classList.add('show');
+        setTimeout(function () { t.classList.remove('show'); }, 3500);
+      }
+      function openSidebar() { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebar-overlay').style.display = 'block'; }
+      function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').style.display = 'none'; }
+      window.addEventListener('resize', function () { if (window.innerWidth > 900) closeSidebar(); });
+      document.querySelectorAll('.modal-overlay').forEach(function (o) { o.addEventListener('click', function (e) { if (e.target === o) closeModal(o.id); }); });
+
+      /* ═══════════════════════════════════════════════
+         LOGOUT
+      ═══════════════════════════════════════════════ */
+      async function logout() {
+        try {
+          var tok = sb._tok();
+          if (tok) await fetch(SUPA_URL + '/auth/v1/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + tok, 'apikey': SUPA_KEY } });
+        } catch (e) { }
+        try { localStorage.removeItem('sb_session'); } catch (e) { }
+        try { localStorage.removeItem('at_state'); } catch (e) { }
+        try { Object.keys(localStorage).forEach(function (k) { if (k.startsWith('sb-') || k.startsWith('supabase')) localStorage.removeItem(k); }); } catch (e) { }
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+      }
+
+      /* ═══════════════════════════════════════════════
+         INIT
+      ═══════════════════════════════════════════════ */
+      (function init() {
+        // Draw QR placeholders immediately
+        drawQR('dep-qr-canvas', 'bc1q705yyxfpnkrr3nzu556nnnl4egv9kkr7xma4wc', 120);
+        // Load state from localStorage first (instant)
+        refreshAllUI();
+        // Then load fresh from Supabase (authoritative)
+        loadProfile();
+        // Draw chart
+        setTimeout(function () { drawTradeChart('BTC'); }, 100);
+      })();
+    </script>
+  </body>
+
+</html>

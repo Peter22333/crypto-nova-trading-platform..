@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Nova — Cloud Mining</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    :root {
+      --blue: #1a6bff;
+      --blue-d: #1254d4;
+      --blue-l: #e8f0ff;
+      --blue-s: rgba(26, 107, 255, .09);
+      --bg: #f2f4f7;
+      --white: #fff;
+      --text: #0d1421;
+      --muted: #6b7a99;
+      --dim: #9ba8c0;
+      --border: #e2e6ef;
+      --green: #16a34a;
+      --green-l: rgba(22, 163, 74, .1);
+      --font: 'Sora', sans-serif;
+      --body: 'DM Sans', sans-serif;
+      --r: 12px;
+      --rl: 16px;
+    }
+
+    body {
+      font-family: var(--body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      overflow-x: hidden
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--blue);
+      border-radius: 3px
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none
+    }
+
+    ul {
+      list-style: none
+    }
+
+    button {
+      cursor: pointer;
+      font-family: inherit
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 40px
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background: rgba(255, 255, 255, .96);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      backdrop-filter: blur(14px);
+      transition: box-shadow .3s
+    }
+
+    .navbar.sc {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .08)
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      height: 62px;
+      padding: 0 40px;
+      position: relative
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-family: var(--font);
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      flex-shrink: 0
+    }
+
+    .logo-icon {
+      width: 30px;
+      height: 30px;
+      background: var(--blue);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%)
+    }
+
+    .nav-links a {
+      padding: 6px 15px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      border-radius: 8px;
+      transition: color .2s, background .2s;
+      font-family: var(--font)
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+      background: var(--bg)
+    }
+
+    .nav-links a.active {
+      color: var(--text);
+      font-weight: 700
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+      flex-shrink: 0
+    }
+
+    .btn-ghost-nav {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 14px;
+      font-family: var(--font);
+      transition: color .2s
+    }
+
+    .btn-ghost-nav:hover {
+      color: var(--text)
+    }
+
+    .btn-nav-solid {
+      background: var(--blue);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 9px 22px;
+      border-radius: var(--r);
+      border: none;
+      box-shadow: 0 3px 12px rgba(26, 107, 255, .3);
+      transition: all .22s
+    }
+
+    .btn-nav-solid:hover {
+      background: var(--blue-d);
+      transform: translateY(-1px)
+    }
+
+    /* ── HAMBURGER ── */
+    .hbg {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 38px;
+      height: 38px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 7px;
+      transition: border-color .2s;
+      flex-shrink: 0
+    }
+
+    .hbg span {
+      display: block;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform .3s, opacity .25s
+    }
+
+    .hbg.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg)
+    }
+
+    .hbg.open span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0)
+    }
+
+    .hbg.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg)
+    }
+
+    /* ── MOBILE MENU ── */
+    .mm {
+      display: none;
+      position: fixed;
+      top: 62px;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, .98);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px 24px;
+      z-index: 190;
+      flex-direction: column;
+      gap: 3px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, .1);
+      animation: mmIn .25s ease
+    }
+
+    .mm.open {
+      display: flex
+    }
+
+    @keyframes mmIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .mm a {
+      display: block;
+      padding: 11px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--muted);
+      border-radius: 10px;
+      font-family: var(--font);
+      transition: background .2s, color .2s
+    }
+
+    .mm a:hover {
+      background: var(--bg);
+      color: var(--text)
+    }
+
+    .mm a.active {
+      color: var(--blue)
+    }
+
+    .mm-div {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 0
+    }
+
+    .mm-cta {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--blue);
+      border-radius: 10px;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font);
+      box-shadow: 0 4px 14px rgba(26, 107, 255, .3);
+      margin-top: 4px
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--bg);
+      padding: 72px 0 56px;
+      text-align: center;
+      position: relative;
+      overflow: hidden
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(26, 107, 255, .06), transparent 70%);
+      pointer-events: none
+    }
+
+    .hero-in {
+      position: relative;
+      z-index: 2;
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 0 20px
+    }
+
+    .eyebrow {
+      display: inline-block;
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 50px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .06)
+    }
+
+    .hero h1 {
+      font-family: var(--font);
+      font-size: clamp(30px, 5.5vw, 60px);
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -.04em;
+      line-height: 1.05;
+      margin-bottom: 18px
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 32px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: var(--r);
+      border: none;
+      box-shadow: 0 4px 18px rgba(26, 107, 255, .35);
+      transition: all .22s;
+      cursor: pointer
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-d);
+      transform: translateY(-2px)
+    }
+
+    /* ── HERO IMAGE ── */
+    .hero-img-wrap {
+      max-width: 900px;
+      margin: 48px auto 0;
+      padding: 0 40px
+    }
+
+    .hero-img {
+      width: 100%;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .22);
+      position: relative;
+      aspect-ratio: 16/6
+    }
+
+    .server-room {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #060d1a 0%, #0a1628 40%, #0d1e35 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    /* Server rack visual */
+    .server-room::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(90deg, transparent, transparent 48px, rgba(10, 184, 160, .04) 48px, rgba(10, 184, 160, .04) 49px), repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(10, 184, 160, .03) 28px, rgba(10, 184, 160, .03) 29px)
+    }
+
+    .sr-glow-l {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, transparent, #00e5ff, #ff00c8, transparent);
+      opacity: .7
+    }
+
+    .sr-glow-r {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, transparent, #ff00c8, #00e5ff, transparent);
+      opacity: .7
+    }
+
+    .sr-center-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, .08) 0%, transparent 70%);
+      border: 1px solid rgba(255, 255, 255, .12)
+    }
+
+    .sr-racks {
+      display: flex;
+      gap: 6px;
+      align-items: flex-end;
+      height: 80%;
+      padding: 0 20px;
+      z-index: 2;
+      position: relative
+    }
+
+    .rack {
+      flex: 1;
+      background: linear-gradient(180deg, rgba(10, 30, 60, .9), rgba(5, 15, 35, .95));
+      border: 1px solid rgba(10, 184, 160, .18);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 6px 4px;
+      min-height: 60%
+    }
+
+    .rack-led {
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(10, 184, 160, .6)
+    }
+
+    .rack-led.on {
+      background: #0ab8a0;
+      box-shadow: 0 0 6px #0ab8a0
+    }
+
+    .rack-led.warn {
+      background: #f59e0b;
+      box-shadow: 0 0 6px #f59e0b
+    }
+
+    .rack-led.off {
+      background: rgba(255, 255, 255, .1)
+    }
+
+    /* Neon floor line */
+    .sr-floor {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #00e5ff 30%, #ff00c8 70%, transparent);
+      opacity: .5
+    }
+
+    /* Floating badge */
+    .sr-badge {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: rgba(10, 20, 40, .85);
+      border: 1px solid rgba(10, 184, 160, .3);
+      border-radius: 10px;
+      padding: 10px 16px;
+      backdrop-filter: blur(10px)
+    }
+
+    .sr-badge-val {
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 800;
+      color: #0ab8a0
+    }
+
+    .sr-badge-lbl {
+      font-size: 10px;
+      color: rgba(255, 255, 255, .5);
+      margin-top: 2px;
+      letter-spacing: .06em;
+      text-transform: uppercase
+    }
+
+    /* ── SECTIONS COMMON ── */
+    .section {
+      padding: 88px 0
+    }
+
+    .section-alt {
+      background: #fff
+    }
+
+    .sec-hd {
+      text-align: center;
+      margin-bottom: 48px
+    }
+
+    .sec-title {
+      font-family: var(--font);
+      font-size: clamp(22px, 3.5vw, 34px);
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -.03em;
+      margin-bottom: 10px
+    }
+
+    .sec-sub {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 440px;
+      margin: 0 auto;
+      line-height: 1.7
+    }
+
+    /* ── CALCULATOR ── */
+    .calc-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, .07);
+      padding: 36px;
+      max-width: 820px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: stretch
+    }
+
+    .calc-inputs {}
+
+    .calc-field {
+      margin-bottom: 22px
+    }
+
+    .calc-field:last-child {
+      margin-bottom: 0
+    }
+
+    .calc-field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      margin-bottom: 8px;
+      font-family: var(--font)
+    }
+
+    .calc-select,
+    .calc-input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-family: var(--font);
+      font-weight: 600;
+      color: var(--text);
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      appearance: none;
+      -webkit-appearance: none
+    }
+
+    .calc-select:focus,
+    .calc-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26, 107, 255, .1)
+    }
+
+    .select-wrap {
+      position: relative
+    }
+
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 12px;
+      pointer-events: none
+    }
+
+    .input-prefix {
+      position: relative;
+      display: flex;
+      align-items: center
+    }
+
+    .input-prefix span {
+      position: absolute;
+      left: 14px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted)
+    }
+
+    .input-prefix .calc-input {
+      padding-left: 28px
+    }
+
+    /* Result side — blue card */
+    .calc-result {
+      background: var(--blue);
+      border-radius: 14px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 0
+    }
+
+    .cr-row {
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, .15)
+    }
+
+    .cr-row:last-of-type {
+      border-bottom: none;
+      padding-bottom: 0
+    }
+
+    .cr-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .65);
+      margin-bottom: 6px;
+      font-family: var(--font)
+    }
+
+    .cr-amount {
+      font-family: var(--font);
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1
+    }
+
+    .cr-btc {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .6);
+      font-family: var(--font);
+      margin-top: 4px
+    }
+
+    /* ── CONTRACTS ── */
+    .contracts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 12px
+    }
+
+    .contract-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--rl);
+      padding: 28px 24px;
+      transition: all .3s;
+      position: relative
+    }
+
+    .contract-card:hover {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .1);
+      transform: translateY(-4px)
+    }
+
+    .contract-card.featured {
+      border: 2px solid var(--blue);
+      box-shadow: 0 8px 36px rgba(26, 107, 255, .15);
+      transform: translateY(-6px)
+    }
+
+    .contract-card.featured:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 16px 48px rgba(26, 107, 255, .22)
+    }
+
+    .contract-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--blue);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 50px;
+      letter-spacing: .08em;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(26, 107, 255, .35)
+    }
+
+    .cc-name {
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 14px
+    }
+
+    .cc-price {
+      font-family: var(--font);
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -.02em;
+      margin-bottom: 22px;
+      line-height: 1
+    }
+
+    .cc-specs {
+      margin-bottom: 22px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .cc-spec {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      font-size: 13px
+    }
+
+    .cc-spec-key {
+      color: var(--muted)
+    }
+
+    .cc-spec-val {
+      font-weight: 600;
+      color: var(--text);
+      font-family: var(--font)
+    }
+
+    .cc-spec-val.green {
+      color: var(--green)
+    }
+
+    .cc-btn {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      border-radius: var(--r);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      transition: all .22s;
+      border: none
+    }
+
+    .cc-btn-outline {
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--text)
+    }
+
+    .cc-btn-outline:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: var(--blue-l)
+    }
+
+    .cc-btn-solid {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(26, 107, 255, .35)
+    }
+
+    .cc-btn-solid:hover {
+      background: var(--blue-d);
+      transform: translateY(-2px)
+    }
+
+    /* ── EARNINGS TABLE ── */
+    .earnings-section {
+      background: var(--bg);
+      padding: 88px 0
+    }
+
+    .table-wrap {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+      max-height: 380px;
+      overflow-y: auto
+    }
+
+    .table-wrap::-webkit-scrollbar {
+      width: 4px
+    }
+
+    .table-wrap::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px
+    }
+
+    .t-head {
+      display: grid;
+      grid-template-columns: 1.4fr 1.6fr 1.4fr 1.6fr 1fr;
+      padding: 12px 22px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 2
+    }
+
+    .t-hd {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--dim)
+    }
+
+    .t-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1.6fr 1.4fr 1.6fr 1fr;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      transition: background .18s;
+      animation: rowIn .4s ease both
+    }
+
+    .t-row:last-child {
+      border-bottom: none
+    }
+
+    .t-row:hover {
+      background: #f8f9fc
+    }
+
+    @keyframes rowIn {
+      from {
+        opacity: 0;
+        transform: translateX(-8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    .t-time {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .t-type {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .t-amount {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--green)
+    }
+
+    .t-hash {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--dim)
+    }
+
+    .t-badge {
+      display: inline-block;
+      background: rgba(22, 163, 74, .1);
+      color: var(--green);
+      border: 1px solid rgba(22, 163, 74, .2);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-family: var(--font)
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: #fff;
+      border-top: 1px solid var(--border);
+      padding: 56px 0 28px
+    }
+
+    .fg {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 40px
+    }
+
+    .fb p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 12px;
+      line-height: 1.75;
+      max-width: 240px
+    }
+
+    .fc h4 {
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 15px
+    }
+
+    .fc li {
+      margin-bottom: 10px
+    }
+
+    .fc a {
+      font-size: 13px;
+      color: var(--muted);
+      transition: color .2s
+    }
+
+    .fc a:hover {
+      color: var(--blue)
+    }
+
+    .fbot {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--dim)
+    }
+
+    /* ── REVEAL ── */
+    .rev {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .6s ease, transform .6s ease
+    }
+
+    .rev.in {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    .d1 {
+      transition-delay: .1s
+    }
+
+    .d2 {
+      transition-delay: .2s
+    }
+
+    .d3 {
+      transition-delay: .3s
+    }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:900px) {
+      .contracts-grid {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+        margin-left: auto;
+        margin-right: auto
+      }
+
+      .contract-card.featured {
+        transform: none
+      }
+
+      .contract-card.featured:hover {
+        transform: translateY(-4px)
+      }
+
+      .fg {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .calc-card {
+        grid-template-columns: 1fr;
+        max-width: 480px
+      }
+
+      .t-head,
+      .t-row {
+        grid-template-columns: 1.2fr 1.4fr 1.2fr 1fr !important
+      }
+
+      .t-hd:nth-child(4),
+      .t-hash {
+        display: none
+      }
+    }
+
+    @media(max-width:768px) {
+      .nav-links {
+        display: none !important
+      }
+
+      .btn-ghost-nav,
+      .btn-nav-solid {
+        display: none !important
+      }
+
+      .hbg {
+        display: flex !important
+      }
+
+      .wrap {
+        padding: 0 20px
+      }
+
+      .nav-inner {
+        padding: 0 20px
+      }
+
+      .hero {
+        padding: 56px 0 44px
+      }
+
+      .hero-img-wrap {
+        padding: 0 20px;
+        margin-top: 32px
+      }
+
+      .section,
+      .earnings-section {
+        padding: 60px 0
+      }
+
+      .calc-card {
+        padding: 22px;
+        gap: 20px
+      }
+
+      .contracts-grid {
+        max-width: 100%
+      }
+
+      .fg {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px
+      }
+
+      .fbot {
+        flex-direction: column;
+        gap: 6px;
+        text-align: center
+      }
+
+      .t-head,
+      .t-row {
+        grid-template-columns: 1.4fr 1.4fr 1fr !important
+      }
+
+      .t-hd:nth-child(3),
+      .t-hd:nth-child(4),
+      .t-amount-col,
+      .t-hash {
+        display: none
+      }
+    }
+
+    @media(max-width:480px) {
+      .fg {
+        grid-template-columns: 1fr
+      }
+
+      .hero h1 {
+        font-size: clamp(26px, 9vw, 36px)
+      }
+
+      .t-head,
+      .t-row {
+        grid-template-columns: 1fr 1fr !important
+      }
+
+      .t-hd:nth-child(3),
+      .t-hd:nth-child(5) {
+        display: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner"><a href="index.html" class="nav-logo">
+        <div class="logo-icon" style="background:#16a34a;border-radius:9px"><svg width="16" height="16"
+            viewBox="0 0 44 44" fill="none">
+            <path d="M22 3L39 12.5V31.5L22 41L5 31.5V12.5L22 3Z" stroke="white" stroke-width="3.2"
+              stroke-linejoin="round" fill="none" />
+            <path
+              d="M30 16C30 16 25.5 14.5 21 16C16.5 17.5 15 20.5 18.5 22.5C22 24.5 28 23 29.5 25.5C31 28 28 29.5 22 29.5"
+              stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+          </svg></div>Crypto Nova
+      </a>
+      <div class="nav-links"><a href="market.html">Markets</a><a href="services.html" class="active">Services</a><a
+          href="investment.html">Investment Plans</a>
+        <div style="position:relative;display:inline-block"><a href="#" onclick="toggleDD(event,'cmenu')">Company
+            &#9662;</a>
+          <div id="cmenu"
+            style="display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--border);border-radius:12px;padding:8px;min-width:180px;z-index:200;box-shadow:0 16px 48px rgba(0,0,0,.12)">
+            <a href="about.html" class="dd-lnk">About Us</a><a href="security.html" class="dd-lnk">Security</a><a
+              href="career.html" class="dd-lnk">Careers</a><a href="contact.html" class="dd-lnk">Contact</a></div>
+        </div>
+      </div>
+      <div class="nav-right"><button class="btn-ghost-nav" onclick="window.location.href='login.html'">Log
+          In</button><button class="btn-nav-solid" onclick="window.location.href='signup.html'">Open
+          Account</button><button class="hbg" id="hbtn" onclick="toggleMM()"
+          aria-label="Menu"><span></span><span></span><span></span></button></div>
+    </div>
+  </nav>
+  <div class="mm" id="mm"><a href="market.html">Markets</a><a href="services.html">Services</a><a
+      href="investment.html">Investment Plans</a><a href="about.html">About Us</a><a href="security.html">Security</a><a
+      href="career.html">Careers</a><a href="contact.html">Contact</a>
+    <div class="mm-div"></div><button class="mm-cta" onclick="window.location.href='signup.html'">Open Account</button>
+  </div>
+
+  <!-- MOBILE MENU -->
+  <div class="mm" id="mm">
+    <a href="markets.html">Markets</a>
+    <a href="services.html" class="active">Services</a>
+    <a href="investment.html">Plans</a>
+    <a href="#">Company</a>
+    <div class="mm-div"></div>
+    <button class="mm-cta" onclick="window.location.href='userdashboard.html'">Go to Dashboard</button>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-in">
+      <div class="eyebrow">Enterprise-Grade Facilities</div>
+      <h1>Cloud Mining Without the<br>Hardware Hassle</h1>
+      <p class="hero-sub">Earn daily passive income through our enterprise-grade remote mining facilities. No equipment
+        maintenance, no electricity bills — just consistent daily crypto payouts.</p>
+      <button class="btn-primary" onclick="document.getElementById('contracts').scrollIntoView({behavior:'smooth'})">
+        View Mining Plans
+      </button>
+    </div>
+  </section>
+
+  <!-- HERO IMAGE (Server Room) -->
+  <div class="hero-img-wrap">
+    <div class="hero-img">
+      <div class="server-room">
+        <div class="sr-glow-l"></div>
+        <div class="sr-glow-r"></div>
+        <div class="sr-racks" id="sr-racks"></div>
+        <div class="sr-center-glow">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1"
+            stroke-linecap="round" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="6" />
+            <circle cx="12" cy="12" r="2" />
+            <line x1="2" y1="12" x2="6" y2="12" />
+            <line x1="18" y1="12" x2="22" y2="12" />
+            <line x1="12" y1="2" x2="12" y2="6" />
+            <line x1="12" y1="18" x2="12" y2="22" />
+          </svg>
+        </div>
+        <div class="sr-floor"></div>
+        <div class="sr-badge">
+          <div class="sr-badge-val">2.14 EH/s</div>
+          <div class="sr-badge-lbl">Active Hashrate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALCULATOR -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-hd rev">
+        <h2 class="sec-title">Calculate Your Mining Profits</h2>
+        <p class="sec-sub">Estimate your daily, weekly, and monthly earnings based on current network difficulty and
+          chosen plan.</p>
+      </div>
+      <div class="calc-card rev">
+
+        <!-- LEFT: inputs -->
+        <div class="calc-inputs">
+          <div class="calc-field">
+            <label>Select Cryptocurrency</label>
+            <div class="select-wrap">
+              <select class="calc-select" id="coin-select" onchange="updateCalc()">
+                <option value="BTC">Bitcoin (BTC)</option>
+                <option value="ETH">Ethereum (ETH)</option>
+                <option value="SOL">Solana (SOL)</option>
+              </select>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label>Select Mining Hardware / Plan</label>
+            <div class="select-wrap">
+              <select class="calc-select" id="plan-select" onchange="updateCalc()">
+                <option value="0.0085">Bronze Miner — 15 TH/s</option>
+                <option value="0.0085" data-plan="silver" selected>AntMiner S19 Pro (110 TH/s)</option>
+                <option value="0.012">Bitmain ASIC 350 TH/s</option>
+              </select>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label>Investment Amount (USD)</label>
+            <div class="input-prefix">
+              <span>$</span>
+              <input type="number" class="calc-input" id="invest-amount" value="5000" min="100" step="100"
+                oninput="updateCalc()">
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: results (blue) -->
+        <div class="calc-result">
+          <div class="cr-row">
+            <div class="cr-lbl">Estimated Daily Earnings</div>
+            <div class="cr-amount" id="daily-earn">$42.50</div>
+            <div class="cr-btc" id="daily-btc">(0.00066 BTC)</div>
+          </div>
+          <div class="cr-row">
+            <div class="cr-lbl">Estimated Weekly Earnings</div>
+            <div class="cr-amount" id="weekly-earn">$297.50</div>
+            <div class="cr-btc" id="weekly-btc">(0.0046 BTC)</div>
+          </div>
+          <div class="cr-row">
+            <div class="cr-lbl">Estimated Monthly Earnings</div>
+            <div class="cr-amount" id="monthly-earn">$1,275.00</div>
+            <div class="cr-btc" id="monthly-btc">(0.0198 BTC)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTRACTS -->
+  <section class="section section-alt" id="contracts">
+    <div class="wrap">
+      <div class="sec-hd rev">
+        <h2 class="sec-title">Cloud Mining Contracts</h2>
+        <p class="sec-sub">Secure your hashrate today and start receiving automated daily payouts directly to your
+          wallet.</p>
+      </div>
+      <div class="contracts-grid">
+
+        <!-- BRONZE -->
+        <div class="contract-card rev d1">
+          <div class="cc-name">Bronze Miner</div>
+          <div class="cc-price">$500</div>
+          <div class="cc-specs">
+            <div class="cc-spec"><span class="cc-spec-key">Hashrate</span><span class="cc-spec-val">15 TH/s</span></div>
+            <div class="cc-spec"><span class="cc-spec-key">Daily ROI</span><span class="cc-spec-val green">~1.2%</span>
+            </div>
+            <div class="cc-spec"><span class="cc-spec-key">Duration</span><span class="cc-spec-val">180 Days</span>
+            </div>
+            <div class="cc-spec"><span class="cc-spec-key">Daily Payouts</span><span
+                class="cc-spec-val green">Included</span></div>
+          </div>
+          <button class="cc-btn cc-btn-outline" onclick="openMineModal('bronze')">Start Bronze Mining</button>
+        </div>
+
+        <!-- SILVER (FEATURED) -->
+        <div class="contract-card featured rev d2">
+          <div class="contract-badge">BEST VALUE</div>
+          <div class="cc-name">Silver Miner</div>
+          <div class="cc-price">$5,000</div>
+          <div class="cc-specs">
+            <div class="cc-spec"><span class="cc-spec-key">Hashrate</span><span class="cc-spec-val">150 TH/s</span>
+            </div>
+            <div class="cc-spec"><span class="cc-spec-key">Daily ROI</span><span class="cc-spec-val green">~1.5%</span>
+            </div>
+            <div class="cc-spec"><span class="cc-spec-key">Duration</span><span class="cc-spec-val">365 Days</span>
+            </div>
+            <div class="cc-spec"><span class="cc-spec-key">Maintenance</span><span class="cc-spec-val green">Zero
+                Fees</span></div>
+          </div>
+          <button class="cc-btn cc-btn-solid" onclick="openMineModal('silver')">Start Silver Mining</button>
+        </div>
+
+        <!-- GOLD -->
+        <div class="contract-card rev d3">
+          <div class="cc-name">Gold Miner</div>
+          <div class="cc-price">$25,000</div>
+          <div class="cc-specs">
+            <div class="cc-spec"><span class="cc-spec-key">Hashrate</span><span class="cc-spec-val">350 TH/s</span>
+            </div>
+            <div class="cc-spec"><span class="cc-spec-key">Daily ROI</span><span class="cc-spec-val green">~2.6%</span>
+            </div>
+            <div class="cc-spec"><span class="cc-spec-key">Duration</span><span class="cc-spec-val">365 Days</span>
+            </div>
+            <div class="cc-spec"><span class="cc-spec-key">Team Allocation</span><span
+                class="cc-spec-val green">Dedicated</span></div>
+          </div>
+          <button class="cc-btn cc-btn-outline" onclick="openMineModal('gold')">Start Gold Mining</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- EARNINGS HISTORY -->
+  <section class="earnings-section">
+    <div class="wrap">
+      <div class="sec-hd rev">
+        <h2 class="sec-title">Transparent Earnings History</h2>
+        <p class="sec-sub">View real-time recent payouts to our global cloud mining participants.</p>
+      </div>
+      <div class="table-wrap rev">
+        <div class="t-head">
+          <div class="t-hd">Date &amp; Time</div>
+          <div class="t-hd">Contract Type</div>
+          <div class="t-hd">Payout Amount</div>
+          <div class="t-hd">Hash ID</div>
+          <div class="t-hd">Status</div>
+        </div>
+        <div id="earnings-body"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="fg">
+        <div class="fb"><a href="index.html" class="nav-logo">
+            <div class="logo-icon" style="background:#16a34a;border-radius:9px"><svg width="16" height="16"
+                viewBox="0 0 44 44" fill="none">
+                <path d="M22 3L39 12.5V31.5L22 41L5 31.5V12.5L22 3Z" stroke="white" stroke-width="3.2"
+                  stroke-linejoin="round" fill="none" />
+                <path
+                  d="M30 16C30 16 25.5 14.5 21 16C16.5 17.5 15 20.5 18.5 22.5C22 24.5 28 23 29.5 25.5C31 28 28 29.5 22 29.5"
+                  stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+              </svg></div>Crypto Nova
+          </a>
+          <p>Crypto Nova is a globally regulated financial technology company providing premium access to Forex, Crypto,
+            and Managed Investment Portfolios.</p>
+        </div>
+        <div class="fc">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="forex.html">Forex Trading</a></li>
+            <li><a href="crpto.html">Cryptocurrency</a></li>
+            <li><a href="cloud.html">Cloud Mining</a></li>
+            <li><a href="investment.html">Investment Plans</a></li>
+            <li><a href="managedport.html">Managed Portfolios</a></li>
+          </ul>
+        </div>
+        <div class="fc">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="marketnews.html">Market News</a></li>
+            <li><a href="tradingGuide.html">Trading Guides</a></li>
+            <li><a href="EconomicCa.html">Economic Calendar</a></li>
+            <li><a href="Affilate.html">Affiliate Program</a></li>
+            <li><a href="systems.html">System Status</a></li>
+          </ul>
+        </div>
+        <div class="fc">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="Terms.html">Terms of Service</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="Risk.html">Risk Disclosure</a></li>
+            <li><a href="Aml.html">AML Policy</a></li>
+            <li><a href="security.html">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="fbot"><span>&copy; 2025 Crypto Nova Trading Limited. All rights reserved.</span><span>Risk Warning:
+          Trading involves significant risk of loss.</span></div>
+    </div>
+  </footer>
+
+
+  <!-- MINING MODALS (static) -->
+  <div id="mine-overlay"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);backdrop-filter:blur(5px);z-index:2000;align-items:center;justify-content:center;padding:16px">
+    <div
+      style="background:#fff;border-radius:20px;padding:32px;max-width:480px;width:100%;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.18)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
+        <div style="font-size:19px;font-weight:800;color:#0d1421" id="mine-title">Mining Contract</div>
+        <button onclick="document.getElementById('mine-overlay').style.display='none'"
+          style="background:none;border:none;font-size:22px;color:#9ba8c0;cursor:pointer;line-height:1">&#10005;</button>
+      </div>
+      <div id="mine-body" style="display:none"></div>
+      <button id="mine-confirm-btn"
+        style="width:100%;padding:14px;background:#1a6bff;color:#fff;font-size:15px;font-weight:700;border:none;border-radius:12px;cursor:pointer;margin-top:20px">Confirm
+        &amp; Activate Contract</button>
+    </div>
+  </div>
+
+  <div id="mine-success-overlay"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);backdrop-filter:blur(5px);z-index:2001;align-items:center;justify-content:center;padding:16px">
+    <div
+      style="background:#fff;border-radius:20px;padding:40px 32px;max-width:420px;width:100%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.18)">
+      <div
+        style="width:64px;height:64px;border-radius:50%;background:rgba(22,163,74,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:30px">
+        &#9989;</div>
+      <div id="mine-s-title" style="font-size:22px;font-weight:800;color:#0d1421;margin-bottom:10px">Contract Activated!
+      </div>
+      <div id="mine-s-summary" style="font-size:14px;color:#6b7a99;margin-bottom:28px">Your mining contract has been
+        activated. Earnings will begin within 24 hours and credited to your account daily.</div>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button onclick="window.location.href='dashboard.html'"
+          style="font-size:14px;font-weight:700;padding:12px 22px;border-radius:10px;background:#1a6bff;color:#fff;border:none;cursor:pointer">Go
+          to Dashboard</button>
+        <button onclick="document.getElementById('mine-success-overlay').style.display='none'"
+          style="font-size:14px;font-weight:600;padding:12px 20px;border-radius:10px;border:1.5px solid #e2e8f0;background:#fff;color:#0d1421;cursor:pointer">Stay
+          Here</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPA_URL = 'https://xqkubletgifqdutybznz.supabase.co';
+    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxa3VibGV0Z2lmcWR1dHliem56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NjA5OTMsImV4cCI6MjA4ODQzNjk5M30.TkweXseKRQuA7FoT7erYdUJMuGtYWYSZ7b7l9WCPq-8';
+    const sb = {
+      _h() { return { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (sb._tok() || SUPA_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' }; },
+      _tok() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.access_token; } catch { return null; } },
+      _uid() { try { return JSON.parse(localStorage.getItem('sb_session') || 'null')?.user?.id; } catch { return null; } },
+      isLoggedIn() { return !!sb._tok(); },
+      requireAuth() { if (!sb.isLoggedIn()) { window.location.href = 'login.html'; return false; } return true; },
+      async get(table, filters = '') { const r = await fetch(SUPA_URL + '/rest/v1/' + table + (filters ? '?' + filters : ''), { headers: sb._h() }); return r.json(); },
+      async insert(table, body) { const r = await fetch(SUPA_URL + '/rest/v1/' + table, { method: 'POST', headers: sb._h(), body: JSON.stringify(body) }); return r.json(); },
+      async update(table, body, filters) { const r = await fetch(SUPA_URL + '/rest/v1/' + table + '?' + filters, { method: 'PATCH', headers: sb._h(), body: JSON.stringify(body) }); return r.json(); },
+      async getProfile() { const uid = sb._uid(); if (!uid) return null; const r = await sb.get('profiles', 'id=eq.' + uid + '&select=*'); return Array.isArray(r) ? r[0] : null; },
+      async updateBalance(newBal) { const uid = sb._uid(); if (!uid) return; return sb.update('profiles', { balance: newBal }, 'id=eq.' + uid); }
+    };
+    if (!sb.isLoggedIn()) { window.location.href = 'login.html'; }
+
+    async function saveMiningToDB(c) {
+      const uid = sb._uid(); if (!uid) return;
+      await sb.insert('mining_contracts', {
+        id: c.id, user_id: uid, type: c.type, name: c.name,
+        price: c.price, hashrate: c.hashrate, daily_roi: c.dailyRoi, duration: c.duration,
+        earned: 0, status: 'active', start_date: c.startDate, end_date: c.endDate,
+        start_ts: c.startTs, end_ts: c.endTs
+      });
+      await sb.insert('transactions', { user_id: uid, type: 'mining', asset: c.name, amount: '-$' + c.price.toFixed(2), status: 'active', ref: c.id });
+      await sb.updateBalance(STATE.balance);
+    }
+
+    /* ── NAV SCROLL ── */
+    window.addEventListener('scroll', function () {
+      document.getElementById('navbar').classList.toggle('sc', scrollY > 40);
+    });
+
+    /* ── HAMBURGER ── */
+    function toggleMM() {
+      var m = document.getElementById('mm'), b = document.getElementById('hbtn');
+      var o = m.classList.toggle('open');
+      b.classList.toggle('open', o);
+      document.body.style.overflow = o ? 'hidden' : '';
+    }
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 768) {
+        var m = document.getElementById('mm'), b = document.getElementById('hbtn');
+        if (m) { m.classList.remove('open'); document.body.style.overflow = ''; }
+        if (b) b.classList.remove('open');
+      }
+    });
+
+    /* ── CALCULATOR ── */
+    function updateMiningCalc() {
+      var coinSel = document.getElementById('coin-select');
+      var hwSel = document.getElementById('plan-select');
+      var amtIn = document.getElementById('invest-amount');
+      if (!coinSel || !hwSel || !amtIn) return;
+      var prices = { BTC: 64230, ETH: 3450, SOL: 145 };
+      var coin = coinSel.value;
+      var hwRate = parseFloat(hwSel.value) || 0.012;
+      var amt = parseFloat(amtIn.value) || 0;
+      var daily = amt * hwRate;
+      var weekly = daily * 7;
+      var monthly = daily * 30;
+      var price = prices[coin] || 64230;
+      var fmt = function (n) { return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+      var fmtc = function (n) { return n < 0.01 ? n.toFixed(6) : n.toFixed(4); };
+      var dailyEl = document.getElementById('daily-earn');
+      var weeklyEl = document.getElementById('weekly-earn');
+      var monthlyEl = document.getElementById('monthly-earn');
+      if (dailyEl) dailyEl.innerHTML = '$' + fmt(daily) + '<br><small style="font-weight:500;opacity:.7">' + fmtc(daily / price) + ' ' + coin + '</small>';
+      if (weeklyEl) weeklyEl.innerHTML = '$' + fmt(weekly) + '<br><small style="font-weight:500;opacity:.7">' + fmtc(weekly / price) + ' ' + coin + '</small>';
+      if (monthlyEl) monthlyEl.innerHTML = '$' + fmt(monthly) + '<br><small style="font-weight:500;opacity:.7">' + fmtc(monthly / price) + ' ' + coin + '</small>';
+    }
+    document.addEventListener('DOMContentLoaded', updateMiningCalc);
+
+    /* ── EARNINGS TABLE (demo live feed) ── */
+    var payouts = [
+      { time: 'Today, 11:42:08 AM', type: 'Silver Miner (ETH)', amount: '+0.1821 ETH', hash: '7f3a...b29c', status: 'Completed' },
+      { time: 'Today, 11:38:55 AM', type: 'Gold Miner (BTC)', amount: '+0.0734 BTC', hash: '9c1e...d47f', status: 'Completed' },
+      { time: 'Today, 11:35:10 AM', type: 'Bronze Miner (SOL)', amount: '+3.2410 SOL', hash: '2a8b...e61d', status: 'Completed' },
+      { time: 'Today, 11:30:44 AM', type: 'Gold Miner (BTC)', amount: '+0.0812 BTC', hash: '4d5f...a93b', status: 'Completed' },
+      { time: 'Today, 11:25:22 AM', type: 'Silver Miner (ETH)', amount: '+0.1654 ETH', hash: '8e2c...f74a', status: 'Completed' },
+      { time: 'Today, 11:20:09 AM', type: 'Bronze Miner (SOL)', amount: '+3.1080 SOL', hash: '5b7d...c28e', status: 'Completed' },
+      { time: 'Today, 11:15:37 AM', type: 'Gold Miner (BTC)', amount: '+0.0791 BTC', hash: '3f9a...b15c', status: 'Completed' },
+      { time: 'Today, 11:10:53 AM', type: 'Silver Miner (ETH)', amount: '+0.1742 ETH', hash: '6c4e...d82f', status: 'Completed' },
+      { time: 'Today, 11:05:18 AM', type: 'Bronze Miner (SOL)', amount: '+3.3120 SOL', hash: '1a6b...e47d', status: 'Completed' },
+      { time: 'Today, 11:00:04 AM', type: 'Gold Miner (BTC)', amount: '+0.0823 BTC', hash: '7d3c...f59a', status: 'Completed' },
+    ];
+    function buildTable() {
+      var tb = document.getElementById('earnings-body');
+      if (!tb) return;
+      tb.innerHTML = payouts.map(function (r) {
+        return '<div class="t-row">' +
+          '<div class="t-time">' + r.time + '</div>' +
+          '<div class="t-type">' + r.type + '</div>' +
+          '<div class="t-amount t-amount-col">' + r.amount + '</div>' +
+          '<div class="t-hash">' + r.hash + '</div>' +
+          '<div><span class="t-badge">' + r.status + '</span></div>' +
+          '</div>';
+      }).join('');
+    }
+    buildTable();
+    var newPayouts = [
+      { type: 'Gold Miner (BTC)', baseAmount: 0.07, sym: 'BTC' },
+      { type: 'Silver Miner (ETH)', baseAmount: 0.18, sym: 'ETH' },
+      { type: 'Bronze Miner (SOL)', baseAmount: 3.2, sym: 'SOL' },
+      { type: 'Gold Miner (BTC)', baseAmount: 0.08, sym: 'BTC' },
+    ];
+    var npIdx = 0;
+    setInterval(function () {
+      var now = new Date();
+      var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+      var timeStr = 'Today, ' + ((h % 12) || 12) + ':' + (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s) + ' ' + (h >= 12 ? 'PM' : 'AM');
+      var np = newPayouts[npIdx % newPayouts.length]; npIdx++;
+      var amt = (np.baseAmount + (Math.random() - .5) * np.baseAmount * .2).toFixed(4);
+      var hash = Math.random().toString(36).substr(2, 4) + '...' + Math.random().toString(36).substr(2, 4);
+      payouts.unshift({ time: timeStr, type: np.type, amount: '+' + amt + ' ' + np.sym, hash: hash, status: 'Completed' });
+      if (payouts.length > 20) payouts.pop();
+      buildTable();
+    }, 4000);
+
+    /* ── REVEAL ── */
+    (function () {
+      var o = new IntersectionObserver(function (e) { e.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); o.unobserve(x.target); } }); }, { threshold: .1 });
+      document.querySelectorAll('.rev').forEach(function (el) { o.observe(el); });
+    })();
+
+    /* ═══════════════════════════════════════
+       SHARED STATE
+    ═══════════════════════════════════════ */
+    var STATE = {};
+    try { STATE = JSON.parse(localStorage.getItem('at_state')) || {}; } catch (e) { }
+    if (!STATE.balance) STATE.balance = 0;
+    if (!STATE.transactions) STATE.transactions = [];
+    if (!STATE.miningContracts) STATE.miningContracts = [];
+    if (!STATE.investments) STATE.investments = [];
+
+    function saveState() {
+      try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { }
+      sb.updateBalance(STATE.balance).catch(function () { });
+    }
+
+    /* Load fresh balance + contracts from Supabase on page load */
+    async function loadFromDB() {
+      try {
+        var profile = await sb.getProfile();
+        if (!profile) return;
+        STATE.balance = parseFloat(profile.balance) || 0;
+        var uid = sb._uid();
+        var mines = await sb.get('mining_contracts', 'user_id=eq.' + uid + '&order=created_at.desc');
+        if (Array.isArray(mines) && mines.length) {
+          STATE.miningContracts = mines.map(function (m) {
+            return {
+              id: m.id, type: m.type, name: m.name,
+              price: parseFloat(m.price), hashrate: m.hashrate,
+              dailyRoi: parseFloat(m.daily_roi), duration: m.duration,
+              startDate: m.start_date, endDate: m.end_date,
+              startTs: m.start_ts, endTs: m.end_ts,
+              earned: parseFloat(m.earned) || 0, status: m.status
+            };
+          });
+        }
+        try { localStorage.setItem('at_state', JSON.stringify(STATE)); } catch (e) { }
+        /* Resume active contracts */
+        STATE.miningContracts.forEach(function (c) {
+          if (c.status === 'active' && Date.now() < c.endTs) startMiningTicker(c);
+        });
+      } catch (e) { console.warn('DB load error:', e); }
+    }
+    loadFromDB();
+
+    /* ── CONTRACT DEFINITIONS ── */
+    var CONTRACTS = {
+      bronze: { name: 'Bronze Miner', price: 500, hashrate: '15 TH/s', dailyRoi: 0.012, duration: 180 },
+      silver: { name: 'Silver Miner', price: 5000, hashrate: '150 TH/s', dailyRoi: 0.015, duration: 365 },
+      gold: { name: 'Gold Miner', price: 25000, hashrate: '350 TH/s', dailyRoi: 0.026, duration: 365 }
+    };
+
+    /* ── INJECT MODALS ── */
+
+
+    function openMineModal(key) {
+      var c = CONTRACTS[key];
+      if (!c) return;
+      var f = function (n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+      var daily = c.price * c.dailyRoi;
+      var total = daily * c.duration;
+
+      document.getElementById('mine-title').textContent = c.name + ' Contract';
+      document.getElementById('mine-body').innerHTML =
+        /* balance */
+        '<div style="background:#f0f4f8;border-radius:10px;padding:13px 16px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center">' +
+        '<div style="font-size:11px;color:#6b7a99;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-family:Sora,sans-serif">Available Balance</div>' +
+        '<div style="font-family:Sora,sans-serif;font-size:16px;font-weight:800;color:#0d1421">' + f(STATE.balance) + '</div>' +
+        '</div>' +
+        /* dark spec card */
+        '<div style="background:linear-gradient(135deg,#060d1a,#0a1628);border-radius:12px;padding:18px;color:#fff;margin-bottom:16px">' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">' +
+        '<div><div style="font-size:10px;opacity:.55;margin-bottom:4px;text-transform:uppercase;letter-spacing:.09em">Hashrate</div><div style="font-family:Sora,sans-serif;font-size:16px;font-weight:800">' + c.hashrate + '</div></div>' +
+        '<div><div style="font-size:10px;opacity:.55;margin-bottom:4px;text-transform:uppercase;letter-spacing:.09em">Duration</div><div style="font-family:Sora,sans-serif;font-size:16px;font-weight:800">' + c.duration + ' Days</div></div>' +
+        '<div><div style="font-size:10px;opacity:.55;margin-bottom:4px;text-transform:uppercase;letter-spacing:.09em">Daily ROI</div><div style="font-family:Sora,sans-serif;font-size:16px;font-weight:800;color:#0db89e">+' + (c.dailyRoi * 100).toFixed(1) + '%</div></div>' +
+        '<div><div style="font-size:10px;opacity:.55;margin-bottom:4px;text-transform:uppercase;letter-spacing:.09em">Daily Earning</div><div style="font-family:Sora,sans-serif;font-size:16px;font-weight:800;color:#0db89e">' + f(daily) + '</div></div>' +
+        '</div>' +
+        '<div style="border-top:1px solid rgba(255,255,255,.1);padding-top:12px;display:flex;justify-content:space-between;align-items:center">' +
+        '<div style="font-size:12px;opacity:.6">Total Return (' + c.duration + 'd)</div>' +
+        '<div style="font-family:Sora,sans-serif;font-size:20px;font-weight:900">' + f(total) + '</div>' +
+        '</div>' +
+        '</div>' +
+        /* error */
+        '<div id="mine-err" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;margin-bottom:14px"></div>' +
+        /* info */
+        '<div style="background:rgba(13,184,158,.07);border:1px solid rgba(13,184,158,.2);border-radius:8px;padding:11px 14px;font-size:13px;color:#0a7a6a;margin-bottom:18px;line-height:1.6">' +
+        '⛏️ <strong>' + f(c.price) + '</strong> will be deducted from your balance. Earnings auto-credited every day.' +
+        '</div>' +
+        /* button */
+        '<button id="mine-btn" onclick="executeMining(\'' + key + '\')" style="width:100%;padding:14px;background:#0db89e;color:#fff;font-family:Sora,sans-serif;font-size:15px;font-weight:800;border-radius:10px;border:none;box-shadow:0 4px 14px rgba(13,184,158,.35);cursor:pointer">' +
+        'Start Mining — ' + f(c.price) +
+        '</button>';
+
+      document.getElementById('mine-overlay').style.display = 'flex';
+    }
+
+    function executeMining(key) {
+      var c = CONTRACTS[key];
+      var errEl = document.getElementById('mine-err');
+      var btn = document.getElementById('mine-btn');
+      errEl.style.display = 'none';
+
+      if (STATE.balance <= 0) {
+        errEl.style.display = 'block';
+        errEl.textContent = 'You have no balance. Please deposit funds first.';
+        return;
+      }
+      if (STATE.balance < c.price) {
+        errEl.style.display = 'block';
+        errEl.textContent = 'Insufficient balance ($' + STATE.balance.toFixed(2) + '). You need $' + c.price.toLocaleString() + ' to start this contract.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Starting…';
+
+      setTimeout(function () {
+        STATE.balance -= c.price;
+        var now = new Date(), end = new Date(now.getTime() + c.duration * 86400000);
+        var contract = {
+          id: 'MNE' + Date.now(),
+          type: key,
+          name: c.name,
+          price: c.price,
+          hashrate: c.hashrate,
+          dailyRoi: c.dailyRoi,
+          duration: c.duration,
+          startDate: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          endDate: end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          startTs: now.getTime(),
+          endTs: end.getTime(),
+          earned: 0,
+          status: 'active'
+        };
+        STATE.miningContracts.push(contract);
+        saveMiningToDB(contract).catch(() => { });
+        STATE.transactions.unshift({ id: contract.id, type: 'mining', asset: c.name, amount: '-$' + c.price.toFixed(2), date: contract.startDate, hash: contract.id, status: 'active' });
+        saveState();
+        document.getElementById('mine-overlay').style.display = 'none';
+
+        var f = function (n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+        document.getElementById('mine-s-title').textContent = c.name + ' Active! ⛏️';
+        document.getElementById('mine-s-summary').innerHTML =
+          mRow('Contract', c.name) + mRow('Cost Deducted', f(c.price)) +
+          mRow('Hashrate', c.hashrate) + mRow('Daily Earning', '+' + f(c.price * c.dailyRoi) + ' / day', '#16a34a') +
+          mRow('Duration', c.duration + ' days') + mRow('Contract Ends', contract.endDate);
+        document.getElementById('mine-success-overlay').style.display = 'flex';
+        startMiningTicker(contract);
+      }, 800);
+    }
+
+    function mRow(k, v, color) {
+      return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #e2e8f0;font-size:13px">' +
+        '<span style="color:#6b7a99">' + k + '</span>' +
+        '<span style="font-weight:700;font-family:Sora,sans-serif' + (color ? ';color:' + color : '') + '">' + v + '</span>' +
+        '</div>';
+    }
+
+    function startMiningTicker(contract) {
+      var tickAmt = (contract.price * contract.dailyRoi) / 2880;
+      var tid = setInterval(function () {
+        try { STATE = JSON.parse(localStorage.getItem('at_state') || '{}'); } catch (e) { }
+        if (!STATE.miningContracts) { clearInterval(tid); return; }
+        var idx = STATE.miningContracts.findIndex(function (c) { return c.id === contract.id; });
+        if (idx === -1 || STATE.miningContracts[idx].status !== 'active') { clearInterval(tid); return; }
+        if (Date.now() >= STATE.miningContracts[idx].endTs) {
+          STATE.miningContracts[idx].status = 'completed';
+          saveState(); // syncs balance to Supabase
+          sb.update('mining_contracts', { status: 'completed' }, 'id=eq.' + contract.id).catch(function () { });
+          clearInterval(tid); return;
+        }
+        STATE.balance += tickAmt;
+        STATE.miningContracts[idx].earned = (STATE.miningContracts[idx].earned || 0) + tickAmt;
+        saveState(); // syncs balance to Supabase every 30s tick
+        if (Math.random() < 0.1) {
+          sb.update('mining_contracts', { earned: STATE.miningContracts[idx].earned }, 'id=eq.' + contract.id).catch(function () { });
+        }
+      }, 30000);
+    }
+
+    /* Resume handled by loadFromDB() above */
+  </script>
+</body>
+
+</html>
